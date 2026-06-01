@@ -233,7 +233,7 @@ function App() {
             <div className="card" style={styles.placeholderCard}>
               <h2 style={styles.placeholderTitle}>{activeTab} Redesign</h2>
               <p style={styles.placeholderDesc}>
-                현재 데모 버전에서는 핵심 화면인 <strong>'IRP 계약등록'</strong> 및 <strong>'계약 찾기'</strong> 모달 검색 연동을 완벽히 구현해 두었습니다.
+                현재 데모 버전에서는 핵심 화면인 <strong>'IRP 계약등록'</strong> 및 <strong>'계약 찾기'</strong> 모달 검색 화면만  구현해 두었습니다.
               </p>
               <button
                 onClick={() => handleSidebarTabSelect('IRP 계약등록')}
