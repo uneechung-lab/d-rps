@@ -22,6 +22,21 @@ function App() {
   
   // Toast notifications engine
   const [notifications, setNotifications] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if device is mobile/tablet based on User Agent or screen width
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const isMobileUA = /android|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(userAgent);
+      const isSmallScreen = window.innerWidth < 1024; // standard tablet & mobile boundary
+      setIsMobile(isMobileUA || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Apply default light mode (or toggle dark class)
   useEffect(() => {
@@ -32,6 +47,73 @@ function App() {
       bodyClass.remove('dark-theme');
     }
   }, [isDark]);
+
+  // Render Mobile Blocking screen if accessed on mobile
+  if (isMobile) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: '#ffb81c', // Solid Daum Yellow
+        color: '#071126',
+        padding: '24px',
+        textAlign: 'center',
+        fontFamily: "'Pretendard', sans-serif",
+      }}>
+        <div style={{
+          width: '72px',
+          height: '72px',
+          borderRadius: '50%',
+          backgroundColor: '#071126',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '28px',
+          boxShadow: '0 8px 24px rgba(7, 17, 38, 0.15)',
+        }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ffb81c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+        </div>
+        <h1 style={{
+          fontSize: '1.6rem',
+          fontWeight: '800',
+          margin: '0 0 16px 0',
+          letterSpacing: '-1px',
+          lineHeight: '1.3'
+        }}>
+          PC 환경 접속 안내
+        </h1>
+        <p style={{
+          fontSize: '1.02rem',
+          fontWeight: '600',
+          color: '#3d2500',
+          maxWidth: '450px',
+          margin: '0 0 12px 0',
+          lineHeight: '1.6',
+          letterSpacing: '-0.5px'
+        }}>
+          다음퇴직연금시스템(D-RPS)은 안전한 자산 관리 및 보안 유지를 위해 <strong style={{ color: '#071126', fontWeight: '800' }}>PC 환경에서만 접속이 가능합니다.</strong>
+        </p>
+        <p style={{
+          fontSize: '0.88rem',
+          fontWeight: '600',
+          color: '#5c3a00',
+          margin: 0,
+          opacity: 0.8
+        }}>
+          태블릿 또는 모바일 기기를 지원하지 않사오니,<br />
+          PC 브라우저를 통해 다시 접속해 주시기 바랍니다.
+        </p>
+      </div>
+    );
+  }
 
   // Alert/Notification system
   const addNotification = (message, type = 'success') => {
