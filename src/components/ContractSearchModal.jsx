@@ -193,14 +193,14 @@ const ContractSearchModal = ({ isOpen, onClose, onSelectContract, addNotificatio
                   contractsList.map((contract, index) => (
                     <tr key={contract.id} onClick={() => onSelectContract(contract)}>
                       <td style={{ textAlign: 'center', fontWeight: '600', color: 'var(--text-secondary)' }}>{index + 1}</td>
-                      <td style={{ fontFamily: 'monospace', fontWeight: '600', color: 'var(--primary)' }}>{contract.no}</td>
+                      <td style={{ fontWeight: '700', color: 'var(--primary)', letterSpacing: '-0.3px' }}>{contract.no}</td>
                       <td>
                         <span style={{ ...styles.badge, ...getTypeBadgeStyle(contract.type) }}>
                           {contract.type}
                         </span>
                       </td>
                       <td style={{ fontWeight: '500' }}>{contract.name}</td>
-                      <td style={{ fontFamily: 'monospace' }}>{contract.bizNo}</td>
+                      <td style={{ fontWeight: '500', color: 'var(--text-secondary)' }}>{contract.bizNo}</td>
                       <td style={{ textAlign: 'center' }}>
                         <span style={{
                           ...styles.statusBadge,
