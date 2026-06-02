@@ -3,25 +3,25 @@ import { ShieldAlertIcon } from '../assets/icons';
 
 // High-fidelity custom SVG icons for the feature list
 const TargetIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
   </svg>
 );
 
 const LayersIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polygon points="12 2 2 7 12 12 22 7 12 2" /><polygon points="2 17 12 22 22 17" /><polygon points="2 12 12 17 22 12" />
   </svg>
 );
 
 const LightningIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
   </svg>
 );
 
 const ShieldCheckIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#071126" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 11 2 2 4-4" />
   </svg>
 );
@@ -61,144 +61,156 @@ const Login = ({ onLoginSuccess }) => {
       </div>
 
       <div style={styles.centeredWrapper}>
-        {/* Left Side: Logo -> Slogan -> High-fidelity Vertical Slogan List */}
-        <div style={styles.leftColumn}>
-          <div style={styles.heroTextContainer}>
-            {/* Custom D-RPS Logo Brand sitting right above the Headline */}
-            <div style={styles.logoSectionLeft}>
-              <div style={styles.logoIcon}>D</div>
-              <h1 style={styles.logoText}>D-RPS</h1>
+        {/* Top Row: Left Column (Headline) and Right Column (Login) */}
+        <div style={styles.topRow}>
+          {/* Left Side: Logo -> Slogan */}
+          <div style={styles.leftColumn}>
+            <div style={styles.heroTextContainer}>
+              {/* Custom D-RPS Logo Brand sitting right above the Headline */}
+              <div style={styles.logoSectionLeft}>
+                <div style={styles.logoIcon}>D</div>
+                <h1 style={styles.logoText}>D-RPS</h1>
+              </div>
+
+              <h2 style={styles.heroTitle}>
+                내가 기다리던<br />
+                퇴직연금을 만나다.
+              </h2>
+              <p style={styles.heroSubtitle}>
+                더 빠르고, 더 안전해진 <strong style={{ color: '#071126', fontWeight: '800' }}>다음퇴직연금시스템</strong>
+              </p>
             </div>
+          </div>
 
-            <h2 style={styles.heroTitle}>
-              내가 기다리던<br />
-              퇴직연금을 만나다.
-            </h2>
-            <p style={styles.heroSubtitle}>
-              더 빠르고, 더 안전해진 <strong style={{ color: '#071126', fontWeight: '800' }}>다음퇴직연금시스템</strong>
-            </p>
-
-            {/* Premium Vertical Features Slogan list matching user reference image exactly */}
-            <div style={styles.featuresVerticalList}>
-              {[
-                {
-                  icon: <TargetIcon />,
-                  title: '개인 맞춤형 자산관리',
-                  desc: '가입자 성향과 라이프사이클에 최적화된 연금 포트폴리오를 제공합니다.'
-                },
-                {
-                  icon: <LayersIcon />,
-                  title: '유연성과 확장성을 갖춘 아키텍처',
-                  desc: '제도 변화와 대용량 거래량 증가에 신속하고 안정적으로 대응합니다.'
-                },
-                {
-                  icon: <LightningIcon />,
-                  title: '퇴직연금 영업 경쟁력 강화',
-                  desc: '체계적인 영업 지원 분석 툴과 최적의 비즈니스 모델을 가동합니다.'
-                },
-                {
-                  icon: <ShieldCheckIcon />,
-                  title: '차별화된 연금 자산 관리',
-                  desc: '체계적인 리스크 제어 시스템과 안정적인 수익성 포인트를 극대화합니다.'
-                }
-              ].map((item, idx) => (
-                <div key={idx} style={styles.featureItemRow}>
-                  {/* Left Rounded Square Icon Card */}
-                  <div style={styles.iconCard}>
-                    {item.icon}
-                  </div>
-                  {/* Right Header and Subtitle Content */}
-                  <div style={styles.featureContent}>
-                    <h4 style={styles.featureTitleText}>{item.title}</h4>
-                    <p style={styles.featureDescText}>{item.desc}</p>
-                  </div>
+          {/* Right Side: Flat, borderless Login Card */}
+          <div style={styles.rightColumn}>
+            <div style={styles.loginCard}>
+              {error && (
+                <div style={styles.errorAlert}>
+                  <ShieldAlertIcon size={18} className="btn-danger" style={{ background: 'none' }} />
+                  <span>{error}</span>
                 </div>
-              ))}
+              )}
+
+              <form onSubmit={handleSubmit} style={styles.form}>
+                <div style={styles.rememberAbove}>
+                  <label style={styles.remember}>
+                    <input type="checkbox" defaultChecked style={styles.checkbox} />
+                    <span>로그인 상태 유지</span>
+                  </label>
+                </div>
+
+                <div style={styles.loginRow}>
+                  <div style={styles.inputContainer}>
+                    <div style={styles.inputWrapper}>
+                      <span style={styles.inputPrefix}>I D</span>
+                      <div style={styles.inputDivider} />
+                      <input
+                        id="username"
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        style={styles.innerInput}
+                        disabled={isLoading}
+                      />
+                    </div>
+                    <div style={styles.inputWrapper}>
+                      <span style={styles.inputPrefix}>PW</span>
+                      <div style={styles.inputDivider} />
+                      <input
+                        id="password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        style={styles.innerInput}
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={styles.submitBtn}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <span className="spinner" style={styles.spinner}></span>
+                    ) : (
+                      '로그인'
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => alert('회원가입은 다음정보시스템즈 보안 규정에 따라 사내 인사시스템 승인 후 계정이 연동됩니다. 시스템 관리자에게 문의해 주세요.')}
+                    className="btn btn-secondary"
+                    style={styles.signupBtn}
+                    disabled={isLoading}
+                  >
+                    회원가입
+                  </button>
+                </div>
+
+                <div style={styles.optionsBelow}>
+                  <a href="#forgot" style={styles.forgotLink}>비밀번호를 잊으셨나요?</a>
+                </div>
+              </form>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Flat, borderless Login Card - Shifted up to match the left column top baseline */}
-        <div style={styles.rightColumn}>
-          <div style={styles.loginCard}>
-            {error && (
-              <div style={styles.errorAlert}>
-                <ShieldAlertIcon size={18} className="btn-danger" style={{ background: 'none' }} />
-                <span>{error}</span>
+        {/* Bottom Section: 4 Features displayed horizontally in 4 columns */}
+        <div style={styles.featuresHorizontalGrid}>
+          {[
+            {
+              icon: <TargetIcon />,
+              title: '개인 맞춤형 자산관리',
+              desc: '가입자 성향과 라이프사이클에 최적화된 연금 포트폴리오를 제공합니다.'
+            },
+            {
+              icon: <LayersIcon />,
+              title: '유연성과 확장성을 갖춘 아키텍처',
+              desc: '제도 변화와 대용량 거래량 증가에 신속하고 안정적으로 대응합니다.'
+            },
+            {
+              icon: <LightningIcon />,
+              title: '퇴직연금 영업 경쟁력 강화',
+              desc: '체계적인 영업 지원 분석 툴과 최적의 비즈니스 모델을 가동합니다.'
+            },
+            {
+              icon: <ShieldCheckIcon />,
+              title: '차별화된 연금 자산 관리',
+              desc: '체계적인 리스크 제어 시스템과 안정적인 수익성 포인트를 극대화합니다.'
+            }
+          ].map((item, idx, arr) => (
+            <React.Fragment key={idx}>
+              <div style={styles.featureGridItem}>
+                {/* Top Rounded Square Icon Card */}
+                <div style={styles.iconCard}>
+                  {item.icon}
+                </div>
+                {/* Bottom Header and Subtitle Content */}
+                <div style={styles.featureContentGrid}>
+                  <h4 style={styles.featureTitleTextGrid}>{item.title}</h4>
+                  <p style={styles.featureDescTextGrid}>{item.desc}</p>
+                </div>
+                {/* Individual Character Image aligned below */}
+                <div style={styles.characterContainer}>
+                  <img
+                    src={`/character-${idx + 1}.png`}
+                    alt={item.title}
+                    style={{
+                      ...styles.characterImageReal,
+                      transform: (idx === 0 || idx === 2) ? 'translateY(8px)' : 'none'
+                    }}
+                  />
+                </div>
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} style={styles.form}>
-              <div className="form-group">
-                <label style={styles.labelOverride} className="form-label" htmlFor="username">ID</label>
-                <input
-                  id="username"
-                  type="text"
-                  className="form-input"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="사용자 ID 입력"
-                  style={styles.input}
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="form-group" style={{ marginTop: '8px' }}>
-                <label style={styles.labelOverride} className="form-label" htmlFor="password">비밀번호</label>
-                <input
-                  id="password"
-                  type="password"
-                  className="form-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  style={styles.input}
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div style={styles.options}>
-                <label style={styles.remember}>
-                  <input type="checkbox" defaultChecked style={styles.checkbox} />
-                  <span>로그인 상태 유지</span>
-                </label>
-                <a href="#forgot" style={styles.forgotLink}>비밀번호 초기화</a>
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary"
-                style={styles.submitBtn}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <span className="spinner" style={styles.spinner}></span>
-                ) : (
-                  '로그인'
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => alert('회원가입은 다음정보시스템즈 보안 규정에 따라 사내 인사시스템 승인 후 계정이 연동됩니다. 시스템 관리자에게 문의해 주세요.')}
-                className="btn btn-secondary"
-                style={styles.signupBtn}
-                disabled={isLoading}
-              >
-                회원가입
-              </button>
-            </form>
-          </div>
+              {idx < arr.length - 1 && <div style={styles.gridDivider} />}
+            </React.Fragment>
+          ))}
         </div>
-      </div>
-
-      {/* Bottom Section: Centered original illustration enlarged to 2x (1000px width) at the screen bottom */}
-      <div style={styles.bottomImageContainer}>
-        <img
-          src="/login-bg.png"
-          alt="Pension Illustration"
-          style={styles.heroImage}
-        />
       </div>
     </div>
   );
@@ -207,7 +219,7 @@ const Login = ({ onLoginSuccess }) => {
 const styles = {
   loginContainer: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'center', // Revert to center to align the entire wrapper vertically in the middle of the screen!
     justifyContent: 'center',
     width: '100vw',
     height: '100vh',
@@ -229,16 +241,26 @@ const styles = {
   },
   centeredWrapper: {
     display: 'flex',
-    alignItems: 'flex-start', // Align left column and right login form at the exact same top baseline
+    flexDirection: 'column',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: '80px',
     width: '100%',
-    maxWidth: '1000px',
-    padding: '40px',
+    maxWidth: '1200px',
+    padding: '40px 24px',
     zIndex: 2,
+    transform: 'translateY(150px)', // Shift down by exactly 150px total relative to screen center!
+  },
+  topRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    width: '100%',
+    gap: '80px',
+    marginBottom: '20px',
   },
   leftColumn: {
     flex: '0 0 auto',
+    width: '500px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
@@ -278,7 +300,7 @@ const styles = {
   },
   heroTitle: {
     fontFamily: 'var(--font-sans)',
-    fontSize: '2.1rem',
+    fontSize: '2.8rem',
     fontWeight: '800',
     color: '#071126',
     lineHeight: '1.42',
@@ -287,70 +309,79 @@ const styles = {
   },
   heroSubtitle: {
     fontFamily: 'var(--font-sans)',
-    fontSize: '1.1rem',
+    fontSize: '1.38rem',
     fontWeight: '600',
     color: '#3d2500', // Deep gold warm accent
     margin: '0 0 68px 0', // Increased spacing below the sub-slogan!
     letterSpacing: '-0.3px',
   },
-  featuresVerticalList: {
+  featuresHorizontalGrid: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'stretch',
+    width: '100%',
+    marginTop: '40px',
+    gap: '24px',
+  },
+  featureGridItem: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '18px',
-    width: '100%',
-    maxWidth: '500px',
-    marginTop: '10px',
+    alignItems: 'flex-start',
+    gap: '12px',
+    flex: 1,
   },
-  featureItemRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    width: '100%',
+  gridDivider: {
+    width: '1px',
+    backgroundColor: 'rgba(7, 17, 38, 0.15)', // Very clean, elegant, soft gray vertical separator
+    alignSelf: 'stretch',
+    margin: '0 8px',
+    flexShrink: 0,
   },
   iconCard: {
-    width: '46px',
-    height: '46px',
-    borderRadius: '12px',
+    width: '54px',
+    height: '54px',
+    borderRadius: '14px',
     backgroundColor: 'rgba(7, 17, 38, 0.08)', // Beautiful translucent square matching yellow background
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
-  featureContent: {
+  featureContentGrid: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '2px',
+    gap: '6px',
   },
-  featureTitleText: {
+  featureTitleTextGrid: {
     fontFamily: 'var(--font-sans)',
-    fontSize: '0.95rem',
+    fontSize: '1.2rem',
     fontWeight: '800',
-    color: '#071126', // Deep navy
+    color: 'rgba(7, 17, 38, 0.65)',
     margin: 0,
     letterSpacing: '-0.3px',
+    lineHeight: '1.3',
   },
-  featureDescText: {
+  featureDescTextGrid: {
     fontFamily: 'var(--font-sans)',
-    fontSize: '0.8rem',
+    fontSize: '0.95rem',
     fontWeight: '600',
-    color: '#5c3a00', // Deep gold sub-headline style
+    color: 'rgba(92, 58, 0, 0.55)',
     margin: 0,
-    lineHeight: '1.4',
+    lineHeight: '1.45',
     letterSpacing: '-0.2px',
   },
   rightColumn: {
     flex: '0 0 auto',
-    width: '350px', // Shrunk by 50px as requested!
+    width: '530px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    paddingTop: '126px', // Pushed down by another 10px as requested!
+    paddingTop: '76px',
   },
   loginCard: {
     width: '100%',
-    maxWidth: '350px', // Shrunk by 50px as requested!
+    maxWidth: '530px',
     display: 'flex',
     flexDirection: 'column',
     color: '#071126', // Deep corporate navy
@@ -376,6 +407,55 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  loginRow: {
+    display: 'flex',
+    gap: '8px',
+    alignItems: 'stretch',
+    width: '100%',
+  },
+  inputContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    flex: 1,
+  },
+  inputWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    border: '1px solid rgba(7, 17, 38, 0.2)',
+    borderRadius: '4px',
+    padding: '0 16px',
+    height: '48px',
+    gap: '4px',
+  },
+  inputPrefix: {
+    fontSize: '0.98rem',
+    fontWeight: '700',
+    color: '#071126',
+    width: '28px',
+    flexShrink: 0,
+    userSelect: 'none',
+    letterSpacing: '0px',
+  },
+  inputDivider: {
+    width: '1px',
+    height: '18px',
+    backgroundColor: '#cbd5e1',
+    margin: '0 12px',
+    flexShrink: 0,
+  },
+  innerInput: {
+    border: 'none',
+    outline: 'none',
+    backgroundColor: 'transparent',
+    color: '#071126',
+    fontWeight: '600',
+    fontSize: '1.08rem',
+    padding: 0,
+    width: '100%',
+    height: '100%',
+  },
   labelOverride: {
     fontSize: '0.95rem',
     fontWeight: '700',
@@ -394,13 +474,17 @@ const styles = {
     height: '48px',
     boxShadow: '0 2px 4px rgba(7, 17, 38, 0.05)',
   },
-  options: {
+  rememberAbove: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    fontSize: '0.98rem',
-    marginBottom: '24px',
-    marginTop: '8px',
+    justifyContent: 'flex-start',
+    marginBottom: '10px',
+    width: '100%',
+  },
+  optionsBelow: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    marginTop: '10px',
+    width: '100%',
   },
   remember: {
     display: 'flex',
@@ -417,50 +501,57 @@ const styles = {
     height: '16px',
   },
   forgotLink: {
-    color: '#071126',
+    color: '#000000',
+    opacity: 0.6,
     textDecoration: 'underline',
-    fontWeight: '700',
-    fontSize: '0.98rem',
+    fontWeight: '400',
+    fontSize: '0.85rem',
   },
   submitBtn: {
     padding: '12px',
-    fontSize: '1.08rem',
-    height: '52px',
+    fontSize: '0.98rem',
+    height: '104px',
+    width: '95px',
     backgroundColor: '#071126',
     color: '#ffffff',
-    boxShadow: '0 4px 12px rgba(7, 17, 38, 0.2)',
-    border: 'none',
+    border: '1px solid #071126', // 1px solid border to match signupBtn box sizing exactly!
     fontWeight: '700',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s',
   },
   signupBtn: {
     padding: '12px',
-    fontSize: '1.08rem',
-    height: '52px', // matching submitBtn perfectly!
-    backgroundColor: 'rgba(7, 17, 38, 0.06)',
+    fontSize: '0.98rem',
+    height: '104px',
+    width: '95px',
+    backgroundColor: 'rgba(7, 17, 38, 0.08)',
     color: '#071126',
-    border: '1px solid rgba(7, 17, 38, 0.15)',
+    border: '1px solid rgba(7, 17, 38, 0.18)',
     fontWeight: '700',
-    marginTop: '12px', // Breathing room below login
-    cursor: 'pointer',
     borderRadius: '4px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     transition: 'all 0.2s',
   },
-  bottomImageContainer: {
-    position: 'absolute',
-    bottom: '-120px', // Restored back to its original bottom horizon position!
-    left: '50%',
-    transform: 'translateX(-50%)',
+  characterContainer: {
     width: '100%',
-    maxWidth: '1000px', // Double enlarged size (200% scale)!
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'flex-end',
-    pointerEvents: 'none',
-    zIndex: 1,
+    alignItems: 'flex-end', // Align images perfectly at the bottom baseline!
+    marginTop: 'auto', // Push the image block to the absolute bottom of the column!
+    height: '380px', // Bounded box matching max-height
+    transform: 'translateY(120px)', // Shift down by an additional 10px (total 120px)!
   },
-  heroImage: {
-    width: '100%',
+  characterImageReal: {
+    width: '252px',
     height: 'auto',
+    maxHeight: '100%',
     objectFit: 'contain',
   },
   spinner: {
