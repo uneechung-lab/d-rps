@@ -546,7 +546,7 @@ const styles = {
     alignItems: 'flex-end', // Align images perfectly at the bottom baseline!
     marginTop: 'auto', // Push the image block to the absolute bottom of the column!
     height: '380px', // Bounded box matching max-height
-    transform: 'translateY(120px)', // Shift down by an additional 10px (total 120px)!
+    transform: 'translateY(110px)',
   },
   characterImageReal: {
     width: '252px',
