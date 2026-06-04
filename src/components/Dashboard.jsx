@@ -149,10 +149,10 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
       ...styles.container,
       backgroundColor: isDark ? '#090a0f' : '#f4f6fa'
     }}>
-      {/* 1. Three-Column Grid Layout on Top */}
-      <div style={styles.dashboardGrid}>
+      {/* Main Outer Split: Left Column (260px) and Right Content Area (rest of the width) */}
+      <div style={styles.outerLayout}>
         
-        {/* Column 1: Left Widget Column */}
+        {/* Left Side: Account and Quick Links Widgets */}
         <div style={styles.leftColumn}>
           {/* Account Widget */}
           <div style={{ ...styles.card, ...styles.profileCard, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
@@ -216,22 +216,49 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
           </div>
         </div>
 
-        {/* Column 2: Middle Widget Column */}
-        <div style={styles.middleColumn}>
-          {/* Today Banner */}
-          <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
-            <div style={styles.cardHeader}>
-              <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                Today 공지 알림 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
-              </h3>
-            </div>
-            <div style={{ ...styles.todayBanner, marginBottom: 0 }}>
-              <span style={styles.todayBannerBadge}>필독</span>
-              <span style={{ ...styles.todayBannerText, color: isDark ? '#cbd5e1' : '#374151' }}>
-                당월 퇴직연금 수수료 마감 및 재정검증 비율 준수
-              </span>
-            </div>
+        {/* Right Side: KPI Grid on Top, Widgets side-by-side underneath */}
+        <div style={styles.rightLayoutArea}>
+          {/* KPI Panel Grid on Top (1 row of 5 columns) */}
+          <div style={styles.kpiGrid}>
+            {kpis.map((kpi, idx) => (
+              <div
+                key={idx}
+                style={{
+                  ...styles.kpiCard,
+                  background: kpi.bg,
+                  backgroundColor: isDark ? '#12141c' : '#ffffff',
+                  borderColor: isDark ? '#222636' : '#e2e8f0',
+                }}
+                className="dashboard-kpi-card"
+              >
+                <div style={styles.kpiHeader}>
+                  <span style={{ ...styles.kpiTitle, color: isDark ? '#94a3b8' : '#64748b' }}>{kpi.title}</span>
+                  {kpi.icon}
+                </div>
+                <div style={{ ...styles.kpiValue, color: isDark ? '#f8fafc' : '#0f172a' }}>{kpi.value}</div>
+                <div style={{ ...styles.kpiChange, color: isDark ? '#cbd5e1' : '#94a3b8' }}>{kpi.change}</div>
+              </div>
+            ))}
           </div>
+
+          {/* Under-KPI Grid: Middle and Right columns side-by-side */}
+          <div style={styles.innerTwoColumnGrid}>
+            {/* Column 2: Middle Widget Column */}
+            <div style={styles.middleColumn}>
+              {/* Today Banner */}
+              <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
+                <div style={styles.cardHeader}>
+                  <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                    Today 공지 알림 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
+                  </h3>
+                </div>
+                <div style={{ ...styles.todayBanner, marginBottom: 0 }}>
+                  <span style={styles.todayBannerBadge}>필독</span>
+                  <span style={{ ...styles.todayBannerText, color: isDark ? '#cbd5e1' : '#374151' }}>
+                    당월 퇴직연금 수수료 마감 및 재정검증 비율 준수
+                  </span>
+                </div>
+              </div>
 
           {/* Schedule Master Widget */}
           <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
@@ -376,29 +403,6 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
         </div>
 
       </div>
-
-      {/* 2. KPI Panel Grid on Bottom (1 row of 5 columns) */}
-      <div style={{ ...styles.kpiGrid, marginTop: '20px' }}>
-        {kpis.map((kpi, idx) => (
-          <div
-            key={idx}
-            style={{
-              ...styles.kpiCard,
-              background: kpi.bg,
-              backgroundColor: isDark ? '#12141c' : '#ffffff',
-              borderColor: isDark ? '#222636' : '#e2e8f0',
-            }}
-            className="dashboard-kpi-card"
-          >
-            <div style={styles.kpiHeader}>
-              <span style={{ ...styles.kpiTitle, color: isDark ? '#94a3b8' : '#64748b' }}>{kpi.title}</span>
-              {kpi.icon}
-            </div>
-            <div style={{ ...styles.kpiValue, color: isDark ? '#f8fafc' : '#0f172a' }}>{kpi.value}</div>
-            <div style={{ ...styles.kpiChange, color: isDark ? '#cbd5e1' : '#94a3b8' }}>{kpi.change}</div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
@@ -444,16 +448,30 @@ const styles = {
     fontSize: '0.72rem',
     fontWeight: '600',
   },
-  dashboardGrid: {
+  outerLayout: {
+    display: 'flex',
+    gap: '20px',
+    alignItems: 'start',
+    width: '100%',
+  },
+  rightLayoutArea: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  innerTwoColumnGrid: {
     display: 'grid',
-    gridTemplateColumns: '260px 1fr 1fr',
+    gridTemplateColumns: '1fr 1fr',
     gap: '20px',
     alignItems: 'start',
   },
   leftColumn: {
+    width: '260px',
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
+    flexShrink: 0,
   },
   middleColumn: {
     display: 'flex',
