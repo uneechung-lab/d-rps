@@ -77,35 +77,40 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
   const kpis = [
     {
       title: '전체 계약수',
-      value: '1,245 건',
+      num: '1,245',
+      unit: ' 건',
       change: '+12건 금주 대비',
       icon: <BriefcaseIcon size={22} color={isDark ? '#38bdf8' : '#0284c7'} />,
       bg: isDark ? 'linear-gradient(135deg, rgba(56,189,248,0.1) 0%, rgba(56,189,248,0.02) 100%)' : 'linear-gradient(135deg, rgba(2,132,199,0.06) 0%, rgba(2,132,199,0.01) 100%)'
     },
     {
       title: '전체 가입자수',
-      value: '48,203 명',
+      num: '48,203',
+      unit: ' 명',
       change: '+143명 당월 누적',
       icon: <UsersIcon size={22} color={isDark ? '#34d399' : '#059669'} />,
       bg: isDark ? 'linear-gradient(135deg, rgba(52,211,153,0.1) 0%, rgba(52,211,153,0.02) 100%)' : 'linear-gradient(135deg, rgba(5,150,105,0.06) 0%, rgba(5,150,105,0.01) 100%)'
     },
     {
       title: '총 적립금',
-      value: '3조 2,450 억원',
+      num: '3조 2,450',
+      unit: ' 억원',
       change: '+1,240억 전월비',
       icon: <DatabaseIcon size={22} color={isDark ? '#a78bfa' : '#7c3aed'} />,
       bg: isDark ? 'linear-gradient(135deg, rgba(167,139,250,0.1) 0%, rgba(167,139,250,0.02) 100%)' : 'linear-gradient(135deg, rgba(124,58,237,0.06) 0%, rgba(124,58,237,0.01) 100%)'
     },
     {
       title: '당월 입금액',
-      value: '142 억원',
+      num: '142',
+      unit: ' 억원',
       change: '+8.4% 목표 대비',
       icon: <ArrowDownRight size={22} color={isDark ? '#f472b6' : '#db2777'} />,
       bg: isDark ? 'linear-gradient(135deg, rgba(244,114,182,0.1) 0%, rgba(244,114,182,0.02) 100%)' : 'linear-gradient(135deg, rgba(219,39,119,0.06) 0%, rgba(219,39,119,0.01) 100%)'
     },
     {
       title: '당월 지급액',
-      value: '98 억원',
+      num: '98',
+      unit: ' 억원',
       change: '-2.1% 전월 대비',
       icon: <ArrowUpLeft size={22} color={isDark ? '#fbbf24' : '#d97706'} />,
       bg: isDark ? 'linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(251,191,36,0.02) 100%)' : 'linear-gradient(135deg, rgba(217,119,6,0.06) 0%, rgba(217,119,6,0.01) 100%)'
@@ -233,7 +238,10 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
                   <span style={{ ...styles.kpiTitle, color: isDark ? '#94a3b8' : '#64748b' }}>{kpi.title}</span>
                   {kpi.icon}
                 </div>
-                <div style={{ ...styles.kpiValue, color: isDark ? '#f8fafc' : '#0f172a' }}>{kpi.value}</div>
+                <div style={{ ...styles.kpiValue, color: isDark ? '#f8fafc' : '#0f172a', display: 'flex', alignItems: 'baseline' }}>
+                  <span>{kpi.num}</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: '600', marginLeft: '2px', color: isDark ? '#94a3b8' : '#475569', fontFamily: 'var(--font-sans)' }}>{kpi.unit}</span>
+                </div>
                 <div style={{ ...styles.kpiChange, color: isDark ? '#cbd5e1' : '#94a3b8' }}>{kpi.change}</div>
               </div>
             ))}
