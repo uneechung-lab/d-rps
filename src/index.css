@@ -508,3 +508,8 @@ input, select, textarea, button {
 .input-icon-btn:hover {
   color: var(--primary);
 }
+
+.tab-action-btn:hover {
+  background-color: var(--bg-accent);
+  color: var(--primary);
+}

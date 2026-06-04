@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import Depth1Menu from './components/Depth1Menu';
 import IRPContractForm from './components/IRPContractForm';
 import ContractSearchModal from './components/ContractSearchModal';
+import { menuDataMap } from './menuData';
 import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
   const [isDark, setIsDark] = useState(false);
+  const [activeDepth1, setActiveDepth1] = useState('계약');
   const [activeTab, setActiveTab] = useState('IRP 계약등록');
+  const [depth1Collapsed, setDepth1Collapsed] = useState(false);
   
   // Multi-tab system (bottom tabs as seen in old system)
   const [openTabs, setOpenTabs] = useState(['IRP 계약등록']);
@@ -23,6 +27,7 @@ function App() {
   // Toast notifications engine
   const [notifications, setNotifications] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+
 
   // Check if device is mobile/tablet based on User Agent or screen width
   useEffect(() => {
@@ -131,11 +136,23 @@ function App() {
     addNotification(`${userData.name} 님, 환영합니다! 시스템 로그인이 완료되었습니다.`, 'success');
   };
 
+  const findTabPath = (tabName) => {
+    for (const [d1Name, groups] of Object.entries(menuDataMap)) {
+      for (const group of groups) {
+        if (group.items.some(item => item.name === tabName)) {
+          return { depth1: d1Name, parent: group.title };
+        }
+      }
+    }
+    return { depth1: '계약', parent: '계약관리' };
+  };
+
   const handleLogout = () => {
     setUser(null);
     setSelectedContract(null);
     setOpenTabs(['IRP 계약등록']);
     setActiveTab('IRP 계약등록');
+    setActiveDepth1('계약');
   };
 
   const handleThemeToggle = () => {
@@ -149,7 +166,17 @@ function App() {
       setOpenTabs(prev => [...prev, tabName]);
     }
     setActiveTab(tabName);
+    
+    // Automatically switch 1-depth active state to match selected tab
+    const path = findTabPath(tabName);
+    setActiveDepth1(path.depth1);
+    
     addNotification(`'${tabName}' 화면으로 이동했습니다.`, 'success');
+  };
+
+  const handleDepth1Select = (depth1Name) => {
+    setActiveDepth1(depth1Name);
+    addNotification(`'${depth1Name}' 메뉴로 이동했습니다.`, 'success');
   };
 
   const handleCloseTab = (e, tabName) => {
@@ -163,9 +190,57 @@ function App() {
     setOpenTabs(newTabs);
     
     if (activeTab === tabName) {
-      setActiveTab(newTabs[newTabs.length - 1]);
+      const nextTab = newTabs[newTabs.length - 1];
+      setActiveTab(nextTab);
+      const path = findTabPath(nextTab);
+      setActiveDepth1(path.depth1);
     }
     addNotification(`'${tabName}' 작업 탭이 종료되었습니다.`, 'success');
+  };
+
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      addNotification('전체 화면 모드가 활성화되었습니다.', 'success');
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        addNotification('전체 화면 모드가 해제되었습니다.', 'success');
+      }
+    }
+  };
+
+  const handleCascadeLayout = () => {
+    addNotification('작업 화면들을 계단식 배열로 정렬했습니다.', 'success');
+  };
+
+  const handleTileHorizontalLayout = () => {
+    addNotification('작업 화면들을 가로 바둑판식 배열로 정렬했습니다.', 'success');
+  };
+
+  const handleTileVerticalLayout = () => {
+    addNotification('작업 화면들을 세로 바둑판식 배열로 정렬했습니다.', 'success');
+  };
+
+  const handleCloseActiveTab = () => {
+    if (openTabs.length === 1) {
+      addNotification('최소 하나 이상의 작업 탭이 유지되어야 합니다.', 'warning');
+      return;
+    }
+    const newTabs = openTabs.filter(t => t !== activeTab);
+    setOpenTabs(newTabs);
+    const nextTab = newTabs[newTabs.length - 1];
+    setActiveTab(nextTab);
+    const path = findTabPath(nextTab);
+    setActiveDepth1(path.depth1);
+    addNotification(`'${activeTab}' 작업 탭이 종료되었습니다.`, 'success');
+  };
+
+  const handleCloseAllTabs = () => {
+    setOpenTabs(['IRP 계약등록']);
+    setActiveTab('IRP 계약등록');
+    setActiveDepth1('계약');
+    addNotification('모든 작업 탭을 닫고 초기화했습니다.', 'success');
   };
 
   const handleSelectContract = (contract) => {
@@ -202,10 +277,21 @@ function App() {
     );
   }
 
+  const currentPath = findTabPath(activeTab);
+
   return (
     <div className="app-container">
+      {/* 1-Depth Left Menu */}
+      <Depth1Menu activeDepth1={activeDepth1} onDepth1Select={handleDepth1Select} collapsed={depth1Collapsed} />
+
       {/* Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} onTabSelect={handleSidebarTabSelect} />
+      <Sidebar
+        activeTab={activeTab}
+        onTabSelect={handleSidebarTabSelect}
+        activeDepth1={activeDepth1}
+        collapsed={depth1Collapsed}
+        onToggleCollapse={() => setDepth1Collapsed(!depth1Collapsed)}
+      />
 
       {/* Main content body panel */}
       <div className="main-content">
@@ -217,6 +303,7 @@ function App() {
           onLogout={handleLogout}
           addNotification={addNotification}
           activeTab={activeTab}
+          activeDepth1={activeDepth1}
         />
 
         {/* Dynamic content screen wrapper */}
@@ -266,9 +353,55 @@ function App() {
               </div>
             ))}
           </div>
-          <div style={styles.activePath}>
-            <span>현재 메뉴 경로:</span>
-            <strong>계약 &gt; 계약관리 &gt; {activeTab}</strong>
+          <div style={styles.tabActionsWrapper} className="tab-actions-wrapper">
+            {/* File ID Display */}
+            <div style={styles.fileIDContainer}>
+              <span style={{ ...styles.fileIDLabel, color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#475569' }}>File ID</span>
+              <span style={{
+                ...styles.fileIDValue,
+                backgroundColor: isDark ? '#2e3748' : '#e2e8f0',
+                color: isDark ? '#ffffff' : '#0f172a'
+              }}>AGM00005</span>
+            </div>
+
+            <button onClick={handleToggleFullscreen} style={styles.tabActionBtn} className="tab-action-btn" title="전체화면">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+              </svg>
+            </button>
+            <button onClick={handleCascadeLayout} style={styles.tabActionBtn} className="tab-action-btn" title="계단식배열">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="13" height="13" rx="1.5" />
+                <rect x="8" y="8" width="13" height="13" rx="1.5" />
+              </svg>
+            </button>
+            <button onClick={handleTileHorizontalLayout} style={styles.tabActionBtn} className="tab-action-btn" title="바둑판식배열(가로)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="8" rx="1.5" />
+                <rect x="3" y="13" width="18" height="8" rx="1.5" />
+              </svg>
+            </button>
+            <button onClick={handleTileVerticalLayout} style={styles.tabActionBtn} className="tab-action-btn" title="바둑판식배열(세로)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="8" height="18" rx="1.5" />
+                <rect x="13" y="3" width="8" height="18" rx="1.5" />
+              </svg>
+            </button>
+            <button onClick={handleCloseActiveTab} style={styles.tabActionBtn} className="tab-action-btn" title="현재화면닫기">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="13" height="13" rx="1.5" />
+                <line x1="14" y1="14" x2="20" y2="20" />
+                <line x1="20" y1="14" x2="14" y2="20" />
+              </svg>
+            </button>
+            <button onClick={handleCloseAllTabs} style={styles.tabActionBtn} className="tab-action-btn" title="전체화면닫기">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="10" height="10" rx="1" />
+                <rect x="7" y="7" width="10" height="10" rx="1" />
+                <line x1="15" y1="15" x2="21" y2="21" />
+                <line x1="21" y1="15" x2="15" y2="21" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -365,6 +498,41 @@ const styles = {
     color: 'var(--text-secondary)',
     display: 'flex',
     gap: '6px',
+  },
+  fileIDContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginRight: '8px',
+  },
+  fileIDLabel: {
+    fontSize: '0.8rem',
+    fontWeight: '800',
+    letterSpacing: '-0.3px',
+  },
+  fileIDValue: {
+    fontSize: '0.8rem',
+    fontWeight: '800',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    fontFamily: 'var(--font-sans)',
+  },
+  tabActionsWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  tabActionBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-secondary)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '6px',
+    borderRadius: '4px',
+    transition: 'all 0.15s ease',
   }
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ChevronDownIcon,
   ChevronRightIcon,
@@ -6,70 +6,76 @@ import {
   FileTextIcon,
   UsersIcon,
   DatabaseIcon,
-  SearchIcon
+  SearchIcon,
+  PercentIcon,
+  ShieldAlertIcon,
+  SettingsIcon,
+  CalendarIcon,
+  DownloadIcon,
+  LayoutDashboardIcon
 } from '../assets/icons';
+import { menuDataMap } from '../menuData';
 
-const menuData = [
-  {
-    id: 'customer',
-    title: '고객관리',
-    icon: <UserIcon size={18} />,
-    items: [
-      { id: 'user-reg', name: '사용자등록' },
-      { id: 'user-list', name: '사용자목록' },
-      { id: 'cust-change', name: '개인고객정보변경' },
-      { id: 'cust-history', name: '개인고객정보이력' },
-      { id: 'worker-reg', name: '근로자고객등록' },
-    ]
-  },
-  {
-    id: 'contract',
-    title: '계약관리',
-    icon: <FileTextIcon size={18} />,
-    items: [
-      { id: 'irp-reg', name: 'IRP 계약등록' },
-      { id: 'dbdc-reg', name: 'DB/DC 계약등록' },
-      { id: 'contract-biz', name: '계약별 업무등록/해제' },
-      { id: 'product-lineup', name: '계약 운용상품라인업' },
-      { id: 'handover-info', name: '계약인계정보' },
-      { id: 'change-query', name: '계약변경조회' },
-      { id: 'history-info', name: '계약정보 변경이력' },
-      { id: 'cancel-req', name: '계약등록 취소신청' },
-    ]
-  },
-  {
-    id: 'subscriber',
-    title: '가입자관리',
-    icon: <UsersIcon size={18} />,
-    items: [
-      { id: 'sub-indiv', name: '가입자개별등록' },
-      { id: 'sub-periodic', name: '가입자주기등록정보' },
-      { id: 'sub-bulk', name: '가입자일괄등록' },
-      { id: 'sub-search', name: '가입자검색' },
-      { id: 'sub-history', name: '가입자변경이력' },
-      { id: 'sub-transfer', name: '가입자이관신청' },
-    ]
-  },
-  {
-    id: 'tax',
-    title: '과세이력',
-    icon: <DatabaseIcon size={18} />,
-    items: [
-      { id: 'tax-trans-reg', name: '과세이전정보 등록(통신)' },
-      { id: 'tax-trans-list', name: '과세이전정보 목록(통신)' },
-    ]
+const getGroupIcon = (groupId) => {
+  switch (groupId) {
+    case 'customer':
+      return <UserIcon size={18} />;
+    case 'subscriber':
+      return <UsersIcon size={18} />;
+    case 'contract-mgmt':
+    case 'contract':
+      return <FileTextIcon size={18} />;
+    case 'tax':
+    case 'tax-info':
+      return <DatabaseIcon size={18} />;
+    case 'contribution':
+    case 'payment-mgmt':
+      return <CalendarIcon size={18} />;
+    case 'inst-mgmt':
+    case 'deposit-expiry':
+    case 'trade-inst':
+    case 'trade-conclusion':
+    case 'balance-yield':
+      return <LayoutDashboardIcon size={18} />;
+    case 'payout-apply':
+    case 'payout-inst':
+    case 'expected-retirement':
+    case 'legal-limit':
+      return <DownloadIcon size={18} />;
+    case 'product-mgmt':
+    case 'product-query':
+      return <DatabaseIcon size={18} />;
+    case 'fee-base-info':
+    case 'fee-mgmt':
+      return <PercentIcon size={18} />;
+    case 'aftercare-mgmt':
+    case 'pension-stats':
+    case 'common-mgmt':
+      return <ShieldAlertIcon size={18} />;
+    case 'system-mgmt':
+    case 'development':
+      return <SettingsIcon size={18} />;
+    default:
+      return <FileTextIcon size={18} />;
   }
-];
+};
 
-const Sidebar = ({ activeTab, onTabSelect }) => {
-  const [collapsed, setCollapsed] = useState(false);
+const Sidebar = ({ activeTab, onTabSelect, activeDepth1, collapsed, onToggleCollapse }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [openGroups, setOpenGroups] = useState({
-    contract: true, // open contract management by default
-    customer: false,
-    subscriber: false,
-    tax: false
-  });
+  const [openGroups, setOpenGroups] = useState({});
+
+  // Reset open accordion groups when activeDepth1 changes
+  useEffect(() => {
+    const currentGroups = menuDataMap[activeDepth1] || [];
+    if (currentGroups.length > 0) {
+      const initialOpenState = {};
+      currentGroups.forEach((group, index) => {
+        initialOpenState[group.id] = index === 0; // open first group by default
+      });
+      setOpenGroups(initialOpenState);
+    }
+  }, [activeDepth1]);
+
 
   const toggleGroup = (groupId) => {
     setOpenGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
@@ -80,7 +86,8 @@ const Sidebar = ({ activeTab, onTabSelect }) => {
   };
 
   // Filter items based on search term
-  const filteredMenuData = menuData.map(group => {
+  const activeMenuData = menuDataMap[activeDepth1] || [];
+  const filteredMenuData = activeMenuData.map(group => {
     const matchedItems = group.items.filter(item =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -88,48 +95,41 @@ const Sidebar = ({ activeTab, onTabSelect }) => {
   }).filter(group => group.items.length > 0 || group.title.includes(searchTerm));
 
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} style={{
+    <aside className="sidebar" style={{
       ...styles.sidebar,
-      backgroundColor: collapsed ? '#071126' : 'var(--bg-secondary)', // Dark when collapsed, original light when expanded!
-      borderRight: collapsed ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid var(--border-color)',
-      color: collapsed ? '#ffffff' : 'var(--text-primary)',
+      backgroundColor: 'var(--bg-secondary)',
+      borderRight: '1px solid var(--border-color)',
+      color: 'var(--text-primary)',
     }}>
       {/* Sidebar Top: Collapse Toggle & App Info */}
       <div className="sidebar-header" style={{
         ...styles.header,
-        padding: collapsed ? '0 10px' : '0 16px',
-        gap: collapsed ? '4px' : '0',
-        borderBottom: collapsed ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid var(--border-color)',
+        padding: '0 16px',
+        gap: '0',
+        borderBottom: '1px solid var(--border-color)',
       }}>
-        {!collapsed ? (
-          <div style={styles.brand}>
-            <span style={{ ...styles.brandTitle, color: 'var(--text-primary)' }}>D-RPS Portal</span>
-            <span style={{ ...styles.brandVersion, color: 'var(--text-tertiary)' }}>v3.5 Enterprise</span>
-          </div>
-        ) : (
-          <div style={styles.collapsedLogo}>
-            D
-          </div>
-        )}
+        <div style={styles.brand}>
+          <span style={{ ...styles.brandTitle, color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '800' }}>{activeDepth1}</span>
+        </div>
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={onToggleCollapse}
           style={{
             ...styles.toggleBtn,
-            width: collapsed ? '22px' : '28px',
-            height: collapsed ? '22px' : '28px',
+            width: '28px',
+            height: '28px',
             padding: 0,
-            color: collapsed ? '#ffb81c' : 'var(--text-secondary)',
-            borderColor: collapsed ? 'rgba(255, 255, 255, 0.15)' : 'var(--border-color)',
-            backgroundColor: collapsed ? 'rgba(255, 255, 255, 0.05)' : 'var(--bg-tertiary)',
+            color: 'var(--text-secondary)',
+            borderColor: 'var(--border-color)',
+            backgroundColor: 'var(--bg-tertiary)',
           }}
           title={collapsed ? "메뉴 열기" : "메뉴 접기"}
         >
-          {collapsed ? <ChevronRightIcon size={12} /> : <ChevronRightIcon size={16} style={{ transform: 'rotate(180deg)' }} />}
+          {collapsed ? <ChevronRightIcon size={16} /> : <ChevronRightIcon size={16} style={{ transform: 'rotate(180deg)' }} />}
         </button>
       </div>
 
       {/* Sidebar search bar */}
-      {!collapsed && (
+      {true && (
         <div style={styles.searchWrapper}>
           <div className="search-input-wrapper" style={{ flex: 1 }}>
             <input
@@ -156,19 +156,14 @@ const Sidebar = ({ activeTab, onTabSelect }) => {
           const hasActiveItem = group.items.some(item => item.name === activeTab);
 
           // Determine theme-based styles dynamically
-          const groupHeaderColor = collapsed
-            ? '#ffb81c'
-            : (hasActiveItem ? 'var(--primary)' : 'var(--text-secondary)');
-            
-          const iconColor = collapsed
-            ? '#ffb81c'
-            : (hasActiveItem ? 'var(--primary)' : 'var(--text-tertiary)');
+          const groupHeaderColor = hasActiveItem ? 'var(--primary)' : 'var(--text-secondary)';
+          const iconColor = hasActiveItem ? 'var(--primary)' : 'var(--text-tertiary)';
 
           return (
             <div key={group.id} style={styles.groupContainer}>
               {/* Group Accordion Header */}
               <div
-                onClick={() => !collapsed && toggleGroup(group.id)}
+                onClick={() => toggleGroup(group.id)}
                 style={{
                   ...styles.groupHeader,
                   color: groupHeaderColor
@@ -176,21 +171,18 @@ const Sidebar = ({ activeTab, onTabSelect }) => {
                 className="menu-group-header"
               >
                 <div style={styles.groupHeaderLeft}>
-                  {/* Next/Daum Yellow icons when collapsed, dynamic theme colors when expanded */}
                   <span style={{ color: iconColor, display: 'flex', alignItems: 'center' }}>
-                    {group.icon}
+                    {getGroupIcon(group.id)}
                   </span>
-                  {!collapsed && <span style={styles.groupTitle}>{group.title}</span>}
+                  <span style={styles.groupTitle}>{group.title}</span>
                 </div>
-                {!collapsed && (
-                  <span style={{ color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center' }}>
-                    {isOpen ? <ChevronDownIcon size={14} /> : <ChevronRightIcon size={14} />}
-                  </span>
-                )}
+                <span style={{ color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center' }}>
+                  {isOpen ? <ChevronDownIcon size={14} /> : <ChevronRightIcon size={14} />}
+                </span>
               </div>
 
               {/* Group Menu Items */}
-              {(!collapsed && isOpen) && (
+              {isOpen && (
                 <div style={styles.groupItems}>
                   {group.items.map((item) => {
                     const isActive = activeTab === item.name;
@@ -223,16 +215,13 @@ const Sidebar = ({ activeTab, onTabSelect }) => {
         })}
       </div>
 
-      {/* Sidebar footer: Quick Help */}
-      {!collapsed && (
-        <div style={styles.sidebarFooter}>
-          <div style={styles.helpCard}>
-            <h4 style={styles.helpTitle}>지원 센터</h4>
-            <p style={styles.helpText}>Tel: 1544-0000</p>
-            <p style={styles.helpText}>내선: 8909 (퇴직연금팀)</p>
-          </div>
+      <div style={styles.sidebarFooter}>
+        <div style={styles.helpCard}>
+          <h4 style={styles.helpTitle}>지원 센터</h4>
+          <p style={styles.helpText}>Tel: 1544-0000</p>
+          <p style={styles.helpText}>내선: 8909 (퇴직연금팀)</p>
         </div>
-      )}
+      </div>
     </aside>
   );
 };

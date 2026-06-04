@@ -1,6 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { SearchIcon, CheckIcon, PrinterIcon, FilePlusIcon, RefreshIcon } from '../assets/icons';
 
+const ButtonGroupSelect = ({ value, onChange, options }) => {
+  return (
+    <div style={{ display: 'flex', width: '100%', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '2px', borderRadius: '6px' }}>
+      {options.map(opt => {
+        const isSelected = opt.value === value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            style={{
+              flex: 1,
+              padding: '8px 12px',
+              fontSize: '0.8rem',
+              fontWeight: isSelected ? '700' : '500',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              backgroundColor: isSelected ? 'var(--bg-secondary)' : 'transparent',
+              color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)',
+              boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+            }}
+          >
+            {isSelected && (
+              <CheckIcon size={12} style={{ strokeWidth: '3px', flexShrink: 0 }} />
+            )}
+            <span>{opt.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addNotification }) => {
   const [activeSubTab, setActiveSubTab] = useState('기본정보');
   const [accountChecked, setAccountChecked] = useState(false);
@@ -101,6 +143,16 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
     window.print();
   };
 
+  const handleCancelContract = () => {
+    onReset();
+    addNotification('계약 등록 신청이 취소되었습니다.', 'warning');
+  };
+
+  const handleNewContract = () => {
+    onReset();
+    addNotification('신규 계약 등록 입력을 시작합니다.', 'success');
+  };
+
   return (
     <div style={styles.container}>
       {/* Top Search Toolbar */}
@@ -125,15 +177,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
           <div className="form-group" style={{ flex: 1, margin: 0 }}>
             <label className="form-label">IRP 유형</label>
-            <select
-              className="form-input"
+            <ButtonGroupSelect
               value={formData.irpType}
-              onChange={(e) => handleInputChange('irpType', e.target.value)}
-              style={styles.toolbarSelect}
-            >
-              <option value="개인형IRP">개인형IRP</option>
-              <option value="기업형IRP">기업형IRP</option>
-            </select>
+              onChange={(val) => handleInputChange('irpType', val)}
+              options={[
+                { value: '개인형IRP', label: '개인형 IRP' },
+                { value: '기업형IRP', label: '기업형 IRP' }
+              ]}
+            />
           </div>
 
           <div style={styles.toolbarActions}>
@@ -188,11 +239,15 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               </div>
               <div className="form-group">
                 <label className="form-label">실명확인구분</label>
-                <select className="form-input" value={formData.realNameType} onChange={(e) => handleInputChange('realNameType', e.target.value)}>
-                  <option value="주민등록증">주민등록증</option>
-                  <option value="운전면허증">운전면허증</option>
-                  <option value="여권">여권</option>
-                </select>
+                <ButtonGroupSelect
+                  value={formData.realNameType}
+                  onChange={(val) => handleInputChange('realNameType', val)}
+                  options={[
+                    { value: '주민등록증', label: '주민등록증' },
+                    { value: '운전면허증', label: '운전면허증' },
+                    { value: '여권', label: '여권' }
+                  ]}
+                />
               </div>
               <div className="form-group">
                 <label className="form-label">주민등록번호 *</label>
@@ -214,10 +269,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               </div>
               <div className="form-group">
                 <label className="form-label">거주여부</label>
-                <select className="form-input" value={formData.residency} onChange={(e) => handleInputChange('residency', e.target.value)}>
-                  <option value="거주">거주</option>
-                  <option value="비거주">비거주</option>
-                </select>
+                <ButtonGroupSelect
+                  value={formData.residency}
+                  onChange={(val) => handleInputChange('residency', val)}
+                  options={[
+                    { value: '거주', label: '거주' },
+                    { value: '비거주', label: '비거주' }
+                  ]}
+                />
               </div>
               <div className="form-group">
                 <label className="form-label">거주국가</label>
@@ -238,10 +297,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               </div>
               <div className="form-group">
                 <label className="form-label">SMS 수신여부</label>
-                <select className="form-input" value={formData.smsReceive} onChange={(e) => handleInputChange('smsReceive', e.target.value)}>
-                  <option value="수신">수신</option>
-                  <option value="미수신">미수신</option>
-                </select>
+                <ButtonGroupSelect
+                  value={formData.smsReceive}
+                  onChange={(val) => handleInputChange('smsReceive', val)}
+                  options={[
+                    { value: '수신', label: '수신' },
+                    { value: '미수신', label: '미수신' }
+                  ]}
+                />
               </div>
               <div className="form-group">
                 <label className="form-label">이메일</label>
@@ -268,10 +331,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               </div>
               <div className="form-group">
                 <label className="form-label">우편수신지</label>
-                <select className="form-input" value={formData.postDest} onChange={(e) => handleInputChange('postDest', e.target.value)}>
-                  <option value="자택">자택</option>
-                  <option value="직장">직장</option>
-                </select>
+                <ButtonGroupSelect
+                  value={formData.postDest}
+                  onChange={(val) => handleInputChange('postDest', val)}
+                  options={[
+                    { value: '자택', label: '자택' },
+                    { value: '직장', label: '직장' }
+                  ]}
+                />
               </div>
             </div>
           </div>
@@ -295,10 +362,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               </div>
               <div className="form-group">
                 <label className="form-label">계약유형</label>
-                <select className="form-input" value={formData.contractType} onChange={(e) => handleInputChange('contractType', e.target.value)}>
-                  <option value="가입자형IRP">가입자형IRP</option>
-                  <option value="기업형IRP">기업형IRP</option>
-                </select>
+                <ButtonGroupSelect
+                  value={formData.contractType}
+                  onChange={(val) => handleInputChange('contractType', val)}
+                  options={[
+                    { value: '가입자형IRP', label: '가입자형 IRP' },
+                    { value: '기업형IRP', label: '기업형 IRP' }
+                  ]}
+                />
               </div>
               <div className="form-group">
                 <label className="form-label">계약상태</label>
@@ -364,10 +435,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               <h3 className="card-title">부담금 및 수수료</h3>
               <div className="form-group">
                 <label className="form-label">운용수수료 납부방법</label>
-                <select className="form-input" value={formData.feePaymentMethod} onChange={(e) => handleInputChange('feePaymentMethod', e.target.value)}>
-                  <option value="자산차감">자산차감 (Deduction)</option>
-                  <option value="직접납부">직접지불 (Direct Pay)</option>
-                </select>
+                <ButtonGroupSelect
+                  value={formData.feePaymentMethod}
+                  onChange={(val) => handleInputChange('feePaymentMethod', val)}
+                  options={[
+                    { value: '자산차감', label: '자산차감' },
+                    { value: '직접납부', label: '직접납부' }
+                  ]}
+                />
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ margin: 0 }}>
@@ -386,18 +461,26 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">가입상태</label>
-                  <select className="form-input" value={formData.defaultStatus} onChange={(e) => handleInputChange('defaultStatus', e.target.value)}>
-                    <option value="미가입">미가입</option>
-                    <option value="가입완료">가입완료</option>
-                  </select>
+                  <ButtonGroupSelect
+                    value={formData.defaultStatus}
+                    onChange={(val) => handleInputChange('defaultStatus', val)}
+                    options={[
+                      { value: '미가입', label: '미가입' },
+                      { value: '가입완료', label: '가입완료' }
+                    ]}
+                  />
                 </div>
                 <div className="form-group">
                   <label className="form-label">투자성향</label>
-                  <select className="form-input" value={formData.investProfile} onChange={(e) => handleInputChange('investProfile', e.target.value)}>
-                    <option value="성장추구형">성장추구형</option>
-                    <option value="안정형">안정형</option>
-                    <option value="위험선호형">위험선호형</option>
-                  </select>
+                  <ButtonGroupSelect
+                    value={formData.investProfile}
+                    onChange={(val) => handleInputChange('investProfile', val)}
+                    options={[
+                      { value: '성장추구형', label: '성장추구형' },
+                      { value: '안정형', label: '안정형' },
+                      { value: '위험선호형', label: '위험선호형' }
+                    ]}
+                  />
                 </div>
               </div>
               <div className="form-group" style={{ margin: 0, marginTop: '8px' }}>
@@ -449,16 +532,25 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
           {/* Form Actions Toolbar */}
           <div style={styles.actionsBar}>
-            <button type="button" onClick={handleFormPrint} className="btn btn-secondary">
-              <PrinterIcon size={16} />
-              신청서 출력
-            </button>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button type="button" onClick={handleFormPrint} className="btn btn-secondary">
+                <PrinterIcon size={16} />
+                계약서 출력
+              </button>
+              <button type="button" onClick={handleCancelContract} className="btn btn-danger">
+                계약취소
+              </button>
+            </div>
             <div style={styles.rightActions}>
-              <button type="button" onClick={onReset} className="btn btn-secondary">
-                초기화
+              <button type="button" onClick={handleNewContract} className="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
+                </svg>
+                신규
               </button>
               <button type="submit" className="btn btn-primary">
-                저장 및 승인
+                <CheckIcon size={16} />
+                저장
               </button>
             </div>
           </div>

@@ -306,6 +306,7 @@ const styles = {
     lineHeight: '1.42',
     margin: '0 0 12px 0',
     letterSpacing: '-1.2px',
+    wordBreak: 'keep-all',
   },
   heroSubtitle: {
     fontFamily: 'var(--font-sans)',
@@ -314,6 +315,7 @@ const styles = {
     color: '#3d2500', // Deep gold warm accent
     margin: '0 0 68px 0', // Increased spacing below the sub-slogan!
     letterSpacing: '-0.3px',
+    wordBreak: 'keep-all',
   },
   featuresHorizontalGrid: {
     display: 'flex',
@@ -360,6 +362,7 @@ const styles = {
     margin: 0,
     letterSpacing: '-0.3px',
     lineHeight: '1.3',
+    wordBreak: 'keep-all',
   },
   featureDescTextGrid: {
     fontFamily: 'var(--font-sans)',
@@ -369,6 +372,7 @@ const styles = {
     margin: 0,
     lineHeight: '1.45',
     letterSpacing: '-0.2px',
+    wordBreak: 'keep-all',
   },
   rightColumn: {
     flex: '0 0 auto',
@@ -437,6 +441,7 @@ const styles = {
     flexShrink: 0,
     userSelect: 'none',
     letterSpacing: '0px',
+    whiteSpace: 'nowrap',
   },
   inputDivider: {
     width: '1px',
@@ -494,6 +499,7 @@ const styles = {
     color: '#3d2500',
     fontWeight: '600',
     fontSize: '0.98rem',
+    whiteSpace: 'nowrap',
   },
   checkbox: {
     accentColor: '#071126',
@@ -506,6 +512,7 @@ const styles = {
     textDecoration: 'underline',
     fontWeight: '400',
     fontSize: '0.85rem',
+    whiteSpace: 'nowrap',
   },
   submitBtn: {
     padding: '12px',
@@ -522,6 +529,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     transition: 'all 0.2s',
+    whiteSpace: 'nowrap',
   },
   signupBtn: {
     padding: '12px',
@@ -538,6 +546,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     transition: 'all 0.2s',
+    whiteSpace: 'nowrap',
   },
   characterContainer: {
     width: '100%',
