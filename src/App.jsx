@@ -183,7 +183,19 @@ function App() {
 
   const handleDepth1Select = (depth1Name) => {
     setActiveDepth1(depth1Name);
-    // Auto-select first submenu item of that depth1 category if switching
+    
+    // Explicit default sub-menu mapping for 1-depth categories
+    const defaultTabMap = {
+      '계약': 'IRP 계약등록',
+    };
+    
+    const targetTab = defaultTabMap[depth1Name];
+    if (targetTab) {
+      handleSidebarTabSelect(targetTab);
+      return;
+    }
+
+    // Fallback: Auto-select first submenu item of that depth1 category if switching
     const groups = menuDataMap[depth1Name];
     if (groups && groups.length > 0 && groups[0].items && groups[0].items.length > 0) {
       const firstTab = groups[0].items[0].name;
