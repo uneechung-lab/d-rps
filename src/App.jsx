@@ -296,7 +296,12 @@ function App() {
   return (
     <div className="app-container">
       {/* 1-Depth Left Menu */}
-      <Depth1Menu activeDepth1={activeDepth1} onDepth1Select={handleDepth1Select} collapsed={depth1Collapsed} />
+      <Depth1Menu 
+        activeDepth1={activeDepth1} 
+        onDepth1Select={handleDepth1Select} 
+        collapsed={depth1Collapsed}
+        onLogoClick={() => handleSidebarTabSelect('대시보드')}
+      />
 
       {/* Sidebar Navigation */}
       {activeTab !== '대시보드' && (

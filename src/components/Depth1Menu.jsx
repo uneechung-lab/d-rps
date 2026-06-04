@@ -1,7 +1,7 @@
 import React from 'react';
 import { depth1Menus } from '../menuData';
 
-const Depth1Menu = ({ activeDepth1, onDepth1Select, collapsed }) => {
+const Depth1Menu = ({ activeDepth1, onDepth1Select, collapsed, onLogoClick }) => {
   return (
     <div style={{
       ...styles.container,
@@ -9,11 +9,16 @@ const Depth1Menu = ({ activeDepth1, onDepth1Select, collapsed }) => {
       alignItems: collapsed ? 'center' : 'stretch',
     }} className={`depth1-menu-container ${collapsed ? 'collapsed' : ''}`}>
       {/* Brand Logo Header (Side-by-Side when expanded, icon only when collapsed) */}
-      <div style={{
-        ...styles.logoSection,
-        padding: collapsed ? '0' : '0 16px',
-        justifyContent: collapsed ? 'center' : 'flex-start',
-      }}>
+      <div 
+        onClick={onLogoClick}
+        style={{
+          ...styles.logoSection,
+          padding: collapsed ? '0' : '0 16px',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          cursor: 'pointer'
+        }}
+        title="대시보드로 이동"
+      >
         <div style={styles.logoCircle}>
           <span style={styles.logoText}>D</span>
         </div>
