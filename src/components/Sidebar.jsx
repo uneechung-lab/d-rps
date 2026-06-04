@@ -64,17 +64,27 @@ const Sidebar = ({ activeTab, onTabSelect, activeDepth1, collapsed, onToggleColl
   const [searchTerm, setSearchTerm] = useState('');
   const [openGroups, setOpenGroups] = useState({});
 
-  // Reset open accordion groups when activeDepth1 changes
+  // Reset open accordion groups when activeDepth1 or activeTab changes
   useEffect(() => {
     const currentGroups = menuDataMap[activeDepth1] || [];
     if (currentGroups.length > 0) {
       const initialOpenState = {};
+      
+      // Expand the group that contains the activeTab
+      const containingGroup = currentGroups.find(group =>
+        group.items.some(item => item.name === activeTab)
+      );
+
       currentGroups.forEach((group, index) => {
-        initialOpenState[group.id] = index === 0; // open first group by default
+        if (containingGroup) {
+          initialOpenState[group.id] = group.id === containingGroup.id;
+        } else {
+          initialOpenState[group.id] = index === 0; // open first group by default
+        }
       });
       setOpenGroups(initialOpenState);
     }
-  }, [activeDepth1]);
+  }, [activeDepth1, activeTab]);
 
 
   const toggleGroup = (groupId) => {
