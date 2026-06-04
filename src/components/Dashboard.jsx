@@ -148,67 +148,10 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
         ))}
       </div>
 
-      {/* 2. Middle Panel Grid (6:4 Ratio) */}
-      <div style={styles.middleGrid}>
-        {/* Left widget: Schedule Master Widget */}
-        <div style={styles.widgetCard} className="card">
-          <div style={styles.widgetHeader}>
-            <h3 style={styles.widgetTitle}>일정 마스터 위젯</h3>
-            <div style={styles.tabContainer}>
-              <button
-                onClick={() => setActiveScheduleTab('today')}
-                style={{
-                  ...styles.tabBtn,
-                  backgroundColor: activeScheduleTab === 'today' ? 'var(--primary)' : 'transparent',
-                  color: activeScheduleTab === 'today' ? '#ffffff' : 'var(--text-secondary)'
-                }}
-              >
-                오늘의 일정
-              </button>
-              <button
-                onClick={() => setActiveScheduleTab('week')}
-                style={{
-                  ...styles.tabBtn,
-                  backgroundColor: activeScheduleTab === 'week' ? 'var(--primary)' : 'transparent',
-                  color: activeScheduleTab === 'week' ? '#ffffff' : 'var(--text-secondary)'
-                }}
-              >
-                금주일정
-              </button>
-              <button
-                onClick={() => setActiveScheduleTab('month')}
-                style={{
-                  ...styles.tabBtn,
-                  backgroundColor: activeScheduleTab === 'month' ? 'var(--primary)' : 'transparent',
-                  color: activeScheduleTab === 'month' ? '#ffffff' : 'var(--text-secondary)'
-                }}
-              >
-                당월일정
-              </button>
-            </div>
-          </div>
-
-          <div style={styles.timelineList}>
-            {schedules[activeScheduleTab].map((sch, idx) => (
-              <div key={idx} style={styles.timelineItem}>
-                <span style={styles.timelineTime}>{sch.time}</span>
-                <div style={styles.timelineContent}>
-                  <span style={styles.timelineText}>{sch.text}</span>
-                  <span style={{
-                    ...styles.statusBadge,
-                    backgroundColor: sch.statusType === 'danger' ? 'rgba(239,68,68,0.1)' : sch.statusType === 'warning' ? 'rgba(245,158,11,0.1)' : sch.statusType === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
-                    color: sch.statusType === 'danger' ? 'var(--danger)' : sch.statusType === 'warning' ? 'var(--warning)' : sch.statusType === 'success' ? 'var(--accent)' : '#0284c7',
-                  }}>
-                    {sch.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Stack: Account Widget & To-Do List */}
-        <div style={styles.rightStack}>
+      {/* 2. Masonry Widget Grid Layout */}
+      <div style={styles.masonryGrid}>
+        {/* Left Column (Account Widget & Schedule Widget) */}
+        <div style={styles.masonryColumn}>
           {/* Account/Profile Widget */}
           <div style={styles.profileWidgetCard} className="card">
             <div style={styles.profileAvatarCircle}>
@@ -241,6 +184,66 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
             </div>
           </div>
 
+          {/* Schedule Master Widget */}
+          <div style={styles.widgetCard} className="card">
+            <div style={styles.widgetHeader}>
+              <h3 style={styles.widgetTitle}>일정 마스터 위젯</h3>
+              <div style={styles.tabContainer}>
+                <button
+                  onClick={() => setActiveScheduleTab('today')}
+                  style={{
+                    ...styles.tabBtn,
+                    backgroundColor: activeScheduleTab === 'today' ? 'var(--primary)' : 'transparent',
+                    color: activeScheduleTab === 'today' ? '#ffffff' : 'var(--text-secondary)'
+                  }}
+                >
+                  오늘의 일정
+                </button>
+                <button
+                  onClick={() => setActiveScheduleTab('week')}
+                  style={{
+                    ...styles.tabBtn,
+                    backgroundColor: activeScheduleTab === 'week' ? 'var(--primary)' : 'transparent',
+                    color: activeScheduleTab === 'week' ? '#ffffff' : 'var(--text-secondary)'
+                  }}
+                >
+                  금주일정
+                </button>
+                <button
+                  onClick={() => setActiveScheduleTab('month')}
+                  style={{
+                    ...styles.tabBtn,
+                    backgroundColor: activeScheduleTab === 'month' ? 'var(--primary)' : 'transparent',
+                    color: activeScheduleTab === 'month' ? '#ffffff' : 'var(--text-secondary)'
+                  }}
+                >
+                  당월일정
+                </button>
+              </div>
+            </div>
+
+            <div style={styles.timelineList}>
+              {schedules[activeScheduleTab].map((sch, idx) => (
+                <div key={idx} style={styles.timelineItem}>
+                  <span style={styles.timelineTime}>{sch.time}</span>
+                  <div style={styles.timelineContent}>
+                    <span style={styles.timelineText}>{sch.text}</span>
+                    <span style={{
+                      ...styles.statusBadge,
+                      backgroundColor: sch.statusType === 'danger' ? 'rgba(239,68,68,0.1)' : sch.statusType === 'warning' ? 'rgba(245,158,11,0.1)' : sch.statusType === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
+                      color: sch.statusType === 'danger' ? 'var(--danger)' : sch.statusType === 'warning' ? 'var(--warning)' : sch.statusType === 'success' ? 'var(--accent)' : '#0284c7',
+                    }}>
+                      {sch.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (To-Do List, Notice Board & Quick Links) */}
+        <div style={styles.masonryColumn}>
           {/* To-Do list */}
           <div style={styles.widgetCard} className="card">
             <div style={styles.widgetHeader}>
@@ -250,7 +253,7 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
 
             <div style={styles.todoList}>
               {todos.map(todo => (
-                <div key={todo.id} style={styles.todoItem} onClick={() => toggleTodo(todo.id)}>
+                <div key={todo.id} style={todo.done ? styles.todoItemDone : styles.todoItem} onClick={() => toggleTodo(todo.id)}>
                   <div style={styles.todoCheckWrapper}>
                     <div style={{
                       ...styles.todoCheckbox,
@@ -280,56 +283,53 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
               ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* 3. Bottom Panel Grid (1:1 Ratio) */}
-      <div style={styles.bottomGrid}>
-        {/* Left widget: Notice Board */}
-        <div style={styles.widgetCard} className="card">
-          <div style={styles.widgetHeader}>
-            <h3 style={styles.widgetTitle}>공지사항</h3>
-            <button style={styles.moreBtn}>더보기 <ChevronRight size={12} /></button>
-          </div>
+          {/* Notice Board */}
+          <div style={styles.widgetCard} className="card">
+            <div style={styles.widgetHeader}>
+              <h3 style={styles.widgetTitle}>공지사항</h3>
+              <button style={styles.moreBtn}>더보기 <ChevronRight size={12} /></button>
+            </div>
 
-          <div style={styles.noticeList}>
-            {notices.map((not, idx) => (
-              <div key={idx} style={styles.noticeItem}>
-                <div style={styles.noticeMeta}>
-                  <span style={styles.noticeDate}>{not.date}</span>
-                  <span style={{
-                    ...styles.noticeTag,
-                    borderColor: not.tagColor,
-                    color: not.tagColor
-                  }}>{not.category}</span>
+            <div style={styles.noticeList}>
+              {notices.map((not, idx) => (
+                <div key={idx} style={styles.noticeItem}>
+                  <div style={styles.noticeMeta}>
+                    <span style={styles.noticeDate}>{not.date}</span>
+                    <span style={{
+                      ...styles.noticeTag,
+                      borderColor: not.tagColor,
+                      color: not.tagColor
+                    }}>{not.category}</span>
+                  </div>
+                  <span style={styles.noticeText}>{not.text}</span>
                 </div>
-                <span style={styles.noticeText}>{not.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right widget: Quick Links */}
-        <div style={styles.widgetCard} className="card">
-          <div style={styles.widgetHeader}>
-            <h3 style={styles.widgetTitle}>자주 쓰는 메뉴 퀵링크</h3>
+              ))}
+            </div>
           </div>
 
-          <div style={styles.quickLinkGrid}>
-            {quickLinks.map((link, idx) => (
-              <div
-                key={idx}
-                onClick={() => onTabSelect(link.target)}
-                style={styles.quickLinkCard}
-                className="dashboard-quicklink"
-              >
-                <div style={{ ...styles.quickLinkIconContainer, backgroundColor: `${link.color}15`, color: link.color }}>
-                  {link.icon}
+          {/* Quick Links */}
+          <div style={styles.widgetCard} className="card">
+            <div style={styles.widgetHeader}>
+              <h3 style={styles.widgetTitle}>자주 쓰는 메뉴 퀵링크</h3>
+            </div>
+
+            <div style={styles.quickLinkGrid}>
+              {quickLinks.map((link, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => onTabSelect(link.target)}
+                  style={styles.quickLinkCard}
+                  className="dashboard-quicklink"
+                >
+                  <div style={{ ...styles.quickLinkIconContainer, backgroundColor: `${link.color}15`, color: link.color }}>
+                    {link.icon}
+                  </div>
+                  <span style={styles.quickLinkLabel}>{link.name}</span>
+                  <span style={styles.quickLinkDesc}>바로가기 &rarr;</span>
                 </div>
-                <span style={styles.quickLinkLabel}>{link.name}</span>
-                <span style={styles.quickLinkDesc}>바로가기 &rarr;</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -382,6 +382,17 @@ const styles = {
   middleGrid: {
     display: 'grid',
     gridTemplateColumns: '6fr 4fr',
+    gap: '24px',
+  },
+  masonryGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '24px',
+    alignItems: 'start',
+  },
+  masonryColumn: {
+    display: 'flex',
+    flexDirection: 'column',
     gap: '24px',
   },
   rightStack: {
@@ -554,9 +565,18 @@ const styles = {
     cursor: 'pointer',
     border: '1px solid transparent',
     transition: 'all 0.2s',
-    ':hover': {
-      borderColor: 'var(--border-color)',
-    }
+  },
+  todoItemDone: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 16px',
+    backgroundColor: 'var(--bg-tertiary)',
+    borderRadius: 'var(--radius-sm)',
+    cursor: 'pointer',
+    border: '1px solid transparent',
+    transition: 'all 0.2s',
+    opacity: 0.6,
   },
   todoCheckWrapper: {
     display: 'flex',
