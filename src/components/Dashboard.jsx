@@ -37,7 +37,19 @@ const ChevronRight = ({ size = 16, color = 'currentColor' }) => (
   </svg>
 );
 
-const Dashboard = ({ isDark, onTabSelect }) => {
+const PlusCircleIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" />
+  </svg>
+);
+
+const BellOffIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" /><path d="M18.63 13A17.89 17.89 0 0 1 18 8" /><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14" /><path d="M18 8a6 6 0 0 0-9.33-5" /><line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
+const Dashboard = ({ isDark, onTabSelect, user }) => {
   const [activeScheduleTab, setActiveScheduleTab] = useState('today');
   const [todos, setTodos] = useState([
     { id: 1, text: '결재 대기 건 심사 승인 (IRP 신규 계약 3건)', done: false, priority: 'High' },
@@ -195,43 +207,78 @@ const Dashboard = ({ isDark, onTabSelect }) => {
           </div>
         </div>
 
-        {/* Right widget: To-Do list */}
-        <div style={styles.widgetCard} className="card">
-          <div style={styles.widgetHeader}>
-            <h3 style={styles.widgetTitle}>나의 할 일 목록</h3>
-            <span style={styles.todoCount}>미완료 {todos.filter(t => !t.done).length}건</span>
+        {/* Right Stack: Account Widget & To-Do List */}
+        <div style={styles.rightStack}>
+          {/* Account/Profile Widget */}
+          <div style={styles.profileWidgetCard} className="card">
+            <div style={styles.profileAvatarCircle}>
+              {user?.name ? user.name.charAt(0) : '정'}
+            </div>
+            <h2 style={styles.profileWelcomeText}>
+              {user?.name || '정윤희'}님,<br />안녕하세요.
+            </h2>
+            <div style={styles.profileDateRow}>
+              <span style={styles.calendarIconWrapper}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </span>
+              <span style={styles.profileDateText}>6월 4일 (목요일)</span>
+            </div>
+
+            <div style={styles.profileActionsWrapper}>
+              <button style={styles.capsuleBtn} className="btn-secondary">
+                <PlusCircleIcon size={16} />
+                상태 설정
+              </button>
+              <button style={styles.capsuleBtn} className="btn-secondary">
+                <BellOffIcon size={16} />
+                알림 일시 정지
+              </button>
+            </div>
           </div>
 
-          <div style={styles.todoList}>
-            {todos.map(todo => (
-              <div key={todo.id} style={styles.todoItem} onClick={() => toggleTodo(todo.id)}>
-                <div style={styles.todoCheckWrapper}>
-                  <div style={{
-                    ...styles.todoCheckbox,
-                    backgroundColor: todo.done ? 'var(--accent)' : 'transparent',
-                    borderColor: todo.done ? 'var(--accent)' : 'var(--border-color)'
-                  }}>
-                    {todo.done && (
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
+          {/* To-Do list */}
+          <div style={styles.widgetCard} className="card">
+            <div style={styles.widgetHeader}>
+              <h3 style={styles.widgetTitle}>나의 할 일 목록</h3>
+              <span style={styles.todoCount}>미완료 {todos.filter(t => !t.done).length}건</span>
+            </div>
+
+            <div style={styles.todoList}>
+              {todos.map(todo => (
+                <div key={todo.id} style={styles.todoItem} onClick={() => toggleTodo(todo.id)}>
+                  <div style={styles.todoCheckWrapper}>
+                    <div style={{
+                      ...styles.todoCheckbox,
+                      backgroundColor: todo.done ? 'var(--accent)' : 'transparent',
+                      borderColor: todo.done ? 'var(--accent)' : 'var(--border-color)'
+                    }}>
+                      {todo.done && (
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </div>
+                    <span style={{
+                      ...styles.todoText,
+                      textDecoration: todo.done ? 'line-through' : 'none',
+                      color: todo.done ? 'var(--text-tertiary)' : 'var(--text-primary)'
+                    }}>{todo.text}</span>
                   </div>
                   <span style={{
-                    ...styles.todoText,
-                    textDecoration: todo.done ? 'line-through' : 'none',
-                    color: todo.done ? 'var(--text-tertiary)' : 'var(--text-primary)'
-                  }}>{todo.text}</span>
+                    ...styles.todoBadge,
+                    backgroundColor: todo.priority === 'High' ? 'rgba(239,68,68,0.1)' : 'rgba(148,163,184,0.1)',
+                    color: todo.priority === 'High' ? 'var(--danger)' : 'var(--text-secondary)'
+                  }}>
+                    {todo.priority}
+                  </span>
                 </div>
-                <span style={{
-                  ...styles.todoBadge,
-                  backgroundColor: todo.priority === 'High' ? 'rgba(239,68,68,0.1)' : 'rgba(148,163,184,0.1)',
-                  color: todo.priority === 'High' ? 'var(--danger)' : 'var(--text-secondary)'
-                }}>
-                  {todo.priority}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -336,6 +383,83 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: '6fr 4fr',
     gap: '24px',
+  },
+  rightStack: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+  },
+  profileWidgetCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '24px',
+    borderRadius: 'var(--radius-md)',
+    backgroundColor: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    boxShadow: 'var(--card-shadow)',
+    gap: '14px',
+    alignItems: 'flex-start',
+  },
+  profileAvatarCircle: {
+    width: '64px',
+    height: '64px',
+    borderRadius: '50%',
+    backgroundColor: '#8aa8d6',
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: '700',
+    fontSize: '1.6rem',
+    marginBottom: '4px',
+  },
+  profileWelcomeText: {
+    fontSize: '1.25rem',
+    fontWeight: '800',
+    color: 'var(--text-primary)',
+    lineHeight: '1.45',
+    margin: '0',
+    letterSpacing: '-0.4px',
+  },
+  profileDateRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    color: 'var(--text-secondary)',
+    fontSize: '0.85rem',
+    fontWeight: '500',
+    marginBottom: '8px',
+  },
+  calendarIconWrapper: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    opacity: 0.7,
+  },
+  profileDateText: {
+    color: 'var(--text-secondary)',
+  },
+  profileActionsWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    width: '100%',
+  },
+  capsuleBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: '10px',
+    padding: '10px 16px',
+    borderRadius: '9999px',
+    border: '1px solid var(--border-color)',
+    backgroundColor: 'var(--bg-secondary)',
+    color: 'var(--text-primary)',
+    fontSize: '0.82rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    width: '100%',
+    textAlign: 'left',
   },
   widgetCard: {
     display: 'flex',

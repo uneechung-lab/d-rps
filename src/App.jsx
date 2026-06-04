@@ -342,7 +342,7 @@ function App() {
         {/* Dynamic content screen wrapper */}
         <div className="scrollable-body">
           {activeTab === '대시보드' ? (
-            <Dashboard isDark={isDark} onTabSelect={handleSidebarTabSelect} />
+            <Dashboard isDark={isDark} onTabSelect={handleSidebarTabSelect} user={user} />
           ) : activeTab === 'IRP 계약등록' ? (
             <IRPContractForm
               selectedContract={selectedContract}
