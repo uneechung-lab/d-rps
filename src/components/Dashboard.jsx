@@ -1,33 +1,57 @@
 import React, { useState } from 'react';
 
-// Custom Icons for the Naver Works style cards
-const InfoCircleIcon = ({ size = 14, color = '#94a3b8' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
-    <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
+// Custom icons inside Dashboard for maximum independence
+const UsersIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
 
-const ChevronRightIcon = ({ size = 14, color = 'currentColor' }) => (
+const BriefcaseIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="14" x="2" y="7" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+  </svg>
+);
+
+const DatabaseIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3" />
+  </svg>
+);
+
+const ArrowDownRight = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="7" y1="7" x2="17" y2="17" /><polyline points="17 7 17 17 7 17" />
+  </svg>
+);
+
+const ArrowUpLeft = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="17" y1="17" x2="7" y2="7" /><polyline points="7 17 7 7 17 7" />
+  </svg>
+);
+
+const ChevronRight = ({ size = 16, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="m9 18 6-6-6-6" />
   </svg>
 );
 
-const ChevronLeftIcon = ({ size = 14, color = 'currentColor' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m15 18-6-6 6-6" />
-  </svg>
-);
-
-const PlusCircleIcon = ({ size = 16 }) => (
+const PlusCircleIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" />
   </svg>
 );
 
-const BellOffIcon = ({ size = 16 }) => (
+const BellOffIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M13.73 21a2 2 0 0 1-3.46 0" /><path d="M18.63 13A17.89 17.89 0 0 1 18 8" /><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14" /><path d="M18 8a6 6 0 0 0-9.33-5" /><line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
+const InfoCircleIcon = ({ size = 14, color = '#94a3b8' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
+    <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
   </svg>
 );
 
@@ -38,23 +62,97 @@ const EmptyStateIcon = ({ size = 48, color = '#d1d5db' }) => (
 );
 
 const Dashboard = ({ isDark, onTabSelect, user }) => {
-  const [activeMyWorkTab, setActiveMyWorkTab] = useState('week'); // 'today' or 'week'
-  const [activeMailTab, setActiveMailTab] = useState('received'); // 'all', 'received', 'unread'
-  const [widgetPage, setWidgetPage] = useState(1);
+  const [activeScheduleTab, setActiveScheduleTab] = useState('today');
+  const [todos, setTodos] = useState([
+    { id: 1, text: '결재 대기 건 심사 승인 (IRP 신규 계약 3건)', done: false, priority: 'High' },
+    { id: 2, text: '지급 오류 거래 내역 대조 확인 (1건)', done: false, priority: 'High' },
+    { id: 3, text: '당일 퇴직연금 미납 부담금 고지서 출력', done: true, priority: 'Normal' },
+    { id: 4, text: '자산기관 결제대금 대사 검증 수행', done: false, priority: 'Normal' },
+  ]);
 
-  const getFormattedDate = () => {
-    return "6월 4일 (목요일)";
+  const toggleTodo = (id) => {
+    setTodos(prev => prev.map(todo => todo.id === id ? { ...todo, done: !todo.done } : todo));
   };
+
+  const kpis = [
+    {
+      title: '전체 계약수',
+      value: '1,245 건',
+      change: '+12건 금주 대비',
+      icon: <BriefcaseIcon size={22} color={isDark ? '#38bdf8' : '#0284c7'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(56,189,248,0.1) 0%, rgba(56,189,248,0.02) 100%)' : 'linear-gradient(135deg, rgba(2,132,199,0.06) 0%, rgba(2,132,199,0.01) 100%)'
+    },
+    {
+      title: '전체 가입자수',
+      value: '48,203 명',
+      change: '+143명 당월 누적',
+      icon: <UsersIcon size={22} color={isDark ? '#34d399' : '#059669'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(52,211,153,0.1) 0%, rgba(52,211,153,0.02) 100%)' : 'linear-gradient(135deg, rgba(5,150,105,0.06) 0%, rgba(5,150,105,0.01) 100%)'
+    },
+    {
+      title: '총 적립금',
+      value: '3조 2,450 억원',
+      change: '+1,240억 전월비',
+      icon: <DatabaseIcon size={22} color={isDark ? '#a78bfa' : '#7c3aed'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(167,139,250,0.1) 0%, rgba(167,139,250,0.02) 100%)' : 'linear-gradient(135deg, rgba(124,58,237,0.06) 0%, rgba(124,58,237,0.01) 100%)'
+    },
+    {
+      title: '당월 입금액',
+      value: '142 억원',
+      change: '+8.4% 목표 대비',
+      icon: <ArrowDownRight size={22} color={isDark ? '#f472b6' : '#db2777'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(244,114,182,0.1) 0%, rgba(244,114,182,0.02) 100%)' : 'linear-gradient(135deg, rgba(219,39,119,0.06) 0%, rgba(219,39,119,0.01) 100%)'
+    },
+    {
+      title: '당월 지급액',
+      value: '98 억원',
+      change: '-2.1% 전월 대비',
+      icon: <ArrowUpLeft size={22} color={isDark ? '#fbbf24' : '#d97706'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(251,191,36,0.02) 100%)' : 'linear-gradient(135deg, rgba(217,119,6,0.06) 0%, rgba(217,119,6,0.01) 100%)'
+    }
+  ];
+
+  const schedules = {
+    today: [
+      { time: '13:00', text: '1차 펀드 매수/매도 지시 마감', status: '마감임박', statusType: 'danger' },
+      { time: '15:30', text: '정기예금 만기 재투자 지시 승인 배치', status: '대기중', statusType: 'warning' },
+      { time: '17:00', text: '당월 퇴직급여 지급 배치 검증 및 송금 실행', status: '정상', statusType: 'success' },
+    ],
+    week: [
+      { time: '06-05', text: '국민연금 이전 과세이연 자료 통산 대조', status: 'D-1', statusType: 'warning' },
+      { time: '06-08', text: 'XX기업 확정기여형(DC) 부담금 납입 기한 마감', status: 'D-4', statusType: 'info' },
+      { time: '06-09', text: '상반기 정기 재정검증 서브미션 보고서 작성', status: 'D-5', statusType: 'normal' },
+    ],
+    month: [
+      { time: '06-15', text: '퇴직연금 수수료(운용/자산관리) 자동 출금 청구일', status: 'D-11', statusType: 'normal' },
+      { time: '06-25', text: 'IRP 미지정 가입자 디폴트옵션 사전 통지 발송 배치', status: 'D-21', statusType: 'normal' },
+      { time: '06-30', text: '분기별 퇴직연금 비교공시 자료 검토 완료', status: 'D-26', statusType: 'danger' },
+    ]
+  };
+
+  const notices = [
+    { date: '2026-06-04', category: '시스템', tagColor: '#38bdf8', text: '퇴직연금 대외 시스템 정기 유지보수 점검 안내 (06/07 01시)' },
+    { date: '2026-06-02', category: '법률개정', tagColor: '#34d399', text: '디폴트옵션(사전지정운용제도) 관련 감독규정 개정안 가이드라인 공지' },
+    { date: '2026-05-29', category: '업무지침', tagColor: '#a78bfa', text: 'IRP 연간납입한도(최대 900만원) 변경 신청 및 확인사항 업무 지침' },
+    { date: '2026-05-25', category: '공지사항', tagColor: '#94a3b8', text: 'D-RPS Enterprise v3.6 마이너 릴리즈 노트 공유' },
+  ];
+
+  const quickLinks = [
+    { name: 'IRP 계약등록', icon: <BriefcaseIcon size={18} />, target: 'IRP 계약등록', color: '#0284c7' },
+    { name: '예적금상품관리', icon: <DatabaseIcon size={18} />, target: '예적금상품관리', color: '#059669' },
+    { name: '보유자산상세현황', icon: <UsersIcon size={18} />, target: '계약별 자산현황/잔고조회', color: '#7c3aed' },
+    { name: '교체매매 지시', icon: <ArrowDownRight size={18} />, target: '상품교체(교체매매) 등록/승인', color: '#db2777' }
+  ];
 
   return (
     <div style={{
       ...styles.container,
       backgroundColor: isDark ? '#090a0f' : '#f4f6fa'
     }}>
-      {/* 3-Column Grid Layout */}
+      {/* 3-Column Grid Layout in Premium Naver Works Style */}
       <div style={styles.dashboardGrid}>
         
-        {/* Column 1: Left Widget Column (width: 250px) */}
+        {/* Column 1: Left Widget Column */}
         <div style={styles.leftColumn}>
           {/* Account Widget */}
           <div style={{ ...styles.card, ...styles.profileCard, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
@@ -73,281 +171,227 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
               </span>
-              <span>{getFormattedDate()}</span>
+              <span>6월 4일 (목요일)</span>
             </div>
 
             <div style={styles.profileActionsWrapper}>
-              <button style={{ ...styles.capsuleBtn, color: isDark ? '#f8fafc' : '#374151', borderColor: isDark ? '#334155' : '#e5e7eb', backgroundColor: isDark ? '#1e293b' : '#ffffff' }} className="btn-secondary">
+              <button style={{ ...styles.capsuleBtn, color: isDark ? '#f8fafc' : '#374151', borderColor: isDark ? '#334155' : '#e5e7eb', backgroundColor: isDark ? '#1e293b' : '#ffffff' }}>
                 <PlusCircleIcon size={16} />
                 상태 설정
               </button>
-              <button style={{ ...styles.capsuleBtn, color: isDark ? '#f8fafc' : '#374151', borderColor: isDark ? '#334155' : '#e5e7eb', backgroundColor: isDark ? '#1e293b' : '#ffffff' }} className="btn-secondary">
+              <button style={{ ...styles.capsuleBtn, color: isDark ? '#f8fafc' : '#374151', borderColor: isDark ? '#334155' : '#e5e7eb', backgroundColor: isDark ? '#1e293b' : '#ffffff' }}>
                 <BellOffIcon size={16} />
                 알림 일시 정지
               </button>
             </div>
           </div>
 
-          {/* Edit Home Widget */}
-          <div style={{ ...styles.card, ...styles.editWidgetCard, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
-            <button style={{ ...styles.closeBtn, color: isDark ? '#94a3b8' : '#9ca3af' }}>&times;</button>
-            
-            <div style={styles.widgetIllustrationContainer}>
-              {/* Custom SVG mockup of a screen with widgets */}
-              <svg width="110" height="74" viewBox="0 0 120 80" fill="none" style={{ opacity: isDark ? 0.75 : 0.95 }}>
-                <rect x="5" y="5" width="110" height="70" rx="4" fill={isDark ? '#1e293b' : '#f3f4f6'} stroke={isDark ? '#334155' : '#e5e7eb'} strokeWidth="1.5" />
-                <rect x="12" y="12" width="96" height="6" rx="1" fill="#8aa8d6" opacity="0.8" />
-                <rect x="12" y="24" width="28" height="24" rx="2" fill={isDark ? '#334155' : '#ffffff'} stroke={isDark ? '#475569' : '#e5e7eb'} strokeWidth="1" />
-                <line x1="16" y1="36" x2="30" y2="36" stroke="#1e6ced" strokeWidth="2" strokeLinecap="round" />
-                <line x1="16" y1="42" x2="36" y2="42" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" />
-                
-                <rect x="46" y="24" width="62" height="44" rx="2" fill={isDark ? '#334155' : '#ffffff'} stroke={isDark ? '#475569' : '#e5e7eb'} strokeWidth="1" />
-                <circle cx="56" cy="34" r="4" fill="#a78bfa" />
-                <line x1="66" y1="34" x2="100" y2="34" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" />
-                <line x1="52" y1="44" x2="96" y2="44" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" />
-                <line x1="52" y1="50" x2="88" y2="50" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" />
-                
-                <rect x="12" y="52" width="28" height="16" rx="2" fill="#34d399" opacity="0.2" />
-                <circle cx="26" cy="60" r="3" fill="#34d399" />
-              </svg>
+          {/* Quick Links Widget */}
+          <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
+            <div style={styles.cardHeader}>
+              <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                자주 쓰는 메뉴 퀵링크 <ChevronRight size={14} />
+              </h3>
             </div>
-
-            <h3 style={{ ...styles.widgetCardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-              홈 위젯 편집 <InfoCircleIcon size={13} color={isDark ? '#64748b' : '#9ca3af'} />
-            </h3>
-            <p style={{ ...styles.widgetCardDesc, color: isDark ? '#94a3b8' : '#64748b' }}>
-              자주 사용하는 메뉴를 홈의 위젯으로 추가할 수 있어요.
-            </p>
-
-            <div style={styles.paginationWrapper}>
-              <div style={styles.paginationArrows}>
-                <button style={{ ...styles.arrowBtn, color: isDark ? '#64748b' : '#9ca3af' }}><ChevronLeftIcon size={12} /></button>
-                <button style={{ ...styles.arrowBtn, color: isDark ? '#64748b' : '#9ca3af' }}><ChevronRightIcon size={12} /></button>
-              </div>
-              <span style={{ ...styles.paginationText, color: isDark ? '#64748b' : '#9ca3af' }}>{widgetPage}/4</span>
-            </div>
-          </div>
-
-          {/* Promotion Card */}
-          <div style={{ ...styles.card, ...styles.promoCard, backgroundColor: isDark ? '#1e202a' : '#eff5ff', borderColor: isDark ? '#2e303c' : '#e0ebff' }}>
-            <span style={{ ...styles.promoSub, color: isDark ? '#a5b4fc' : '#1e6ced' }}>프로젝트 서비스 출시</span>
-            <h4 style={{ ...styles.promoTitle, color: isDark ? '#f8fafc' : '#1e293b' }}>
-              흩어진 업무를 모아 프로젝트로 관리해 보세요.
-            </h4>
-            <div style={styles.promoIllustration}>
-              <svg width="140" height="60" viewBox="0 0 140 60" fill="none">
-                <rect x="10" y="5" width="120" height="50" rx="4" fill={isDark ? '#272935' : '#ffffff'} stroke={isDark ? '#3a3d4d' : '#d0e0fc'} strokeWidth="1" />
-                <rect x="20" y="15" width="22" height="22" rx="11" fill="#1e6ced" opacity="0.15" />
-                <circle cx="31" cy="26" r="6" fill="#1e6ced" />
-                
-                <rect x="52" y="18" width="60" height="6" rx="3" fill="#e2e8f0" />
-                <rect x="52" y="28" width="40" height="6" rx="3" fill="#e2e8f0" />
-                
-                <circle cx="20" cy="48" r="3" fill="#34d399" />
-                <circle cx="30" cy="48" r="3" fill="#a78bfa" />
-                <circle cx="40" cy="48" r="3" fill="#fbbf24" />
-              </svg>
+            <div style={styles.quickLinkGrid}>
+              {quickLinks.map((link, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => onTabSelect(link.target)}
+                  style={{
+                    ...styles.quickLinkCard,
+                    backgroundColor: isDark ? '#1e202a' : '#f8fafc',
+                    borderColor: isDark ? '#2e303c' : '#e2e8f0',
+                  }}
+                  className="dashboard-quicklink"
+                >
+                  <div style={{ ...styles.quickLinkIconContainer, backgroundColor: `${link.color}15`, color: link.color }}>
+                    {link.icon}
+                  </div>
+                  <span style={{ ...styles.quickLinkLabel, color: isDark ? '#f8fafc' : '#0f172a' }}>{link.name}</span>
+                  <span style={styles.quickLinkDesc}>바로가기 &rarr;</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Column 2: Middle Widget Column */}
         <div style={styles.middleColumn}>
-          {/* Today Widget */}
+          {/* Today KPI Widget */}
           <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
             <div style={styles.cardHeader}>
               <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                Today <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
+                Today 핵심 업무 지표 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
               </h3>
             </div>
-
             <div style={styles.todayBanner}>
               <span style={styles.todayBannerBadge}>필독</span>
-              <span style={{ ...styles.todayBannerText, color: isDark ? '#cbd5e1' : '#374151' }}>업무 효율을 200%로 만드는 게시판 활용법</span>
+              <span style={{ ...styles.todayBannerText, color: isDark ? '#cbd5e1' : '#374151' }}>
+                당월 퇴직연금 수수료 마감 및 재정검증 비율 준수
+              </span>
             </div>
-
-            <div style={styles.todayItems}>
-              <div style={{ ...styles.todayLineItem, borderLeftColor: isDark ? '#3b82f6' : '#1e6ced' }}>
-                <span style={{ ...styles.todayItemText, color: isDark ? '#f8fafc' : '#111827' }}>테스트</span>
-                <span style={styles.todayItemBadge}>+1</span>
-              </div>
+            
+            <div style={styles.kpiList}>
+              {kpis.map((kpi, idx) => (
+                <div key={idx} style={{
+                  ...styles.kpiRow,
+                  borderLeftColor: kpi.icon.props.color,
+                  backgroundColor: isDark ? '#1e202a' : '#f8fafc',
+                  border: `1px solid ${isDark ? '#2e303c' : '#e2e8f0'}`,
+                  borderLeft: `4px solid ${kpi.icon.props.color}`
+                }}>
+                  <div style={styles.kpiRowLeft}>
+                    <span style={{ ...styles.kpiRowTitle, color: isDark ? '#94a3b8' : '#475569' }}>{kpi.title}</span>
+                    <span style={{ ...styles.kpiRowValue, color: isDark ? '#f8fafc' : '#0f172a' }}>{kpi.value}</span>
+                  </div>
+                  <div style={styles.kpiRowRight}>
+                    <span style={{ ...styles.kpiRowChange, color: isDark ? '#cbd5e1' : '#64748b' }}>{kpi.change}</span>
+                    {kpi.icon}
+                  </div>
+                </div>
+              ))}
             </div>
-
-            <div style={{ height: '140px' }} /> {/* Match mockup height spacing */}
           </div>
 
-          {/* My Business Widget */}
+          {/* Schedule Master Widget */}
           <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
             <div style={styles.cardHeader}>
               <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                내 업무 <ChevronRightIcon size={14} />
+                일정 마스터 위젯 <ChevronRight size={14} />
               </h3>
-              {/* Custom Blue Shield Badge Icon */}
-              <div style={styles.blueBadgeIcon}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
             </div>
-
             <div style={styles.tabNavRow}>
               <span
-                onClick={() => setActiveMyWorkTab('today')}
+                onClick={() => setActiveScheduleTab('today')}
                 style={{
                   ...styles.tabNavLink,
-                  color: activeMyWorkTab === 'today' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeMyWorkTab === 'today' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeMyWorkTab === 'today' ? '700' : '500'
+                  color: activeScheduleTab === 'today' ? '#1e6ced' : 'var(--text-secondary)',
+                  borderBottomColor: activeScheduleTab === 'today' ? '#1e6ced' : 'transparent',
+                  fontWeight: activeScheduleTab === 'today' ? '700' : '500'
                 }}
               >
-                오늘 마감
+                오늘의 일정
               </span>
               <span
-                onClick={() => setActiveMyWorkTab('week')}
+                onClick={() => setActiveScheduleTab('week')}
                 style={{
                   ...styles.tabNavLink,
-                  color: activeMyWorkTab === 'week' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeMyWorkTab === 'week' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeMyWorkTab === 'week' ? '700' : '500'
+                  color: activeScheduleTab === 'week' ? '#1e6ced' : 'var(--text-secondary)',
+                  borderBottomColor: activeScheduleTab === 'week' ? '#1e6ced' : 'transparent',
+                  fontWeight: activeScheduleTab === 'week' ? '700' : '500'
                 }}
               >
-                이번 주 마감
+                금주일정
+              </span>
+              <span
+                onClick={() => setActiveScheduleTab('month')}
+                style={{
+                  ...styles.tabNavLink,
+                  color: activeScheduleTab === 'month' ? '#1e6ced' : 'var(--text-secondary)',
+                  borderBottomColor: activeScheduleTab === 'month' ? '#1e6ced' : 'transparent',
+                  fontWeight: activeScheduleTab === 'month' ? '700' : '500'
+                }}
+              >
+                당월일정
               </span>
             </div>
 
-            <div style={styles.emptyStateContainer}>
-              <EmptyStateIcon size={44} color={isDark ? '#334155' : '#d1d5db'} />
-              <span style={{ ...styles.emptyStateText, color: isDark ? '#64748b' : '#9ca3af' }}>표시할 내용이 없습니다.</span>
+            <div style={styles.timelineList}>
+              {schedules[activeScheduleTab].map((sch, idx) => (
+                <div key={idx} style={styles.timelineItem}>
+                  <span style={{ ...styles.timelineTime, color: isDark ? '#94a3b8' : '#64748b' }}>{sch.time}</span>
+                  <div style={styles.timelineContent}>
+                    <span style={{ ...styles.timelineText, color: isDark ? '#f8fafc' : '#111827' }}>{sch.text}</span>
+                    <span style={{
+                      ...styles.statusBadge,
+                      backgroundColor: sch.statusType === 'danger' ? 'rgba(239,68,68,0.1)' : sch.statusType === 'warning' ? 'rgba(245,158,11,0.1)' : sch.statusType === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
+                      color: sch.statusType === 'danger' ? 'var(--danger)' : sch.statusType === 'warning' ? 'var(--warning)' : sch.statusType === 'success' ? 'var(--accent)' : '#0284c7',
+                    }}>
+                      {sch.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Column 3: Right Widget Column */}
         <div style={styles.rightColumn}>
-          {/* Org Chart Widget */}
+          {/* To-Do List Widget */}
           <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
             <div style={styles.cardHeader}>
               <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                조직도 <ChevronRightIcon size={14} />
+                나의 할 일 목록 <ChevronRight size={14} />
               </h3>
-              {/* Custom Green User Badge Icon */}
-              <div style={{ ...styles.blueBadgeIcon, backgroundColor: '#0ea5e9' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                </svg>
-              </div>
-            </div>
-
-            <div style={{ ...styles.emptyStateContainer, padding: '40px 0 24px' }}>
-              <EmptyStateIcon size={40} color={isDark ? '#334155' : '#d1d5db'} />
-              <span style={{ ...styles.emptyStateText, color: isDark ? '#64748b' : '#9ca3af' }}>표시할 내용이 없습니다.</span>
-            </div>
-
-            <button style={styles.blueStretchBtn}>전체보기</button>
-          </div>
-
-          {/* Mail Widget */}
-          <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
-            <div style={styles.cardHeader}>
-              <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                메일 <ChevronRightIcon size={14} />
-              </h3>
-              {/* Custom Green Mail Badge Icon */}
-              <div style={{ ...styles.blueBadgeIcon, backgroundColor: '#10b981' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="20" height="14" x="2" y="5" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                </svg>
-              </div>
-            </div>
-
-            <div style={styles.tabNavRow}>
-              <span
-                onClick={() => setActiveMailTab('all')}
-                style={{
-                  ...styles.tabNavLink,
-                  color: activeMailTab === 'all' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeMailTab === 'all' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeMailTab === 'all' ? '700' : '500'
-                }}
-              >
-                전체 메일
-              </span>
-              <span
-                onClick={() => setActiveMailTab('received')}
-                style={{
-                  ...styles.tabNavLink,
-                  color: activeMailTab === 'received' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeMailTab === 'received' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeMailTab === 'received' ? '700' : '500'
-                }}
-              >
-                받은 메일
-              </span>
-              <span
-                onClick={() => setActiveMailTab('unread')}
-                style={{
-                  ...styles.tabNavLink,
-                  color: activeMailTab === 'unread' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeMailTab === 'unread' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeMailTab === 'unread' ? '700' : '500'
-                }}
-              >
-                안 읽은 메일 <span style={{ color: '#ef4444', fontWeight: '700' }}>2</span>
+              <span style={{ ...styles.todoCount, color: isDark ? '#94a3b8' : '#64748b' }}>
+                미완료 {todos.filter(t => !t.done).length}건
               </span>
             </div>
 
-            <div style={styles.mailList}>
-              <div style={styles.mailItem}>
-                <span style={{ ...styles.mailSubject, color: isDark ? '#f8fafc' : '#111827' }}>[네이버웍스 코어] 신청 완료 안내</span>
-                <div style={styles.mailMeta}>
-                  <span style={{ ...styles.mailSender, color: isDark ? '#94a3b8' : '#4b5563' }}>NAVER WORKS</span>
-                  <span style={{ ...styles.mailDate, color: isDark ? '#64748b' : '#9ca3af' }}>2026.06.04 12:39</span>
+            <div style={styles.todoList}>
+              {todos.map(todo => (
+                <div
+                  key={todo.id}
+                  style={{
+                    ...styles.todoItem,
+                    backgroundColor: isDark ? '#1e202a' : '#f8fafc',
+                    borderColor: isDark ? '#2e303c' : '#e2e8f0',
+                  }}
+                  onClick={() => toggleTodo(todo.id)}
+                >
+                  <div style={styles.todoCheckWrapper}>
+                    <div style={{
+                      ...styles.todoCheckbox,
+                      backgroundColor: todo.done ? 'var(--accent)' : 'transparent',
+                      borderColor: todo.done ? 'var(--accent)' : (isDark ? '#475569' : '#cbd5e1')
+                    }}>
+                      {todo.done && (
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </div>
+                    <span style={{
+                      ...styles.todoText,
+                      textDecoration: todo.done ? 'line-through' : 'none',
+                      color: todo.done ? 'var(--text-tertiary)' : (isDark ? '#f8fafc' : '#0f172a')
+                    }}>{todo.text}</span>
+                  </div>
+                  <span style={{
+                    ...styles.todoBadge,
+                    backgroundColor: todo.priority === 'High' ? 'rgba(239,68,68,0.1)' : 'rgba(148,163,184,0.1)',
+                    color: todo.priority === 'High' ? 'var(--danger)' : (isDark ? '#94a3b8' : '#64748b')
+                  }}>
+                    {todo.priority}
+                  </span>
                 </div>
-              </div>
-              <div style={styles.mailItem}>
-                <span style={{ ...styles.mailSubject, color: isDark ? '#f8fafc' : '#111827' }}>환영합니다! 지금부터 NAVER WORKS를 이용해 업무를 시작해보...</span>
-                <div style={styles.mailMeta}>
-                  <span style={{ ...styles.mailSender, color: isDark ? '#94a3b8' : '#4b5563' }}>NAVER WORKS</span>
-                  <span style={{ ...styles.mailDate, color: isDark ? '#64748b' : '#9ca3af' }}>2026.06.04 12:38</span>
-                </div>
-              </div>
-            </div>
-
-            <div style={styles.doubleActionsRow}>
-              <button style={{ ...styles.halfWhiteBtn, color: isDark ? '#f8fafc' : '#374151', borderColor: isDark ? '#334155' : '#cbd5e1', backgroundColor: isDark ? '#1e293b' : '#ffffff' }}>전체보기</button>
-              <button style={styles.halfBlueBtn}>메일 쓰기</button>
+              ))}
             </div>
           </div>
 
-          {/* Latest Posts Widget */}
+          {/* Notice Board Widget */}
           <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
             <div style={styles.cardHeader}>
               <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                최신 게시글 <ChevronRightIcon size={14} />
+                공지사항 <ChevronRight size={14} />
               </h3>
-              {/* Custom Purple File Badge Icon */}
-              <div style={{ ...styles.blueBadgeIcon, backgroundColor: '#a855f7' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" />
-                </svg>
-              </div>
             </div>
-
-            <div style={styles.mailList}>
-              <div style={styles.mailItem}>
-                <span style={{ ...styles.mailSubject, color: isDark ? '#f8fafc' : '#111827' }}>[게시글 작성 가이드] 업무 매뉴얼 게시판 활용하기</span>
-                <div style={styles.mailMeta}>
-                  <span style={{ ...styles.mailSender, color: isDark ? '#94a3b8' : '#4b5563' }}>업무 매뉴얼 | Board</span>
-                  <span style={{ ...styles.mailDate, color: isDark ? '#64748b' : '#9ca3af' }}>2026.06.04 12:38</span>
+            <div style={styles.noticeList}>
+              {notices.map((not, idx) => (
+                <div key={idx} style={styles.noticeItem}>
+                  <div style={styles.noticeMeta}>
+                    <span style={{ ...styles.noticeDate, color: isDark ? '#64748b' : '#9ca3af' }}>{not.date}</span>
+                    <span style={{
+                      ...styles.noticeTag,
+                      borderColor: not.tagColor,
+                      color: not.tagColor
+                    }}>{not.category}</span>
+                  </div>
+                  <span style={{ ...styles.noticeText, color: isDark ? '#cbd5e1' : '#1e293b' }}>{not.text}</span>
                 </div>
-              </div>
-              <div style={styles.mailItem}>
-                <span style={{ ...styles.mailSubject, color: isDark ? '#f8fafc' : '#111827' }}>[게시글 작성 가이드] 공지사항 게시판 활용하기</span>
-                <div style={styles.mailMeta}>
-                  <span style={{ ...styles.mailSender, color: isDark ? '#94a3b8' : '#4b5563' }}>공지사항 | Board</span>
-                  <span style={{ ...styles.mailDate, color: isDark ? '#64748b' : '#9ca3af' }}>2026.06.04 12:38</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -457,94 +501,13 @@ const styles = {
     gap: '10px',
     padding: '10px 16px',
     borderRadius: '9999px',
-    border: '1px solid',
+    border: '1px solid var(--border-color)',
     fontSize: '0.82rem',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.2s',
     width: '100%',
     textAlign: 'left',
-  },
-  editWidgetCard: {
-    padding: '20px',
-    alignItems: 'flex-start',
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: '12px',
-    right: '12px',
-    background: 'none',
-    border: 'none',
-    fontSize: '1.3rem',
-    cursor: 'pointer',
-  },
-  widgetIllustrationContainer: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '12px 0 20px',
-  },
-  widgetCardTitle: {
-    fontSize: '0.9rem',
-    fontWeight: '700',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    margin: '0 0 6px 0',
-  },
-  widgetCardDesc: {
-    fontSize: '0.78rem',
-    lineHeight: '1.4',
-    margin: '0 0 16px 0',
-  },
-  paginationWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    borderTop: '1px solid var(--border-color)',
-    paddingTop: '12px',
-  },
-  paginationArrows: {
-    display: 'flex',
-    gap: '4px',
-  },
-  arrowBtn: {
-    background: 'none',
-    border: 'none',
-    padding: '2px',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  paginationText: {
-    fontSize: '0.75rem',
-    fontWeight: '600',
-  },
-  promoCard: {
-    padding: '20px',
-    borderStyle: 'solid',
-    borderWidth: '1px',
-  },
-  promoSub: {
-    fontSize: '0.72rem',
-    fontWeight: '700',
-    marginBottom: '6px',
-    display: 'block',
-  },
-  promoTitle: {
-    fontSize: '0.85rem',
-    fontWeight: '800',
-    lineHeight: '1.45',
-    margin: '0 0 12px 0',
-    letterSpacing: '-0.3px',
-  },
-  promoIllustration: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   todayBanner: {
     backgroundColor: '#fff1f2',
@@ -573,40 +536,42 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  todayItems: {
+  kpiList: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: '10px',
   },
-  todayLineItem: {
+  kpiRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderLeftWidth: '3px',
-    borderLeftStyle: 'solid',
-    paddingLeft: '12px',
-    height: '24px',
+    padding: '12px 14px',
+    borderRadius: '8px',
+    transition: 'all 0.2s',
   },
-  todayItemText: {
-    fontSize: '0.82rem',
-    fontWeight: '700',
-  },
-  todayItemBadge: {
-    backgroundColor: 'rgba(30,108,237,0.1)',
-    color: '#1e6ced',
-    fontSize: '0.75rem',
-    fontWeight: '700',
-    padding: '2px 8px',
-    borderRadius: '999px',
-  },
-  blueBadgeIcon: {
-    width: '24px',
-    height: '24px',
-    borderRadius: '6px',
-    backgroundColor: '#1e6ced',
+  kpiRowLeft: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  kpiRowTitle: {
+    fontSize: '0.78rem',
+    fontWeight: '600',
+  },
+  kpiRowValue: {
+    fontSize: '1.15rem',
+    fontWeight: '800',
+    fontFamily: 'var(--font-display)',
+  },
+  kpiRowRight: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: '4px',
+  },
+  kpiRowChange: {
+    fontSize: '0.7rem',
+    fontWeight: '600',
   },
   tabNavRow: {
     display: 'flex',
@@ -622,90 +587,150 @@ const styles = {
     borderBottom: '2px solid transparent',
     transition: 'all 0.2s',
   },
-  emptyStateContainer: {
+  timelineList: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '48px 0',
-    gap: '10px',
+    gap: '16px',
   },
-  emptyStateText: {
-    fontSize: '0.78rem',
+  timelineItem: {
+    display: 'flex',
+    gap: '16px',
+    alignItems: 'flex-start',
+  },
+  timelineTime: {
+    fontSize: '0.8rem',
+    fontWeight: '700',
+    fontFamily: 'monospace',
+    width: '45px',
+    paddingTop: '2px',
+  },
+  timelineContent: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottom: '1px solid var(--border-color)',
+    paddingBottom: '12px',
+  },
+  timelineText: {
+    fontSize: '0.82rem',
+    fontWeight: '600',
+    lineHeight: '1.4',
+  },
+  statusBadge: {
+    fontSize: '0.7rem',
+    fontWeight: '700',
+    padding: '3px 8px',
+    borderRadius: '4px',
+  },
+  todoCount: {
+    fontSize: '0.75rem',
     fontWeight: '600',
   },
-  blueStretchBtn: {
-    width: '100%',
-    padding: '12px 0',
-    borderRadius: '6px',
-    backgroundColor: '#1e6ced',
-    color: '#ffffff',
-    border: 'none',
-    fontSize: '0.82rem',
-    fontWeight: '700',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-    marginTop: 'auto',
+  todoList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
   },
-  mailList: {
+  todoItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 16px',
+    borderRadius: 'var(--radius-sm)',
+    cursor: 'pointer',
+    border: '1px solid transparent',
+    transition: 'all 0.2s',
+  },
+  todoCheckWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  todoCheckbox: {
+    width: '16px',
+    height: '16px',
+    borderRadius: '4px',
+    border: '1px solid',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.15s',
+  },
+  todoText: {
+    fontSize: '0.82rem',
+    fontWeight: '600',
+  },
+  todoBadge: {
+    fontSize: '0.7rem',
+    fontWeight: '700',
+    padding: '3px 8px',
+    borderRadius: '4px',
+  },
+  noticeList: {
     display: 'flex',
     flexDirection: 'column',
     gap: '14px',
-    marginBottom: '16px',
   },
-  mailItem: {
+  noticeItem: {
     display: 'flex',
     flexDirection: 'column',
     gap: '6px',
     borderBottom: '1px solid var(--border-color)',
     paddingBottom: '10px',
-    cursor: 'pointer',
   },
-  mailSubject: {
-    fontSize: '0.8rem',
-    fontWeight: '700',
-    lineHeight: '1.4',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  mailMeta: {
+  noticeMeta: {
     display: 'flex',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  noticeDate: {
     fontSize: '0.72rem',
-  },
-  mailSender: {
-    fontWeight: '600',
-  },
-  mailDate: {
     fontFamily: 'monospace',
   },
-  doubleActionsRow: {
-    display: 'flex',
-    gap: '8px',
-    marginTop: 'auto',
-  },
-  halfWhiteBtn: {
-    flex: 1,
-    padding: '12px 0',
-    borderRadius: '6px',
-    border: '1px solid',
-    fontSize: '0.82rem',
+  noticeTag: {
+    fontSize: '0.65rem',
     fontWeight: '700',
+    border: '1px solid',
+    borderRadius: '3px',
+    padding: '1px 5px',
+  },
+  noticeText: {
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    lineHeight: '1.4',
+  },
+  quickLinkGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '12px',
+  },
+  quickLinkCard: {
+    border: '1px solid var(--border-color)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
     cursor: 'pointer',
     transition: 'all 0.2s',
   },
-  halfBlueBtn: {
-    flex: 1,
-    padding: '12px 0',
-    borderRadius: '6px',
-    backgroundColor: '#1e6ced',
-    color: '#ffffff',
-    border: 'none',
-    fontSize: '0.82rem',
+  quickLinkIconContainer: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickLinkLabel: {
+    fontSize: '0.85rem',
     fontWeight: '700',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
+  },
+  quickLinkDesc: {
+    fontSize: '0.72rem',
+    color: 'var(--text-tertiary)',
+    fontWeight: '600',
   }
 };
 
