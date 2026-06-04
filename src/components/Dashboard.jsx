@@ -243,7 +243,7 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
 
           {/* Under-KPI Grid: Middle and Right columns side-by-side */}
           <div style={styles.innerTwoColumnGrid}>
-            {/* Column 2: Middle Widget Column */}
+            {/* Column 2 Part 1: Today Banner inside middleColumn */}
             <div style={styles.middleColumn}>
               {/* Today Banner */}
               <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
@@ -259,150 +259,155 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
                   </span>
                 </div>
               </div>
+            </div> {/* Closing middleColumn (Today Banner card container & middleColumn div) */}
 
-          {/* Schedule Master Widget */}
-          <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
-            <div style={styles.cardHeader}>
-              <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                일정 마스터 위젯 <ChevronRight size={14} />
-              </h3>
-            </div>
-            <div style={styles.tabNavRow}>
-              <span
-                onClick={() => setActiveScheduleTab('today')}
-                style={{
-                  ...styles.tabNavLink,
-                  color: activeScheduleTab === 'today' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeScheduleTab === 'today' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeScheduleTab === 'today' ? '700' : '500'
-                }}
-              >
-                오늘의 일정
-              </span>
-              <span
-                onClick={() => setActiveScheduleTab('week')}
-                style={{
-                  ...styles.tabNavLink,
-                  color: activeScheduleTab === 'week' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeScheduleTab === 'week' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeScheduleTab === 'week' ? '700' : '500'
-                }}
-              >
-                금주일정
-              </span>
-              <span
-                onClick={() => setActiveScheduleTab('month')}
-                style={{
-                  ...styles.tabNavLink,
-                  color: activeScheduleTab === 'month' ? '#1e6ced' : 'var(--text-secondary)',
-                  borderBottomColor: activeScheduleTab === 'month' ? '#1e6ced' : 'transparent',
-                  fontWeight: activeScheduleTab === 'month' ? '700' : '500'
-                }}
-              >
-                당월일정
-              </span>
-            </div>
-
-            <div style={styles.timelineList}>
-              {schedules[activeScheduleTab].map((sch, idx) => (
-                <div key={idx} style={styles.timelineItem}>
-                  <span style={{ ...styles.timelineTime, color: isDark ? '#94a3b8' : '#64748b' }}>{sch.time}</span>
-                  <div style={styles.timelineContent}>
-                    <span style={{ ...styles.timelineText, color: isDark ? '#f8fafc' : '#111827' }}>{sch.text}</span>
-                    <span style={{
-                      ...styles.statusBadge,
-                      backgroundColor: sch.statusType === 'danger' ? 'rgba(239,68,68,0.1)' : sch.statusType === 'warning' ? 'rgba(245,158,11,0.1)' : sch.statusType === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
-                      color: sch.statusType === 'danger' ? 'var(--danger)' : sch.statusType === 'warning' ? 'var(--warning)' : sch.statusType === 'success' ? 'var(--accent)' : '#0284c7',
-                    }}>
-                      {sch.status}
-                    </span>
-                  </div>
+            {/* Column 2 Part 2: Schedule Master Widget inside middleColumn */}
+            <div style={styles.middleColumn}>
+              <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
+                <div style={styles.cardHeader}>
+                  <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                    일정 마스터 위젯 <ChevronRight size={14} />
+                  </h3>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Column 3: Right Widget Column */}
-        <div style={styles.rightColumn}>
-          {/* To-Do List Widget */}
-          <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
-            <div style={styles.cardHeader}>
-              <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                나의 할 일 목록 <ChevronRight size={14} />
-              </h3>
-              <span style={{ ...styles.todoCount, color: isDark ? '#94a3b8' : '#64748b' }}>
-                미완료 {todos.filter(t => !t.done).length}건
-              </span>
-            </div>
-
-            <div style={styles.todoList}>
-              {todos.map(todo => (
-                <div
-                  key={todo.id}
-                  style={{
-                    ...styles.todoItem,
-                    backgroundColor: isDark ? '#1e202a' : '#f8fafc',
-                    borderColor: isDark ? '#2e303c' : '#e2e8f0',
-                  }}
-                  onClick={() => toggleTodo(todo.id)}
-                >
-                  <div style={styles.todoCheckWrapper}>
-                    <div style={{
-                      ...styles.todoCheckbox,
-                      backgroundColor: todo.done ? 'var(--accent)' : 'transparent',
-                      borderColor: todo.done ? 'var(--accent)' : (isDark ? '#475569' : '#cbd5e1')
-                    }}>
-                      {todo.done && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </div>
-                    <span style={{
-                      ...styles.todoText,
-                      textDecoration: todo.done ? 'line-through' : 'none',
-                      color: todo.done ? 'var(--text-tertiary)' : (isDark ? '#f8fafc' : '#0f172a')
-                    }}>{todo.text}</span>
-                  </div>
-                  <span style={{
-                    ...styles.todoBadge,
-                    backgroundColor: todo.priority === 'High' ? 'rgba(239,68,68,0.1)' : 'rgba(148,163,184,0.1)',
-                    color: todo.priority === 'High' ? 'var(--danger)' : (isDark ? '#94a3b8' : '#64748b')
-                  }}>
-                    {todo.priority}
+                <div style={styles.tabNavRow}>
+                  <span
+                    onClick={() => setActiveScheduleTab('today')}
+                    style={{
+                      ...styles.tabNavLink,
+                      color: activeScheduleTab === 'today' ? '#1e6ced' : 'var(--text-secondary)',
+                      borderBottomColor: activeScheduleTab === 'today' ? '#1e6ced' : 'transparent',
+                      fontWeight: activeScheduleTab === 'today' ? '700' : '500'
+                    }}
+                  >
+                    오늘의 일정
+                  </span>
+                  <span
+                    onClick={() => setActiveScheduleTab('week')}
+                    style={{
+                      ...styles.tabNavLink,
+                      color: activeScheduleTab === 'week' ? '#1e6ced' : 'var(--text-secondary)',
+                      borderBottomColor: activeScheduleTab === 'week' ? '#1e6ced' : 'transparent',
+                      fontWeight: activeScheduleTab === 'week' ? '700' : '500'
+                    }}
+                  >
+                    금주일정
+                  </span>
+                  <span
+                    onClick={() => setActiveScheduleTab('month')}
+                    style={{
+                      ...styles.tabNavLink,
+                      color: activeScheduleTab === 'month' ? '#1e6ced' : 'var(--text-secondary)',
+                      borderBottomColor: activeScheduleTab === 'month' ? '#1e6ced' : 'transparent',
+                      fontWeight: activeScheduleTab === 'month' ? '700' : '500'
+                    }}
+                  >
+                    당월일정
                   </span>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Notice Board Widget */}
-          <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
-            <div style={styles.cardHeader}>
-              <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                공지사항 <ChevronRight size={14} />
-              </h3>
-            </div>
-            <div style={styles.noticeList}>
-              {notices.map((not, idx) => (
-                <div key={idx} style={styles.noticeItem}>
-                  <div style={styles.noticeMeta}>
-                    <span style={{ ...styles.noticeDate, color: isDark ? '#64748b' : '#9ca3af' }}>{not.date}</span>
-                    <span style={{
-                      ...styles.noticeTag,
-                      borderColor: not.tagColor,
-                      color: not.tagColor
-                    }}>{not.category}</span>
-                  </div>
-                  <span style={{ ...styles.noticeText, color: isDark ? '#cbd5e1' : '#1e293b' }}>{not.text}</span>
+                <div style={styles.timelineList}>
+                  {schedules[activeScheduleTab].map((sch, idx) => (
+                    <div key={idx} style={styles.timelineItem}>
+                      <span style={{ ...styles.timelineTime, color: isDark ? '#94a3b8' : '#64748b' }}>{sch.time}</span>
+                      <div style={styles.timelineContent}>
+                        <span style={{ ...styles.timelineText, color: isDark ? '#f8fafc' : '#111827' }}>{sch.text}</span>
+                        <span style={{
+                          ...styles.statusBadge,
+                          backgroundColor: sch.statusType === 'danger' ? 'rgba(239,68,68,0.1)' : sch.statusType === 'warning' ? 'rgba(245,158,11,0.1)' : sch.statusType === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
+                          color: sch.statusType === 'danger' ? 'var(--danger)' : sch.statusType === 'warning' ? 'var(--warning)' : sch.statusType === 'success' ? 'var(--accent)' : '#0284c7',
+                        }}>
+                          {sch.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        </div>
 
-      </div>
+            {/* Column 3: Right Widget Column */}
+            <div style={styles.rightColumn}>
+              {/* To-Do List Widget */}
+              <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
+                <div style={styles.cardHeader}>
+                  <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                    나의 할 일 목록 <ChevronRight size={14} />
+                  </h3>
+                  <span style={{ ...styles.todoCount, color: isDark ? '#94a3b8' : '#64748b' }}>
+                    미완료 {todos.filter(t => !t.done).length}건
+                  </span>
+                </div>
+
+                <div style={styles.todoList}>
+                  {todos.map(todo => (
+                    <div
+                      key={todo.id}
+                      style={{
+                        ...styles.todoItem,
+                        backgroundColor: isDark ? '#1e202a' : '#f8fafc',
+                        borderColor: isDark ? '#2e303c' : '#e2e8f0',
+                      }}
+                      onClick={() => toggleTodo(todo.id)}
+                    >
+                      <div style={styles.todoCheckWrapper}>
+                        <div style={{
+                          ...styles.todoCheckbox,
+                          backgroundColor: todo.done ? 'var(--accent)' : 'transparent',
+                          borderColor: todo.done ? 'var(--accent)' : (isDark ? '#475569' : '#cbd5e1')
+                        }}>
+                          {todo.done && (
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                        <span style={{
+                          ...styles.todoText,
+                          textDecoration: todo.done ? 'line-through' : 'none',
+                          color: todo.done ? 'var(--text-tertiary)' : (isDark ? '#f8fafc' : '#0f172a')
+                        }}>{todo.text}</span>
+                      </div>
+                      <span style={{
+                        ...styles.todoBadge,
+                        backgroundColor: todo.priority === 'High' ? 'rgba(239,68,68,0.1)' : 'rgba(148,163,184,0.1)',
+                        color: todo.priority === 'High' ? 'var(--danger)' : (isDark ? '#94a3b8' : '#64748b')
+                      }}>
+                        {todo.priority}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Notice Board Widget */}
+              <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
+                <div style={styles.cardHeader}>
+                  <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                    공지사항 <ChevronRight size={14} />
+                  </h3>
+                </div>
+                <div style={styles.noticeList}>
+                  {notices.map((not, idx) => (
+                    <div key={idx} style={styles.noticeItem}>
+                      <div style={styles.noticeMeta}>
+                        <span style={{ ...styles.noticeDate, color: isDark ? '#64748b' : '#9ca3af' }}>{not.date}</span>
+                        <span style={{
+                          ...styles.noticeTag,
+                          borderColor: not.tagColor,
+                          color: not.tagColor
+                        }}>{not.category}</span>
+                      </div>
+                      <span style={{ ...styles.noticeText, color: isDark ? '#cbd5e1' : '#1e293b' }}>{not.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+          </div> {/* Closing innerTwoColumnGrid */}
+        </div> {/* Closing rightLayoutArea */}
+
+      </div> {/* Closing outerLayout */}
     </div>
   );
 };
