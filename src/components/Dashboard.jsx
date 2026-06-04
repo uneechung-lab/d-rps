@@ -149,7 +149,30 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
       ...styles.container,
       backgroundColor: isDark ? '#090a0f' : '#f4f6fa'
     }}>
-      {/* 3-Column Grid Layout in Premium Naver Works Style */}
+      {/* 1. KPI Panel Grid on Top (1 row of 5 columns) */}
+      <div style={styles.kpiGrid}>
+        {kpis.map((kpi, idx) => (
+          <div
+            key={idx}
+            style={{
+              ...styles.kpiCard,
+              background: kpi.bg,
+              backgroundColor: isDark ? '#12141c' : '#ffffff',
+              borderColor: isDark ? '#222636' : '#e2e8f0',
+            }}
+            className="dashboard-kpi-card"
+          >
+            <div style={styles.kpiHeader}>
+              <span style={{ ...styles.kpiTitle, color: isDark ? '#94a3b8' : '#64748b' }}>{kpi.title}</span>
+              {kpi.icon}
+            </div>
+            <div style={{ ...styles.kpiValue, color: isDark ? '#f8fafc' : '#0f172a' }}>{kpi.value}</div>
+            <div style={{ ...styles.kpiChange, color: isDark ? '#cbd5e1' : '#94a3b8' }}>{kpi.change}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 2. Three-Column Grid Layout below the KPIs */}
       <div style={styles.dashboardGrid}>
         
         {/* Column 1: Left Widget Column */}
@@ -218,39 +241,18 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
 
         {/* Column 2: Middle Widget Column */}
         <div style={styles.middleColumn}>
-          {/* Today KPI Widget */}
+          {/* Today Banner (No list below, just the standalone alert/banner) */}
           <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
             <div style={styles.cardHeader}>
               <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                Today 핵심 업무 지표 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
+                Today 공지 알림 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
               </h3>
             </div>
-            <div style={styles.todayBanner}>
+            <div style={{ ...styles.todayBanner, marginBottom: 0 }}>
               <span style={styles.todayBannerBadge}>필독</span>
               <span style={{ ...styles.todayBannerText, color: isDark ? '#cbd5e1' : '#374151' }}>
                 당월 퇴직연금 수수료 마감 및 재정검증 비율 준수
               </span>
-            </div>
-            
-            <div style={styles.kpiList}>
-              {kpis.map((kpi, idx) => (
-                <div key={idx} style={{
-                  ...styles.kpiRow,
-                  borderLeftColor: kpi.icon.props.color,
-                  backgroundColor: isDark ? '#1e202a' : '#f8fafc',
-                  border: `1px solid ${isDark ? '#2e303c' : '#e2e8f0'}`,
-                  borderLeft: `4px solid ${kpi.icon.props.color}`
-                }}>
-                  <div style={styles.kpiRowLeft}>
-                    <span style={{ ...styles.kpiRowTitle, color: isDark ? '#94a3b8' : '#475569' }}>{kpi.title}</span>
-                    <span style={{ ...styles.kpiRowValue, color: isDark ? '#f8fafc' : '#0f172a' }}>{kpi.value}</span>
-                  </div>
-                  <div style={styles.kpiRowRight}>
-                    <span style={{ ...styles.kpiRowChange, color: isDark ? '#cbd5e1' : '#64748b' }}>{kpi.change}</span>
-                    {kpi.icon}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -405,6 +407,42 @@ const styles = {
   container: {
     padding: '24px',
     minHeight: 'calc(100vh - 70px)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  kpiGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(5, 1fr)',
+    gap: '16px',
+    width: '100%',
+  },
+  kpiCard: {
+    borderRadius: '12px',
+    padding: '16px 20px',
+    border: '1px solid var(--border-color)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+  },
+  kpiHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  kpiTitle: {
+    fontSize: '0.8rem',
+    fontWeight: '600',
+  },
+  kpiValue: {
+    fontSize: '1.35rem',
+    fontWeight: '800',
+    fontFamily: 'var(--font-display)',
+  },
+  kpiChange: {
+    fontSize: '0.72rem',
+    fontWeight: '600',
   },
   dashboardGrid: {
     display: 'grid',
