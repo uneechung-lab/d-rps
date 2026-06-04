@@ -7,10 +7,12 @@ import {
   FilePlusIcon,
   PercentIcon,
   ShieldAlertIcon,
-  SettingsIcon
+  SettingsIcon,
+  LayoutDashboardIcon
 } from './assets/icons';
 
 export const depth1Menus = [
+  { id: 'dashboard', name: '대시보드', icon: (props) => <LayoutDashboardIcon {...props} /> },
   { id: 'contract', name: '계약', icon: (props) => <FileTextIcon {...props} /> },
   { id: 'payment', name: '납입', icon: (props) => <CalendarIcon {...props} /> },
   { id: 'asset', name: '자산운용', icon: (props) => <DatabaseIcon {...props} /> },
@@ -22,6 +24,15 @@ export const depth1Menus = [
 ];
 
 export const menuDataMap = {
+  대시보드: [
+    {
+      id: 'dashboard-mgmt',
+      title: '종합현황',
+      items: [
+        { id: 'dashboard-main', name: '대시보드' }
+      ]
+    }
+  ],
   계약: [
     {
       id: 'customer',

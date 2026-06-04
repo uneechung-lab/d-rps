@@ -5,18 +5,19 @@ import Sidebar from './components/Sidebar';
 import Depth1Menu from './components/Depth1Menu';
 import IRPContractForm from './components/IRPContractForm';
 import ContractSearchModal from './components/ContractSearchModal';
+import Dashboard from './components/Dashboard';
 import { menuDataMap } from './menuData';
 import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
   const [isDark, setIsDark] = useState(false);
-  const [activeDepth1, setActiveDepth1] = useState('계약');
-  const [activeTab, setActiveTab] = useState('IRP 계약등록');
+  const [activeDepth1, setActiveDepth1] = useState('대시보드');
+  const [activeTab, setActiveTab] = useState('대시보드');
   const [depth1Collapsed, setDepth1Collapsed] = useState(false);
   
   // Multi-tab system (bottom tabs as seen in old system)
-  const [openTabs, setOpenTabs] = useState(['IRP 계약등록']);
+  const [openTabs, setOpenTabs] = useState(['대시보드']);
   
   // Modal states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -133,10 +134,16 @@ function App() {
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
+    setOpenTabs(['대시보드']);
+    setActiveTab('대시보드');
+    setActiveDepth1('대시보드');
     addNotification(`${userData.name} 님, 환영합니다! 시스템 로그인이 완료되었습니다.`, 'success');
   };
 
   const findTabPath = (tabName) => {
+    if (tabName === '대시보드') {
+      return { depth1: '대시보드', parent: '종합현황' };
+    }
     for (const [d1Name, groups] of Object.entries(menuDataMap)) {
       for (const group of groups) {
         if (group.items.some(item => item.name === tabName)) {
@@ -150,9 +157,9 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     setSelectedContract(null);
-    setOpenTabs(['IRP 계약등록']);
-    setActiveTab('IRP 계약등록');
-    setActiveDepth1('계약');
+    setOpenTabs(['대시보드']);
+    setActiveTab('대시보드');
+    setActiveDepth1('대시보드');
   };
 
   const handleThemeToggle = () => {
@@ -176,7 +183,14 @@ function App() {
 
   const handleDepth1Select = (depth1Name) => {
     setActiveDepth1(depth1Name);
-    addNotification(`'${depth1Name}' 메뉴로 이동했습니다.`, 'success');
+    // Auto-select first submenu item of that depth1 category if switching
+    const groups = menuDataMap[depth1Name];
+    if (groups && groups.length > 0 && groups[0].items && groups[0].items.length > 0) {
+      const firstTab = groups[0].items[0].name;
+      handleSidebarTabSelect(firstTab);
+    } else {
+      addNotification(`'${depth1Name}' 메뉴로 이동했습니다.`, 'success');
+    }
   };
 
   const handleCloseTab = (e, tabName) => {
@@ -237,9 +251,9 @@ function App() {
   };
 
   const handleCloseAllTabs = () => {
-    setOpenTabs(['IRP 계약등록']);
-    setActiveTab('IRP 계약등록');
-    setActiveDepth1('계약');
+    setOpenTabs(['대시보드']);
+    setActiveTab('대시보드');
+    setActiveDepth1('대시보드');
     addNotification('모든 작업 탭을 닫고 초기화했습니다.', 'success');
   };
 
@@ -308,7 +322,9 @@ function App() {
 
         {/* Dynamic content screen wrapper */}
         <div className="scrollable-body">
-          {activeTab === 'IRP 계약등록' ? (
+          {activeTab === '대시보드' ? (
+            <Dashboard isDark={isDark} onTabSelect={handleSidebarTabSelect} />
+          ) : activeTab === 'IRP 계약등록' ? (
             <IRPContractForm
               selectedContract={selectedContract}
               onOpenSearch={() => setIsSearchOpen(true)}

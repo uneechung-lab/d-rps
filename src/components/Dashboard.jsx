@@ -1,0 +1,549 @@
+import React, { useState } from 'react';
+
+// Custom icons inside Dashboard for maximum independence
+const UsersIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const BriefcaseIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="14" x="2" y="7" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+  </svg>
+);
+
+const DatabaseIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3" />
+  </svg>
+);
+
+const ArrowDownRight = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="7" y1="7" x2="17" y2="17" /><polyline points="17 7 17 17 7 17" />
+  </svg>
+);
+
+const ArrowUpLeft = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="17" y1="17" x2="7" y2="7" /><polyline points="7 17 7 7 17 7" />
+  </svg>
+);
+
+const ChevronRight = ({ size = 16, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m9 18 6-6-6-6" />
+  </svg>
+);
+
+const Dashboard = ({ isDark, onTabSelect }) => {
+  const [activeScheduleTab, setActiveScheduleTab] = useState('today');
+  const [todos, setTodos] = useState([
+    { id: 1, text: '결재 대기 건 심사 승인 (IRP 신규 계약 3건)', done: false, priority: 'High' },
+    { id: 2, text: '지시 오류 거래 내역 대사 확인 (1건)', done: false, priority: 'High' },
+    { id: 3, text: '당일 퇴직연금 미납 부담금 고지서 출력', done: true, priority: 'Normal' },
+    { id: 4, text: '자산기관 결제대금 대사 검증 수행', done: false, priority: 'Normal' },
+  ]);
+
+  const toggleTodo = (id) => {
+    setTodos(prev => prev.map(todo => todo.id === id ? { ...todo, done: !todo.done } : todo));
+  };
+
+  const kpis = [
+    {
+      title: '전체 계약수',
+      value: '1,245 건',
+      change: '+12건 금주 대비',
+      icon: <BriefcaseIcon size={22} color={isDark ? '#38bdf8' : '#0284c7'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(56,189,248,0.1) 0%, rgba(56,189,248,0.02) 100%)' : 'linear-gradient(135deg, rgba(2,132,199,0.06) 0%, rgba(2,132,199,0.01) 100%)'
+    },
+    {
+      title: '전체 가입자수',
+      value: '48,203 명',
+      change: '+143명 당월 누적',
+      icon: <UsersIcon size={22} color={isDark ? '#34d399' : '#059669'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(52,211,153,0.1) 0%, rgba(52,211,153,0.02) 100%)' : 'linear-gradient(135deg, rgba(5,150,105,0.06) 0%, rgba(5,150,105,0.01) 100%)'
+    },
+    {
+      title: '총 적립금',
+      value: '3조 2,450 억원',
+      change: '+1,240억 전월비',
+      icon: <DatabaseIcon size={22} color={isDark ? '#a78bfa' : '#7c3aed'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(167,139,250,0.1) 0%, rgba(167,139,250,0.02) 100%)' : 'linear-gradient(135deg, rgba(124,58,237,0.06) 0%, rgba(124,58,237,0.01) 100%)'
+    },
+    {
+      title: '당월 입금액',
+      value: '142 억원',
+      change: '+8.4% 목표 대비',
+      icon: <ArrowDownRight size={22} color={isDark ? '#f472b6' : '#db2777'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(244,114,182,0.1) 0%, rgba(244,114,182,0.02) 100%)' : 'linear-gradient(135deg, rgba(219,39,119,0.06) 0%, rgba(219,39,119,0.01) 100%)'
+    },
+    {
+      title: '당월 지급액',
+      value: '98 억원',
+      change: '-2.1% 전월 대비',
+      icon: <ArrowUpLeft size={22} color={isDark ? '#fbbf24' : '#d97706'} />,
+      bg: isDark ? 'linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(251,191,36,0.02) 100%)' : 'linear-gradient(135deg, rgba(217,119,6,0.06) 0%, rgba(217,119,6,0.01) 100%)'
+    }
+  ];
+
+  const schedules = {
+    today: [
+      { time: '13:00', text: '1차 펀드 매수/매도 지시 마감', status: '마감임박', statusType: 'danger' },
+      { time: '15:30', text: '정기예금 만기 재투자 의뢰 승인 배치', status: '대기중', statusType: 'warning' },
+      { time: '17:00', text: '당월 퇴직급여 지급 배치 가동 및 송금 실행', status: '정상', statusType: 'success' },
+    ],
+    week: [
+      { time: '06-05', text: '국민연금 이전 과세이연 자료 통산 대사', status: 'D-1', statusType: 'warning' },
+      { time: '06-08', text: 'XX기업 확정기여형(DC) 부담금 납입 기한 마감', status: 'D-4', statusType: 'info' },
+      { time: '06-09', text: '상반기 정기 재정검증 시뮬레이션 보고서 작성', status: 'D-5', statusType: 'normal' },
+    ],
+    month: [
+      { time: '06-15', text: '퇴직연금 수수료(운용/자산관리) 자동 출금 청구일', status: 'D-11', statusType: 'normal' },
+      { time: '06-25', text: 'IRP 미지정 가입자 디폴트옵션 사전 통지 발송 배치', status: 'D-21', statusType: 'normal' },
+      { time: '06-30', text: '분기별 퇴직연금 비교공시 자료 검수 완료', status: 'D-26', statusType: 'danger' },
+    ]
+  };
+
+  const notices = [
+    { date: '2026-06-04', category: '시스템', tagColor: '#38bdf8', text: '퇴직연금 대사 시스템 정기 유지보수 점검 안내 (06/07 01시)' },
+    { date: '2026-06-02', category: '법률개정', tagColor: '#34d399', text: '디폴트옵션(사전지정운용제도) 관련 감독규정 개정안 가이드라인 공지' },
+    { date: '2026-05-29', category: '업무지침', tagColor: '#a78bfa', text: 'IRP 연간납입한도(최대 900만원) 가입 신청 시 확인사항 업무 지침' },
+    { date: '2026-05-25', category: '공지사항', tagColor: '#94a3b8', text: 'D-RPS Enterprise v3.6 마이너 릴리즈 노트 공유' },
+  ];
+
+  const quickLinks = [
+    { name: 'IRP 계약등록', icon: <BriefcaseIcon size={18} />, target: 'IRP 계약등록', color: '#0284c7' },
+    { name: '예적금상품관리', icon: <DatabaseIcon size={18} />, target: '예적금상품관리', color: '#059669' },
+    { name: '보유자산상세현황', icon: <UsersIcon size={18} />, target: '계약별 자산현황/잔고조회', color: '#7c3aed' },
+    { name: '교체매매 지시', icon: <ArrowDownRight size={18} />, target: '상품교체(교체매매) 등록/승인', color: '#db2777' }
+  ];
+
+  return (
+    <div style={styles.container}>
+      {/* 1. KPI Panel Grid */}
+      <div style={styles.kpiGrid}>
+        {kpis.map((kpi, idx) => (
+          <div key={idx} style={{ ...styles.kpiCard, background: kpi.bg }} className="dashboard-kpi-card">
+            <div style={styles.kpiHeader}>
+              <span style={styles.kpiTitle}>{kpi.title}</span>
+              {kpi.icon}
+            </div>
+            <div style={styles.kpiValue}>{kpi.value}</div>
+            <div style={styles.kpiChange}>{kpi.change}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 2. Middle Panel Grid (6:4 Ratio) */}
+      <div style={styles.middleGrid}>
+        {/* Left widget: Schedule Master Widget */}
+        <div style={styles.widgetCard} className="card">
+          <div style={styles.widgetHeader}>
+            <h3 style={styles.widgetTitle}>일정 마스터 위젯</h3>
+            <div style={styles.tabContainer}>
+              <button
+                onClick={() => setActiveScheduleTab('today')}
+                style={{
+                  ...styles.tabBtn,
+                  backgroundColor: activeScheduleTab === 'today' ? 'var(--primary)' : 'transparent',
+                  color: activeScheduleTab === 'today' ? '#ffffff' : 'var(--text-secondary)'
+                }}
+              >
+                오늘의 일정
+              </button>
+              <button
+                onClick={() => setActiveScheduleTab('week')}
+                style={{
+                  ...styles.tabBtn,
+                  backgroundColor: activeScheduleTab === 'week' ? 'var(--primary)' : 'transparent',
+                  color: activeScheduleTab === 'week' ? '#ffffff' : 'var(--text-secondary)'
+                }}
+              >
+                금주일정
+              </button>
+              <button
+                onClick={() => setActiveScheduleTab('month')}
+                style={{
+                  ...styles.tabBtn,
+                  backgroundColor: activeScheduleTab === 'month' ? 'var(--primary)' : 'transparent',
+                  color: activeScheduleTab === 'month' ? '#ffffff' : 'var(--text-secondary)'
+                }}
+              >
+                당월일정
+              </button>
+            </div>
+          </div>
+
+          <div style={styles.timelineList}>
+            {schedules[activeScheduleTab].map((sch, idx) => (
+              <div key={idx} style={styles.timelineItem}>
+                <span style={styles.timelineTime}>{sch.time}</span>
+                <div style={styles.timelineContent}>
+                  <span style={styles.timelineText}>{sch.text}</span>
+                  <span style={{
+                    ...styles.statusBadge,
+                    backgroundColor: sch.statusType === 'danger' ? 'rgba(239,68,68,0.1)' : sch.statusType === 'warning' ? 'rgba(245,158,11,0.1)' : sch.statusType === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
+                    color: sch.statusType === 'danger' ? 'var(--danger)' : sch.statusType === 'warning' ? 'var(--warning)' : sch.statusType === 'success' ? 'var(--accent)' : '#0284c7',
+                  }}>
+                    {sch.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right widget: To-Do list */}
+        <div style={styles.widgetCard} className="card">
+          <div style={styles.widgetHeader}>
+            <h3 style={styles.widgetTitle}>나의 할 일 목록</h3>
+            <span style={styles.todoCount}>미완료 {todos.filter(t => !t.done).length}건</span>
+          </div>
+
+          <div style={styles.todoList}>
+            {todos.map(todo => (
+              <div key={todo.id} style={styles.todoItem} onClick={() => toggleTodo(todo.id)}>
+                <div style={styles.todoCheckWrapper}>
+                  <div style={{
+                    ...styles.todoCheckbox,
+                    backgroundColor: todo.done ? 'var(--accent)' : 'transparent',
+                    borderColor: todo.done ? 'var(--accent)' : 'var(--border-color)'
+                  }}>
+                    {todo.done && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </div>
+                  <span style={{
+                    ...styles.todoText,
+                    textDecoration: todo.done ? 'line-through' : 'none',
+                    color: todo.done ? 'var(--text-tertiary)' : 'var(--text-primary)'
+                  }}>{todo.text}</span>
+                </div>
+                <span style={{
+                  ...styles.todoBadge,
+                  backgroundColor: todo.priority === 'High' ? 'rgba(239,68,68,0.1)' : 'rgba(148,163,184,0.1)',
+                  color: todo.priority === 'High' ? 'var(--danger)' : 'var(--text-secondary)'
+                }}>
+                  {todo.priority}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Bottom Panel Grid (1:1 Ratio) */}
+      <div style={styles.bottomGrid}>
+        {/* Left widget: Notice Board */}
+        <div style={styles.widgetCard} className="card">
+          <div style={styles.widgetHeader}>
+            <h3 style={styles.widgetTitle}>공지사항</h3>
+            <button style={styles.moreBtn}>더보기 <ChevronRight size={12} /></button>
+          </div>
+
+          <div style={styles.noticeList}>
+            {notices.map((not, idx) => (
+              <div key={idx} style={styles.noticeItem}>
+                <div style={styles.noticeMeta}>
+                  <span style={styles.noticeDate}>{not.date}</span>
+                  <span style={{
+                    ...styles.noticeTag,
+                    borderColor: not.tagColor,
+                    color: not.tagColor
+                  }}>{not.category}</span>
+                </div>
+                <span style={styles.noticeText}>{not.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right widget: Quick Links */}
+        <div style={styles.widgetCard} className="card">
+          <div style={styles.widgetHeader}>
+            <h3 style={styles.widgetTitle}>자주 쓰는 메뉴 퀵링크</h3>
+          </div>
+
+          <div style={styles.quickLinkGrid}>
+            {quickLinks.map((link, idx) => (
+              <div
+                key={idx}
+                onClick={() => onTabSelect(link.target)}
+                style={styles.quickLinkCard}
+                className="dashboard-quicklink"
+              >
+                <div style={{ ...styles.quickLinkIconContainer, backgroundColor: `${link.color}15`, color: link.color }}>
+                  {link.icon}
+                </div>
+                <span style={styles.quickLinkLabel}>{link.name}</span>
+                <span style={styles.quickLinkDesc}>바로가기 &rarr;</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const styles = {
+  container: {
+    padding: '24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+  },
+  kpiGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(5, 1fr)',
+    gap: '16px',
+  },
+  kpiCard: {
+    borderRadius: 'var(--radius-md)',
+    padding: '20px',
+    border: '1px solid var(--border-color)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+  },
+  kpiHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  kpiTitle: {
+    fontSize: '0.82rem',
+    fontWeight: '600',
+    color: 'var(--text-secondary)',
+  },
+  kpiValue: {
+    fontSize: '1.4rem',
+    fontWeight: '800',
+    color: 'var(--text-primary)',
+    fontFamily: 'var(--font-display)',
+  },
+  kpiChange: {
+    fontSize: '0.72rem',
+    fontWeight: '600',
+    color: 'var(--text-tertiary)',
+  },
+  middleGrid: {
+    display: 'grid',
+    gridTemplateColumns: '6fr 4fr',
+    gap: '24px',
+  },
+  widgetCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '24px',
+    borderRadius: 'var(--radius-md)',
+    backgroundColor: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    boxShadow: 'var(--card-shadow)',
+  },
+  widgetHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+  },
+  widgetTitle: {
+    fontSize: '1rem',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+  },
+  tabContainer: {
+    display: 'flex',
+    gap: '4px',
+    backgroundColor: 'var(--bg-tertiary)',
+    padding: '3px',
+    borderRadius: '6px',
+  },
+  tabBtn: {
+    padding: '5px 12px',
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    borderRadius: '4px',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  timelineList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  },
+  timelineItem: {
+    display: 'flex',
+    gap: '16px',
+    alignItems: 'flex-start',
+  },
+  timelineTime: {
+    fontSize: '0.8rem',
+    fontWeight: '700',
+    color: 'var(--text-secondary)',
+    fontFamily: 'monospace',
+    width: '45px',
+    paddingTop: '2px',
+  },
+  timelineContent: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottom: '1px solid var(--border-color)',
+    paddingBottom: '12px',
+  },
+  timelineText: {
+    fontSize: '0.82rem',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+  },
+  statusBadge: {
+    fontSize: '0.7rem',
+    fontWeight: '700',
+    padding: '3px 8px',
+    borderRadius: '4px',
+  },
+  todoCount: {
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    color: 'var(--text-secondary)',
+  },
+  todoList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  todoItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 16px',
+    backgroundColor: 'var(--bg-tertiary)',
+    borderRadius: 'var(--radius-sm)',
+    cursor: 'pointer',
+    border: '1px solid transparent',
+    transition: 'all 0.2s',
+    ':hover': {
+      borderColor: 'var(--border-color)',
+    }
+  },
+  todoCheckWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  todoCheckbox: {
+    width: '16px',
+    height: '16px',
+    borderRadius: '4px',
+    border: '1px solid',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.15s',
+  },
+  todoText: {
+    fontSize: '0.82rem',
+    fontWeight: '600',
+  },
+  todoBadge: {
+    fontSize: '0.7rem',
+    fontWeight: '700',
+    padding: '3px 8px',
+    borderRadius: '4px',
+  },
+  bottomGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '24px',
+  },
+  moreBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '0.75rem',
+    color: 'var(--text-secondary)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+  },
+  noticeList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '14px',
+  },
+  noticeItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+    borderBottom: '1px solid var(--border-color)',
+    paddingBottom: '10px',
+  },
+  noticeMeta: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  noticeDate: {
+    fontSize: '0.72rem',
+    color: 'var(--text-tertiary)',
+    fontFamily: 'monospace',
+  },
+  noticeTag: {
+    fontSize: '0.65rem',
+    fontWeight: '700',
+    border: '1px solid',
+    borderRadius: '3px',
+    padding: '1px 5px',
+  },
+  noticeText: {
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+    lineHeight: '1.4',
+  },
+  quickLinkGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '12px',
+    flex: 1,
+  },
+  quickLinkCard: {
+    border: '1px solid var(--border-color)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    backgroundColor: 'var(--bg-tertiary)',
+  },
+  quickLinkIconContainer: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickLinkLabel: {
+    fontSize: '0.85rem',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+  },
+  quickLinkDesc: {
+    fontSize: '0.72rem',
+    color: 'var(--text-tertiary)',
+    fontWeight: '600',
+  }
+};
+
+export default Dashboard;
