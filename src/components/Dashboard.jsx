@@ -149,8 +149,51 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
       ...styles.container,
       backgroundColor: isDark ? '#090a0f' : '#f4f6fa'
     }}>
-      {/* 1. KPI Panel Grid on Top (1 row of 5 columns) */}
-      <div style={styles.kpiGrid}>
+      {/* 1. Today Announcement & Todo List side-by-side on top (Row 1) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '20px', marginBottom: '20px' }}>
+        {/* Today Announcement Banner */}
+        <div style={{ ...styles.card, padding: '20px', margin: 0, justifyContent: 'center', backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
+          <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a', marginBottom: '12px' }}>
+            Today 공지 알림 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
+          </h3>
+          <div style={{ ...styles.todayBanner, marginBottom: 0 }}>
+            <span style={styles.todayBannerBadge}>필독</span>
+            <span style={{ ...styles.todayBannerText, color: isDark ? '#cbd5e1' : '#374151' }}>
+              당월 퇴직연금 수수료 마감 및 재정검증 비율 준수
+            </span>
+          </div>
+        </div>
+
+        {/* Minified Quick Todo Summary Panel */}
+        <div style={{ ...styles.card, padding: '20px', margin: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
+          <div>
+            <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a', marginBottom: '4px' }}>
+              나의 할 일 목록 <ChevronRight size={14} />
+            </h3>
+            <span style={{ fontSize: '0.78rem', color: isDark ? '#cbd5e1' : '#64748b', fontWeight: '600' }}>
+              남은 긴급 업무 {todos.filter(t => !t.done && t.priority === 'High').length}건을 포함해 총 {todos.filter(t => !t.done).length}건의 할 일이 있습니다.
+            </span>
+          </div>
+          <button
+            onClick={() => onTabSelect('IRP 계약등록')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '6px',
+              backgroundColor: '#1e6ced',
+              color: '#ffffff',
+              border: 'none',
+              fontSize: '0.78rem',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }}
+          >
+            업무 처리하기
+          </button>
+        </div>
+      </div>
+
+      {/* 2. Today KPI Panel Grid (Row 2, 5 columns) */}
+      <div style={{ ...styles.kpiGrid, marginBottom: '20px' }}>
         {kpis.map((kpi, idx) => (
           <div
             key={idx}
