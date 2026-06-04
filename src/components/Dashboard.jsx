@@ -157,10 +157,10 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
           {/* Account Widget */}
           <div style={{ ...styles.card, ...styles.profileCard, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
             <div style={styles.profileAvatarCircle}>
-              {user?.name ? user.name.charAt(0) : '정'}
+              {user?.name ? user.name.charAt(0) : '홍'}
             </div>
             <h2 style={{ ...styles.profileWelcomeText, color: isDark ? '#f8fafc' : '#0f172a' }}>
-              {user?.name || '정윤희'}님,<br />안녕하세요.
+              {user?.name || '홍길동'}님,<br />안녕하세요.
             </h2>
             <div style={{ ...styles.profileDateRow, color: isDark ? '#94a3b8' : '#64748b' }}>
               <span style={styles.calendarIconWrapper}>
@@ -176,10 +176,6 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
 
             <div style={styles.profileActionsWrapper}>
               <button style={{ ...styles.capsuleBtn, color: isDark ? '#f8fafc' : '#374151', borderColor: isDark ? '#334155' : '#e5e7eb', backgroundColor: isDark ? '#1e293b' : '#ffffff' }}>
-                <PlusCircleIcon size={16} />
-                상태 설정
-              </button>
-              <button style={{ ...styles.capsuleBtn, color: isDark ? '#f8fafc' : '#374151', borderColor: isDark ? '#334155' : '#e5e7eb', backgroundColor: isDark ? '#1e293b' : '#ffffff' }}>
                 <BellOffIcon size={16} />
                 알림 일시 정지
               </button>
@@ -193,23 +189,25 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
                 자주 쓰는 메뉴 퀵링크 <ChevronRight size={14} />
               </h3>
             </div>
-            <div style={styles.quickLinkGrid}>
+            <div style={styles.quickLinkGrid1Col}>
               {quickLinks.map((link, idx) => (
                 <div
                   key={idx}
                   onClick={() => onTabSelect(link.target)}
                   style={{
-                    ...styles.quickLinkCard,
+                    ...styles.quickLinkCardHorizontal,
                     backgroundColor: isDark ? '#1e202a' : '#f8fafc',
                     borderColor: isDark ? '#2e303c' : '#e2e8f0',
                   }}
                   className="dashboard-quicklink"
                 >
-                  <div style={{ ...styles.quickLinkIconContainer, backgroundColor: `${link.color}15`, color: link.color }}>
+                  <div style={{ ...styles.quickLinkIconContainer, backgroundColor: `${link.color}15`, color: link.color, flexShrink: 0 }}>
                     {link.icon}
                   </div>
-                  <span style={{ ...styles.quickLinkLabel, color: isDark ? '#f8fafc' : '#0f172a' }}>{link.name}</span>
-                  <span style={styles.quickLinkDesc}>바로가기 &rarr;</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                    <span style={{ ...styles.quickLinkLabel, color: isDark ? '#f8fafc' : '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.name}</span>
+                    <span style={styles.quickLinkDesc}>바로가기 &rarr;</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -243,13 +241,13 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
 
           {/* Under-KPI Grid: Middle and Right columns side-by-side */}
           <div style={styles.innerTwoColumnGrid}>
-            {/* Column 2 Part 1: Today Banner inside middleColumn */}
+            {/* Column 2: Today Banner & Schedule Widget */}
             <div style={styles.middleColumn}>
               {/* Today Banner */}
               <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
                 <div style={styles.cardHeader}>
                   <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                    Today 공지 알림 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
+                    Today 공지 <InfoCircleIcon size={14} color={isDark ? '#64748b' : '#9ca3af'} />
                   </h3>
                 </div>
                 <div style={{ ...styles.todayBanner, marginBottom: 0 }}>
@@ -259,14 +257,12 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
                   </span>
                 </div>
               </div>
-            </div> {/* Closing middleColumn (Today Banner card container & middleColumn div) */}
 
-            {/* Column 2 Part 2: Schedule Master Widget inside middleColumn */}
-            <div style={styles.middleColumn}>
+              {/* Schedule Widget (일정) */}
               <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
                 <div style={styles.cardHeader}>
                   <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                    일정 마스터 위젯 <ChevronRight size={14} />
+                    일정 <ChevronRight size={14} />
                   </h3>
                 </div>
                 <div style={styles.tabNavRow}>
@@ -327,11 +323,11 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
 
             {/* Column 3: Right Widget Column */}
             <div style={styles.rightColumn}>
-              {/* To-Do List Widget */}
+              {/* To-Do List Widget (나의 할 일) */}
               <div style={{ ...styles.card, backgroundColor: isDark ? '#12141c' : '#ffffff' }}>
                 <div style={styles.cardHeader}>
                   <h3 style={{ ...styles.cardTitle, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                    나의 할 일 목록 <ChevronRight size={14} />
+                    나의 할 일 <ChevronRight size={14} />
                   </h3>
                   <span style={{ ...styles.todoCount, color: isDark ? '#94a3b8' : '#64748b' }}>
                     미완료 {todos.filter(t => !t.done).length}건
@@ -766,6 +762,11 @@ const styles = {
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '12px',
   },
+  quickLinkGrid1Col: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
   quickLinkCard: {
     border: '1px solid var(--border-color)',
     borderRadius: 'var(--radius-sm)',
@@ -773,6 +774,17 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  quickLinkCardHorizontal: {
+    border: '1px solid var(--border-color)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '12px 14px',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: '12px',
     cursor: 'pointer',
     transition: 'all 0.2s',
   },
@@ -785,13 +797,14 @@ const styles = {
     justifyContent: 'center',
   },
   quickLinkLabel: {
-    fontSize: '0.85rem',
+    fontSize: '0.825rem',
     fontWeight: '700',
   },
   quickLinkDesc: {
-    fontSize: '0.72rem',
+    fontSize: '0.68rem',
     color: 'var(--text-tertiary)',
     fontWeight: '600',
+    marginTop: '2px',
   }
 };
 
