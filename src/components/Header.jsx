@@ -44,15 +44,21 @@ const Header = ({ user, isDark, onThemeToggle, onLogout, addNotification, active
       {/* Left side: Premium Dynamic Breadcrumbs & Process Banner */}
       <div style={styles.leftSection}>
         <div style={styles.breadcrumb}>
-          <span style={styles.breadcrumbHome}>{activeDepth1}</span>
-          {parentTitle && (
+          {activeTab === '대시보드' ? (
+            <span style={styles.breadcrumbActive}>대시보드</span>
+          ) : (
             <>
+              <span style={styles.breadcrumbHome}>{activeDepth1}</span>
+              {parentTitle && (
+                <>
+                  <span style={styles.breadcrumbSeparator}>/</span>
+                  <span style={styles.breadcrumbParent}>{parentTitle}</span>
+                </>
+              )}
               <span style={styles.breadcrumbSeparator}>/</span>
-              <span style={styles.breadcrumbParent}>{parentTitle}</span>
+              <span style={styles.breadcrumbActive}>{activeTab || 'IRP 계약등록'}</span>
             </>
           )}
-          <span style={styles.breadcrumbSeparator}>/</span>
-          <span style={styles.breadcrumbActive}>{activeTab || 'IRP 계약등록'}</span>
         </div>
 
         <div style={styles.verticalDivider} />

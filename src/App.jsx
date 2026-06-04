@@ -299,13 +299,15 @@ function App() {
       <Depth1Menu activeDepth1={activeDepth1} onDepth1Select={handleDepth1Select} collapsed={depth1Collapsed} />
 
       {/* Sidebar Navigation */}
-      <Sidebar
-        activeTab={activeTab}
-        onTabSelect={handleSidebarTabSelect}
-        activeDepth1={activeDepth1}
-        collapsed={depth1Collapsed}
-        onToggleCollapse={() => setDepth1Collapsed(!depth1Collapsed)}
-      />
+      {activeTab !== '대시보드' && (
+        <Sidebar
+          activeTab={activeTab}
+          onTabSelect={handleSidebarTabSelect}
+          activeDepth1={activeDepth1}
+          collapsed={depth1Collapsed}
+          onToggleCollapse={() => setDepth1Collapsed(!depth1Collapsed)}
+        />
+      )}
 
       {/* Main content body panel */}
       <div className="main-content">
