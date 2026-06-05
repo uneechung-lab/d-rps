@@ -513,3 +513,29 @@ input, select, textarea, button {
   background-color: var(--bg-accent);
   color: var(--primary);
 }
+
+/* Unify widths and heights of action buttons in IRP Form (React) */
+.toolbar-actions .btn,
+.actions-bar .btn,
+.right-actions .btn {
+  width: 150px !important;
+  height: 57px !important; /* 1.5x of 38px reset button */
+  font-size: 0.95rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  padding: 0 16px !important;
+}
+
+/* Set search toolbar box border to 5px and height to 80px */
+.toolbar-card {
+  border-width: 5px !important;
+  height: 80px !important;
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+
+

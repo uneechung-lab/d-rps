@@ -1,0 +1,747 @@
+﻿/**
+ * @fileoverview 프로젝트 메인프레임관련 공통함수
+ */
+if (!JsNamespace.exist("Drps.Excel"))
+{
+    /**
+     * @namespace
+     * @name Drps.Excel
+     * @author
+     * @memberof!  <global>
+     */
+     JsNamespace.declare("Drps.Excel",{
+
+        /**
+         * @class excel export <br>
+         * @param {nexacro.Grid} [objGrid    ] - Grid Object	
+         * @param {String      } [sSheetName ] - sheet name
+         * @param {String      } [sFileName  ] - file name
+         * @param {Boolean     } [bPromptResn] - 사유입력여부(true:입력,false:미입력)(default:true)
+         * @param {Boolean     } [bOpen      ] - 다운로드 후 파일 open 여부(true:open, false:unopen)(default:true)
+         * @return N/A
+         * @example
+         * Drps.Excel.excelExport(this.grid_export, "SheetName","");
+         * @memberOf Drps.Excel
+         * 2020.01.20 김준권 다중 그리드 멀티시트 엑셀 처리
+         * - @param {Object} objGrid
+         * -> @param                  objGrid
+         *           {nexacro.Grid  } : 대상 Grid Object
+         *           {nexacro.Grid[]} : 멀티시트 대상 Grid Array
+         *    @param                  sSheetName
+         *           {String        } : sheet name
+         *           {String[]      } : 멀티시트 대상 sheet name Array
+         */
+        excelExport2 : function(objGrid,  sSheetName, sFileName, bPromptResn, bOpen)
+        {
+            if(!objGrid)
+            {
+                Drps.Core.showError("undefined parameter : objGrid - " + objGrid);
+                return;
+            }
+            let totCnt = 0;
+            if(objGrid instanceof Array)
+            {
+                for(let i in objGrid)
+                {
+                    let gridObj = objGrid[i];
+                    if(!gridObj)
+                    {
+                        Drps.Core.showError("undefined : objGrid["+i+"] - " + gridObj);
+                        return;
+                    }
+                    else if(gridObj instanceof nexacro.Grid)
+                    {
+                        totCnt += gridObj.rowcount;
+                    }
+                    else
+                    {
+                        Drps.Core.showError("illegal : objGrid["+i+"] - " + gridObj);
+                        return;
+                    }
+                }
+            }
+            else if(objGrid instanceof nexacro.Grid)
+            {
+                totCnt = objGrid.rowcount;
+            }
+            else
+            {
+                Drps.Core.showError("illegal parameter : objGrid - " + objGrid);
+            }
+            
+            var ffobj = Drps.Util.ffobj;
+            
+            var objGrid_excel = objGrid;
+            
+            var regExp = /[`~!@#$%^&*|\\\'\";:\/?]/g;  // 엑셀에서 지원하지않는 모든 문자
+
+            //fileName nullcheck
+            sFileName = Drps.Util.isNull(sFileName) ? "ExcelExport_"+Drps.Util.getDate() : sFileName;
+
+            sFileName = sFileName.replace(regExp,"");	//파일명에 특수문자 제거
+            
+            /**
+             * 엑셀 다운로드 사유입력 처리
+             */
+            if(bPromptResn!==false && !Drps.Util.resnRegPopup(sFileName, totCnt))
+            {
+                return;
+            }
+            
+            // sSheetName = sSheetName.replace(regExp,""); //시트명에 특수문자 제거  // 2020.01.20 김준권 line 이동
+            
+            // 2020.01.20 김준권 type별 분기처리, 들여쓰기 처리 START
+            if(sSheetName && typeof sSheetName == "string")
+            {
+                //sheetName nullcheck
+                sSheetName = Drps.Util.isNull(sSheetName) ? "sheet1" : sSheetName;
+                sSheetName = sSheetName.replace(regExp,""); //시트명에 특수문자 제거  // 2020.01.20 김준권 line 이동
+                //sheetName 30이상일경우 기본시트명
+                if( String(sSheetName).length > 30 ){
+                    sSheetName =  "sheet1";
+                }
+            }
+            // 2020.01.20 김준권 type별 분기처리, 들여쓰기 처리 END
+            
+            var svcUrl = "svcurl::XExportImport.nx";
+            ffobj.objExport = null
+            ffobj.objExport = new ExcelExportObject();
+
+            ffobj.objExport.objgrid = objGrid_excel;
+            ffobj.objExport.set_exporturl(svcUrl);
+            ffobj.objExport.set_transferrowcount(5000);
+            // 2020.01.20 김준권 멀티시트 처리 - 그리드 배열 처리 START
+            // ffobj.objExport.addExportItem(nexacro.ExportItemTypes.GRID, objGrid_excel, sSheetName+"!A1","allband","allrecord");
+            if(objGrid_excel && (objGrid_excel instanceof nexacro.Grid))
+            {
+                let sSheetNameTmp = "";
+                if(typeof sSheetName=="string")
+                {
+                    sSheetNameTmp = sSheetName;
+                }
+                else if(sSheetName && (sSheetName instanceof Array) && sSheetName[0])
+                {
+                    sSheetNameTmp = sSheetName[0];
+                }
+                else
+                {
+                    sSheetNameTmp = "sheet1";
+                }
+                ffobj.objExport.addExportItem(nexacro.ExportItemTypes.GRID, objGrid_excel, sSheetNameTmp+"!A1","allband","allrecord");
+            }
+            else
+            {
+                let arrSheetName = [];
+                if(sSheetName==="sheet1")
+                {
+                    sSheetName = "sheet";
+                }
+                
+                if(typeof sSheetName=="string")
+                {
+                    arrSheetName.push();
+                }
+                else if(sSheetName && (sSheetName instanceof Array))
+                {
+                    arrSheetName = sSheetName;
+                }
+                
+                for(let x=arrSheetName.length;x<objGrid_excel.length;x++)
+                {
+                    if(typeof sSheetName=="string")
+                    {
+                        arrSheetName.push(sSheetName+x);
+                    }
+                    else
+                    {
+                        arrSheetName.push("sheet"+x);
+                    }
+                    
+                }
+                
+                for(let i=0;i<objGrid_excel.length;i++)
+                {
+                    let objGrid_excelTmp = objGrid_excel[i];
+                    let sSheetNameTmp    = arrSheetName.shift();
+                    ffobj.objExport.addExportItem(nexacro.ExportItemTypes.GRID, objGrid_excelTmp, sSheetNameTmp+"!A1","allband","allrecord");
+                }
+            }
+            // 2020.01.20 김준권 멀티시트 처리 - 그리드 배열 처리 END
+            ffobj.objExport.set_exportfilename(sFileName);	
+            
+            ffobj.objExport.set_exporteventtype("itemrecord");
+            ffobj.objExport.set_exportuitype("none");
+            ffobj.objExport.set_exportmessageprocess("");
+            ffobj.objExport.addEventHandler("onsuccess", this.exportOnsuccess, this);	
+            ffobj.objExport.addEventHandler("onerror", this.exportOnerror, this);	
+            
+            let sActiveMode = "active";
+            if(bOpen===false)
+            {
+                sActiveMode = "noactive";
+            }
+
+            ffobj.objExport.set_exportactivemode(sActiveMode);
+            ffobj.objExport.__opener = ffobj;
+            Drps.Util.waitCursor(ffobj,true);
+            try{
+                var result = ffobj.objExport.exportData();
+            }catch(e){
+                Drps.Util.waitCursor(ffobj,false);
+                throw e;
+            }
+        },
+        excelExport : function(objGrid,  sSheetName, sFileName, bPromptResn, bOpen)
+        {
+            if(!objGrid)
+            {
+                Drps.Core.showError("undefined parameter : objGrid - " + objGrid);
+                return;
+            }
+            let totCnt = 0;
+            if(objGrid instanceof Array)
+            {
+                for(let i in objGrid)
+                {
+                    let gridObj = objGrid[i];
+                    if(!gridObj)
+                    {
+                        Drps.Core.showError("undefined : objGrid["+i+"] - " + gridObj);
+                        return;
+                    }
+                    else if(gridObj instanceof nexacro.Grid)
+                    {
+                        totCnt += gridObj.rowcount;
+                    }
+                    else
+                    {
+                        Drps.Core.showError("illegal : objGrid["+i+"] - " + gridObj);
+                        return;
+                    }
+                }
+            }
+            else if(objGrid instanceof nexacro.Grid)
+            {
+                totCnt = objGrid.rowcount;
+            }
+            else
+            {
+                Drps.Core.showError("illegal parameter : objGrid - " + objGrid);
+            }
+            
+            var ffobj = Drps.Util.ffobj;
+            
+            var objGrid_excel = objGrid;
+
+			var arrOriginalSelectTypes = [];
+
+            var regExp = /[`~!@#$%^&*|\\\'\";:\/?]/g;  // 엑셀에서 지원하지않는 모든 문자
+
+            //fileName nullcheck
+            sFileName = Drps.Util.isNull(sFileName) ? "ExcelExport_"+Drps.Util.getDate() : sFileName;
+
+            sFileName = sFileName.replace(regExp,"");	//파일명에 특수문자 제거
+            
+            /**
+             * 엑셀 다운로드 사유입력 처리
+             */
+            if(bPromptResn!==false && !Drps.Util.resnRegPopup(sFileName, totCnt))
+            {
+                return;
+            }
+            
+            // sSheetName = sSheetName.replace(regExp,""); //시트명에 특수문자 제거  // 2020.01.20 김준권 line 이동
+            
+            // 2020.01.20 김준권 type별 분기처리, 들여쓰기 처리 START
+            if(sSheetName && typeof sSheetName == "string")
+            {
+                //sheetName nullcheck
+                sSheetName = Drps.Util.isNull(sSheetName) ? "sheet1" : sSheetName;
+                sSheetName = sSheetName.replace(regExp,""); //시트명에 특수문자 제거  // 2020.01.20 김준권 line 이동
+                //sheetName 30이상일경우 기본시트명
+                if( String(sSheetName).length > 30 ){
+                    sSheetName =  "sheet1";
+                }
+            }
+            // 2020.01.20 김준권 type별 분기처리, 들여쓰기 처리 END
+            
+            var svcUrl = "svcurl::XExportImport.nx";
+            ffobj.objExport = null
+            ffobj.objExport = new ExcelExportObject();
+
+			if(objGrid_excel instanceof nexacro.Grid) {
+				// 단일 그리드 처리
+				arrOriginalSelectTypes.push({grid: objGrid_excel, type: objGrid_excel.selecttype});
+				objGrid_excel.set_selecttype("row"); // 임시로 row로 변경 (헤더 출력 보장)
+			} else if(objGrid_excel instanceof Array) {
+				// 다중 그리드 처리
+				for(var i=0; i<objGrid_excel.length; i++) {
+					arrOriginalSelectTypes.push({grid: objGrid_excel[i], type: objGrid_excel[i].selecttype});
+					objGrid_excel[i].set_selecttype("row");
+				}
+			}
+
+			ffobj.objExport._originalSelectTypes = arrOriginalSelectTypes;
+            ffobj.objExport.objgrid = objGrid_excel;
+            ffobj.objExport.set_exporturl(svcUrl);
+            ffobj.objExport.set_transferrowcount(5000);
+            ffobj.objExport.set_exportfilepath( "%MYDOCUMENT%" );
+
+            // 2020.01.20 김준권 멀티시트 처리 - 그리드 배열 처리 START
+            // ffobj.objExport.addExportItem(nexacro.ExportItemTypes.GRID, objGrid_excel, sSheetName+"!A1","allband","allrecord");
+            if(objGrid_excel && (objGrid_excel instanceof nexacro.Grid))
+            {
+                let sSheetNameTmp = "";
+                if(typeof sSheetName=="string")
+                {
+                    sSheetNameTmp = sSheetName;
+                }
+                else if(sSheetName && (sSheetName instanceof Array) && sSheetName[0])
+                {
+                    sSheetNameTmp = sSheetName[0];
+                }
+                else
+                {
+                    sSheetNameTmp = "sheet1";
+                }
+                ffobj.objExport.addExportItem(nexacro.ExportItemTypes.GRID, objGrid_excel, sSheetNameTmp+"!A1","allband","allrecord");
+            }
+            else
+            {
+                let arrSheetName = [];
+                if(sSheetName==="sheet1")
+                {
+                    sSheetName = "sheet";
+                }
+                
+                if(typeof sSheetName=="string")
+                {
+                    arrSheetName.push();
+                }
+                else if(sSheetName && (sSheetName instanceof Array))
+                {
+                    arrSheetName = sSheetName;
+                }
+                
+                for(let x=arrSheetName.length;x<objGrid_excel.length;x++)
+                {
+                    if(typeof sSheetName=="string")
+                    {
+                        arrSheetName.push(sSheetName+x);
+                    }
+                    else
+                    {
+                        arrSheetName.push("sheet"+x);
+                    }
+                    
+                }
+                
+                for(let i=0;i<objGrid_excel.length;i++)
+                {
+                    let objGrid_excelTmp = objGrid_excel[i];
+                    let sSheetNameTmp    = arrSheetName.shift();
+                    ffobj.objExport.addExportItem(nexacro.ExportItemTypes.GRID, objGrid_excelTmp, sSheetNameTmp+"!A1","allband","allrecord");
+                }
+            }
+            // 2020.01.20 김준권 멀티시트 처리 - 그리드 배열 처리 END
+            ffobj.objExport.set_exportfilename(sFileName);	
+            
+            ffobj.objExport.set_exporteventtype("itemrecord");
+            ffobj.objExport.set_exportuitype("none");
+            ffobj.objExport.set_exportmessageprocess("");
+            ffobj.objExport.addEventHandler("onsuccess", this.exportOnsuccess, this);	
+            ffobj.objExport.addEventHandler("onerror", this.exportOnerror, this);	
+            
+            let sActiveMode = "active";
+
+            ffobj.objExport.set_exportactivemode(sActiveMode);
+            ffobj.objExport.__opener = ffobj;
+            Drps.Util.waitCursor(ffobj,true);
+            try{
+                var result = ffobj.objExport.exportData();
+            }catch(e){
+			    this._restoreSelectType(ffobj.objExport);
+                Drps.Util.waitCursor(ffobj,false);
+                throw e;
+            }
+        },
+		_restoreSelectType : function(objExport) {
+			var arrTypes = objExport._originalSelectTypes;
+			if(arrTypes && arrTypes.length > 0) {
+				for(var i=0; i<arrTypes.length; i++) {
+					arrTypes[i].grid.set_selecttype(arrTypes[i].type);
+				}
+			}
+		},
+        /**
+         * @class excel export on sucess <br>
+         * @param {Object} obj	
+         * @param {Event} e		
+         * @return N/A
+         * @example
+         * @memberOf Drps.Excel
+         */
+        exportOnsuccess : function(obj, e)
+        {
+		    this._restoreSelectType(obj);
+            let exportObj = null;
+            if(obj instanceof nexacro.ExportItem)
+            {
+                exportObj = obj.parent;
+            }
+            else if(obj instanceof nexacro.ExcelExportObject)
+            {
+                exportObj = obj;
+            }
+            if(exportObj && exportObj.__opener)
+            {
+                let ffobj = exportObj.__opener;
+                Drps.Util.waitCursor(ffobj,false);
+            }
+        },
+        
+        /**
+         * @class  excel export on error <br>
+         * @param {Object} obj	
+         * @param {Event} e		
+         * @return N/A
+         * @example
+         * @memberOf Excel
+         */
+        exportOnerror : function(obj,  e)
+        {
+		    this._restoreSelectType(obj);
+            let exportObj = null;
+            if(obj instanceof nexacro.ExportItem)
+            {
+                exportObj = obj.parent;
+            }
+            else if(obj instanceof nexacro.ExcelExportObject)
+            {
+                exportObj = obj;
+            }
+            if(exportObj && exportObj.__opener)
+            {
+                let ffobj = exportObj.__opener;
+                Drps.Util.waitCursor(ffobj,false);
+            }
+            Drps.Util.alertBox("Excel Export Error!!");
+        },
+        
+        /**
+         * @class  excel import( 데이터 헤더포함 ) <br>
+         * @param {String} objDs - dataset	
+         * @param {String} [sSheet]	- sheet name(default:Sheet1)
+         * @param {String} sHead - Head 영역지정	
+         * @param {String} [sBody] - body 영역지정(default A2)	
+         * @param {String} [sCallback]	- callback 함수
+         * @param {String} [sImportId] - import id(callback호출시 필수)	
+         * @param {Object} [objForm] - form object(callback호출시 필수)
+         * @return N/A
+         * @example
+         * Drps.Excel.excelImportAll("dsList","SheetName","A1:G1","A2","fnImportCallback","import",this);
+         * @memberOf Drps.Excel
+         */
+        excelImportAll : function(objDs,sSheet,sHead,sBody,sCallback,sImportId,objForm)
+        {
+            if(Drps.Util.isNull(sSheet)) sSheet = "sheet1";
+            if(Drps.Util.isNull(sBody)) sBody = "A2";
+            if(Drps.Util.isNull(sHead)) return false;
+            
+            //var svcUrl = "SVC::XExportImport.do";
+            var svcUrl = "svcurl::XExportImport.nx";
+            
+            var objImport;
+            objImport = new nexacro.ExcelImportObject(objDs+"_ExcelImport",objForm);
+            objImport.set_importurl(svcUrl);
+            objImport.set_importtype(nexacro.ImportTypes.EXCEL);
+            
+            objImport.__callback = sCallback;
+            objImport.__importid = sImportId;
+            objImport.__form = objForm;
+        
+            objImport.addEventHandler("onsuccess", this.importAllOnsuccess, objForm);
+            objImport.addEventHandler("onerror"  , this.importAllOnerror  , objForm);
+            
+            // 2020.08.11 김도진 - 엑셀 표시대로 처리, 기본값(true)시 소수점 발생되는 경우 있음 ex 131,280,215 => 131,280,215.999996
+            // 콤마, 통화 기호는 importOnsuccess 에서 replace한다.
+            objImport.set_userawnumbervalue(false);
+            var sParam1 = "[Command=getsheetdata;Output=outds;Head="+sSheet+"!"+sHead+";Body="+sSheet+"!"+sBody+"]";
+            var sParam2 = "["+objDs+"=outds]";
+            objImport.importData("", sParam1, sParam2);
+            objImport = null;
+        },
+
+        /**
+         * @class  excel import( 데이터 헤더제외 ) <br>
+         * @param {String} sDataset - dataset	
+         * @param {String} [sSheet]	- sheet name
+         * @param {String} [sBody] - body 영역지정	
+         * @param {String} [sCallback] - callback 함수	
+         * @param {String} [sImportId] - import id(callback호출시 필수)
+         * @param {Object} [objForm] - form object(callback호출시 필수)
+         * @param {Object} [objOption] - grid object or formatstring : 해당 파라미터가 존재 시 그리드의 셀 순서에 맞춰서 데이터셋이 세팅됨 
+         *                              해당 파라미터 미존재 시 데이터셋 컬럼 자체가 지워지고 column0...column1....column..으로 채번되어 데이터셋이 덮어씌워짐
+         *                              직접 엑셀컬럼과 넥사크로 컬럼id를 매핑시켜 처리 할때는 그리드 객체 대신 포멧에 맞는 문자열을 입력한다.
+         *                                      ex - "넥사columnid=엑셀컬럼id|넥사columnid=엑셀컬럼id|넥사columnid=엑셀컬럼id"
+         * @return N/A
+         * @example
+         * Drps.Excel.excelImport("dsCommCdBasList",this.staSubtitle.text,"A2","","import",this, this.grdCommCdBas);
+         * Drps.Excel.excelImport("dsCommCdDetailList",this.staSubtitle01.text,"A2","","import",this, "commCdId=A|commCdIdNm=A");
+         * @memberOf Drps.Excel
+         */
+        excelImport : function(sDataset,sSheet,sBody,sCallback, sImportId, objForm, objOption)
+        {
+            if ( Drps.Util.isNull(sSheet) ) sSheet = "sheet1";
+            if ( Drps.Util.isNull(sBody ) ) sBody  = "A2"    ;
+            
+            var svcUrl = "svcurl::XExportImport.nx";
+            
+            var objImport;
+            objImport = new nexacro.ExcelImportObject(sDataset+"_ExcelImport",objForm);
+            objImport.set_importurl(svcUrl);
+            objImport.set_importtype(nexacro.ImportTypes.EXCEL);
+            objImport.outds = sDataset;
+            
+            objImport.__callback = sCallback;
+            objImport.__importid = sImportId;
+            objImport.__form = objForm;
+            
+            if ( objOption && Drps.Util.typeOf(objOption) == "Grid" )
+            {
+                objImport.__grid = objOption;
+            }
+            else if ( objOption && typeof(objOption) == "string" )
+            {
+                objImport.__format = objOption;
+            }
+            
+            //out dataset 생성(차후 onsucess 함수에서 헤더생성하기 위한)
+            var sOutDsName = sDataset+"_outds";	
+            if(objForm.isValidObject(sOutDsName)) objForm.removeChild(sOutDsName);
+            var objOutDs = new Dataset();
+            objOutDs.name = sOutDsName;
+            objForm.addChild(objOutDs.name, objOutDs);
+            
+            objImport.addEventHandler("onsuccess", this.importOnsuccess , objForm);
+            objImport.addEventHandler("onerror"  , this.importAllOnerror, objForm);
+            
+            // 2020.08.11 김도진 - 엑셀 표시대로 처리, 기본값(true)시 소수점 발생되는 경우 있음 ex 131,280,215 => 131,280,215.999996
+            // 콤마, 통화 기호는 importOnsuccess 에서 replace한다.
+            objImport.set_userawnumbervalue(false);
+            
+            var sParam = "[command=getsheetdata;output=outDs;body=" + sSheet + "!" + sBody +";]";
+            var sParam2 = "[" + sOutDsName + "=outDs]";
+            objImport.importData("", sParam, sParam2);
+            objImport = null;
+        },
+
+        /**
+         * @class excel import on success <br>
+         * @param {Object} obj	
+         * @param {Event} e		
+         * @return N/A
+         * @example
+         * @memberOf Drps.Excel
+         */
+        importOnsuccess : function(obj,  e)
+        {		
+            var objForm = obj.__form;
+            
+            var objOutDs = objForm.objects[obj.outds+"_outds"];
+            var objOrgDs = objForm.objects[obj.outds];
+            var sCallback = obj.__callback;
+            var sImportId = obj.__importid;
+            var sColumnId;
+            var objGrid = obj.__grid;
+            var sFormat = obj.__format;
+            
+            objOrgDs.clearData();
+            objOrgDs.set_enableevent(false);
+            
+            if ( objGrid )
+            {
+                for(var nRow = 0; nRow < objOutDs.rowcount; nRow++)
+                {
+                    var newRow = objOrgDs.addRow();
+                    for(var nCell = 0; nCell < objGrid.getCellCount("Body"); nCell++)
+                    {
+                        sColumnId = objGrid.getCellProperty("body", nCell, "text");
+                        if( sColumnId )
+                        {
+                            sColumnId = sColumnId.replace("bind:", "");
+                            
+                            // 2020.08.11 김도진 - ExcelImportObject.set_userawnumbervalue 대응 숫자외처리
+                            var cellVal = objOutDs.getColumn(nRow, "Column" + nCell);
+                            if(cellVal==null)
+                            {
+                                // @EMPTY_BLOCK_NULL
+                            }
+                            else if ( objOrgDs.getColumnInfo(sColumnId).type == "BIGDECIMAL"
+                              || objOrgDs.getColumnInfo(sColumnId).type == "INT"
+                              || objOrgDs.getColumnInfo(sColumnId).type == "FLOAT"
+                            ) {
+                                cellVal = cellVal.replace(/[^0-9.]/g, "");
+                            }
+                            
+                            objOrgDs.setColumn(newRow, sColumnId, cellVal);
+                        }
+                    }
+                }
+            }
+            else if(sFormat)
+            {
+                var arrFormatCol = sFormat.split("|");
+                for(var nRow = 0; nRow < objOutDs.rowcount; nRow++)
+                {
+                    var newRow = objOrgDs.addRow();
+                    for(var nCol=0; nCol<arrFormatCol.length; nCol++)
+                    {
+                        sColumnId = arrFormatCol[nCol].split("=")[0];
+                        
+                        // 엑셀 컬럼 id를 넥사크로 컬럼 인덱스로 반환
+                        var sOutColIdx = Drps.Excel.excelColumnToColumnIndex(arrFormatCol[nCol].split("=")[1]);
+
+                        // 2020.08.11 김도진 - ExcelImportObject.set_userawnumbervalue 대응 숫자외처리
+                        var cellVal = objOutDs.getColumn(nRow, "Column" + sOutColIdx)||"";
+                        if(cellVal==null)
+                        {
+                            // @EMPTY_BLOCK_NULL
+                        }
+                        else if ( objOrgDs.getColumnInfo(sColumnId).type == "BIGDECIMAL"
+                          || objOrgDs.getColumnInfo(sColumnId).type == "INT"
+                          || objOrgDs.getColumnInfo(sColumnId).type == "FLOAT"
+                        ) {
+                            cellVal = cellVal.replace(/[^0-9.]/g, "");
+                        }
+                        objOrgDs.setColumn(newRow, sColumnId, cellVal);
+                    }
+                }
+            }
+            else
+            {
+                Drps.Core.trace("Excel 처리 할 수 없는 조건입니다.");
+            }
+            
+            objOrgDs.set_enableevent(true);
+            if (!Drps.Util.isNull(sCallback)) objForm.lookupFunc(sCallback).call(objForm,sImportId);
+        },
+
+        /**
+         * @class excel import on success <br>
+         * @param {Object} obj	
+         * @param {Event} e		
+         * @return N/A
+         * @example
+         * @memberOf Drps.Excel
+         */
+        importAllOnsuccess : function(obj,  e)
+        {	
+            var objForm = obj.__form;
+            
+            var sCallback = obj.__callback;
+            var sImportId = obj.__importid;
+            //화면의 callback 함수 호출
+            if (!Drps.Util.isNull(sCallback)) objForm.lookupFunc(sCallback).call(objForm,sImportId);
+        },
+        
+        /**
+         * @class  excel import on error <br>
+         * @param {Object} obj	
+         * @param {Event} e		
+         * @return N/A
+         * @example
+         * @memberOf Drps.Excel
+         */
+        importAllOnerror : function(obj,  e)
+        {
+            // 소스변경 할 수 없는 Core Library 에러메시지를 변경해서 보여준다.
+            var errmsg = e.errormsg;
+            if ( errmsg == "the file extension is wrong" )
+            {
+                errmsg = "엑셀 파일이 아닙니다. 확장자를 확인하세요.";
+            }
+            // Unable to process: Not found '(시트명)' sheet.
+            else if ( errmsg.startsWith("Unable to process: Not found") )
+            {
+                errmsg = errmsg.replace(/Unable to process: Not found '(.*?)' sheet./gi, "선택한 파일은 [$1] 엑셀 양식이 아닙니다.");
+            }
+            
+            var objForm = obj.__form;
+            Drps.Util.alertBox(errmsg,null, null, "ERR");
+        },
+        
+        /**
+         * @class excel export multi sheet
+         * @param {Object[]} [grids      ] : 멀티시트 대상 Grid 정보 Array
+         *                   - {Object}
+         *                     - {nexacro.Grid} [grid ] : 대상 grid
+         *                     - {String      } [sheet] : 시트명
+         * @param {String  } [fileName   ] : 엑셀파일명
+         * @param {Boolean } [bPromptResn] : 사유입력여부(true:입력,false:미입력)(default:true)
+         * @param {Boolean } [bOpen      ] : 다운로드 후 파일 open 여부(true:open, false:unopen)
+         * @return N/A
+         * @example
+         * Drps.Excel.exportExcelSheet(
+         *                            [
+         *                             {grid:this.Grid00,sheet:"sheet1"}
+         *                            ,{grid:this.Grid01,sheet:"sheet2"}
+         *                            ]
+         *                           ,"projectExcel"
+         *                           );
+         */
+        exportExcelSheet : function(grids, fileName, bPromptResn, bOpen)
+        {
+            if(grids && (grids instanceof Array)){
+                let arrGrid  = [];
+                let arrSheet = [];
+                let nSeq     = 0;
+                for(let i=0;i<grids.length;i++)
+                {
+                    let gridInfo = grids[i];
+                    if(gridInfo.grid && (gridInfo.grid instanceof nexacro.Grid))
+                    {
+                        let oGrid  = gridInfo.grid;
+                        let sSheet = gridInfo.sheet;
+                        if(typeof sSheet=="string" && sSheet.length > 0)
+                        {
+                            // sSheet = gridInfo.sheet;
+                        }
+                        else
+                        {
+                            sSheet = "sheet"+(arrSheet.length+1);
+                        }
+                        arrGrid.push(oGrid);
+                        arrSheet.push(sSheet);
+                    }
+                }
+                if(bPromptResn!==false)
+                {
+                    bPromptResn = true;
+                }
+                this.excelExport(arrGrid, arrSheet, fileName, bPromptResn, bOpen);
+            }
+        },
+        
+        /**
+         * @class 엑셀의 컬럼id 받아 넥사크로의 컬럼인덱스로 반환
+         * @param {String} sExcelColumn
+         * @return {int}
+         * @example
+         * @memberOf Drps.Excel
+         */
+        excelColumnToColumnIndex : function(sExcelColumn)
+        {
+            let base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let result = 0;
+            let j;
+
+            for (let i = 0, j = sExcelColumn.length - 1; i < sExcelColumn.length; i += 1, j -= 1) 
+            {
+                result += Math.pow(base.length, j) * (base.indexOf(sExcelColumn[i]) + 1);
+            }
+            return result-1;
+        }
+        
+     });
+}

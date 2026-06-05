@@ -1,0 +1,202 @@
+﻿/**
+ * @fileoverview 프로젝트 메인프레임관련 공통함수
+ */
+if (!JsNamespace.exist("Drps.File"))
+{
+    /**
+     * @namespace
+     * @name Drps.File
+     * @author
+     * @memberof!  <global>
+     */
+     JsNamespace.declare("Drps.File",{
+        /**
+         * @class FileUpTransfer 상의 가상파일을 서버에 업로드한다. <br>
+         * @param {Object} objFileUpTransfer    - 파일업로드트랜스퍼 컴포넌트
+         * @param {String} sUrl                 - 파일업로드 서비스 호출 경로
+         * @param {String} sPath                - 파일업로드시킬 폴더 위치
+         * @return N/A
+         * @example 
+         * Drps.File.upload(this.FileUpTransfer, sUrl, sPath);
+         * @memberOf Drps.File
+         */
+        upload : function(objFileUpTransfer, sUrl, sPath, sAtchFileId, sRelateTableId)
+        {
+            var svcUrl          = nexacro.getEnvironment().services.svcurl.url;
+            var sPath           = "?trgb=" + sPath ;  // 경로
+			var sAtchFileId     = "&atch_file_id=" + sAtchFileId;  // 첨부파일구분ID
+            var sRelateTableId  = "&relate_table_id=" + sRelateTableId;  // 관계테이블ID
+
+            var resultUploadUrl = svcUrl + sUrl + sPath + sAtchFileId + sRelateTableId;
+            
+            // 파일업로드 실행
+            objFileUpTransfer.upload(resultUploadUrl);
+        }
+        /**
+         * @class 현재 FileDownTransfer 컴포넌트를 이용하여 지정한 위치에서 원하는 파일을 다운로드한다. <br>
+         * @param {Object} objFileDownTransfer - 파일다운로드트랜스퍼 컴포넌트
+         * @param {String} url                 - 파일다운로드 서비스 호출 경로
+         * @param {String} serverFilePath      - 서버에 저장된 파일의 경로
+         * @param {String} serverFileNm        - 서버에 저장된 파일명(물리적파일명)
+         * @param {String} localFileNm         - 다운로드 받을 파일명(논리적파일명)
+         * @param {Boolean} autoOpen           - 파일다운로드 후 자동열기, 기본값 true
+         * @return N/A
+         * @example Drps.File.download(objFileDownTransfer, url, serverFilePath, serverFileNm, localFileNm, [autoOpen]);
+         * @memberOf Drps.File
+         */
+        , download : function(objFileDownTransfer, url, serverFilePath, serverFileNm, localFileNm, autoOpen)
+        {
+            if (autoOpen == undefined) {
+                autoOpen = true;
+            }
+            
+            var svcUrl = nexacro.getEnvironment().services.svcurl.url;
+            if ( ! serverFileNm )
+            {
+                Drps.Util.alertBox("물리파일명 설정을 해주시기 바랍니다.");
+                return;
+            }
+            var serverFilePath    = "?atchFileId=" + serverFilePath;  // 물리파일경로
+            var serverFileNm      = "&fileSeqNo="   + serverFileNm  ;  // 물리파일명
+            var resultDownloadUrl = svcUrl + url + serverFilePath + serverFileNm;
+            
+            // 자동실행_조건_시작
+            if ( autoOpen ) {
+                var downPath = system.convertRealPath("%DOCUMENT%DRPS다운로드");
+                var vFile = new VirtualFile();
+                vFile.set_async(false);
+                vFile.addEventHandler("onsuccess", function(obj, e) {
+                    if ( e.reason == 10 ) {
+                        vFile.$fileisexist = e.fileisexist;
+                        //Drps.Core.trace("fileisexist : " + vFile.$fileisexist);
+                    }
+                    else if ( e.reason == 11 ) {
+                        vFile.$createDirectory = true;
+                        //Drps.Core.trace("createDirectory : " + vFile.$createDirectory);
+                    }
+                }, this);
+                
+                // 다운로드 폴더 확인
+                vFile.isExist(downPath);
+                if ( ! vFile.$fileisexist ) {
+                    vFile.createDirectory(downPath, true);
+                }
+
+                // 유니크 파일명 생성
+                var uniqueName = Drps.File.getUniqueFileName(downPath, localFileNm, 0, "");
+                objFileDownTransfer.set_downloadfilename(uniqueName); // 파일명
+                objFileDownTransfer.download(resultDownloadUrl, downPath);
+                
+                // 폴더열기
+                system.execShell(downPath);
+                
+                // 파일열기
+                system.execShell(downPath + "\\" + uniqueName);
+                
+            // 자동실행_조건_종료
+            } else {
+                objFileDownTransfer.set_downloadfilename(localFileNm); // 파일명
+                objFileDownTransfer.download(resultDownloadUrl);       // 파일다운로드
+            }
+        }
+		
+        /**
+         * @class 다운받을 이미지의 url을 반환
+         * @param {String} sUrl                 - 이미지 다운로드 서비스 호출 경로
+         * @param {String} sPath                - 서버에 저장된 파일의 경로
+         * @param {String} sServerFileName      - 서버에 저장된 파일명(물리적파일명)
+         * @return N/A
+         * @example Drps.File.getImageDownUrl(sUrl, sPath, sServerFileName);
+         * @memberOf Drps.File
+         */
+        , getImageDownUrl : function(sUrl, sPath, sServerFileName)
+        {
+            let svcUrl = nexacro.getEnvironment().services.svcurl.url;
+            
+            // 경로 및 서버파일명이 없다면 빈값을 리턴한다.
+            if(!sPath || !sServerFileName)
+            {
+                return "";
+            }
+            let sPathParam = "?filePath="+sPath;
+            
+            // 물리적파일명 파라미터
+            let sServerFileNameParam = "&fileNm="+sServerFileName;
+            
+            let resultDownloadUrl = svcUrl + sUrl + sPathParam + sServerFileNameParam;
+            
+            return resultDownloadUrl;
+        }
+        /**
+         * @class File Path 문자열(예 : C:\a\b\filename.ext)에서 File명(예 : filename)을 추출 <br>
+         * @param {String} sPath - File Path 문자열 (예 : "C:\a\b\filename.ext")
+         * @param {String} bExt - extend를 return되는 File명에 포함시킬지 여부 ( 옵션 : Default=false )
+         * @return {String} 
+         * 성공 : <br>
+         * bExt가 true인 경우 ==> sPath에서 File명(예 : "filename.ext") <br>
+         * bExt가 false인 경우 ==> sPath에서 File명(예 : "filename") <br>
+         * 실패 : "" <br>
+         * @memberOf Drps.File
+         */
+        , getFileName : function (sPath, bExt)
+        {
+            var start_pos,end_pos,tmp_pos,filename;
+
+            if (Drps.Core.isNull(sPath)) 
+            {
+                return "";
+            }
+            if (Drps.Core.isNull(bExt)) 
+            {
+                bExt = false;
+            }
+
+            start_pos = Math.max(Drps.Core.posReverse(sPath, "\\"), Drps.Core.posReverse(sPath, "/"));
+            tmp_pos = Drps.Core.posReverse(sPath, "::");
+            if (tmp_pos > 0) 
+            {
+                tmp_pos++;
+            }
+            start_pos = Math.max(start_pos, tmp_pos);
+            if (bExt == false) 
+            {
+                end_pos = Drps.Core.posReverse(sPath, ".");
+                if (end_pos < 0) 
+                {
+                    end_pos = sPath.length;
+                }
+                filename = sPath.substr(start_pos + 1, end_pos - start_pos - 1);
+            }
+            else 
+            {
+                filename = sPath.substr(start_pos + 1);
+            }
+            return filename;
+        }
+        /*
+         * 지정된 패스에서 고유한 파일명을 리턴한다.
+         */
+        , getUniqueFileName : function (path, fileName, appendSeq, newFileName) {
+            var vFile   = new VirtualFile();
+            var isExist = false;
+            vFile.set_async(false);
+            vFile.addEventHandler("onsuccess", function(obj, e) {
+                if ( e.reason == 10 ) {
+                    vFile.$fileisexist = e.fileisexist;
+                }
+            }, this);
+            
+            // 재귀호출시 일련번호 더해서 확인
+            var newFileName = fileName;
+            if ( 0 < appendSeq ) {
+                newFileName = fileName.substring(0, fileName.lastIndexOf(".")) + "("+ appendSeq +")" + fileName.substring(fileName.lastIndexOf("."));
+            }
+            vFile.isExist(path + "\\" + newFileName);
+            if ( vFile.$fileisexist ) {
+                appendSeq = appendSeq + 1;
+                return Drps.File.getUniqueFileName(path, fileName, appendSeq, newFileName);
+            }
+            return newFileName;
+        }
+    });
+}

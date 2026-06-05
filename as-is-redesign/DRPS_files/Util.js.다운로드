@@ -1,0 +1,4185 @@
+﻿/**
+ * @fileoverview 프로젝트 메인프레임관련 공통함수
+ */
+ if (!JsNamespace.exist("Drps.Util"))
+ {
+     // ----------------------------------------------------------------------------------------------------
+     // 1. 기본    
+     // 2. Date 관련 Util
+     // 3. Dataset 관련 Util
+     // 4. Grid 관련 Util
+     // 5. POPUP 성격
+     // 6. Chart
+     // ----------------------------------------------------------------------------------------------------
+     /**
+      * @namespace
+      * @name Drps.Util
+      * @author
+      * @memberof!  <global>
+      */
+      JsNamespace.declare("Drps.Util", {
+         /**
+          * this formFile object 선언 변수
+          * @private
+          * @memberOf Drps.Core
+          */
+         ffobj : undefined,
+         
+         /**
+          * 폼 온로드시 폼 init 설정
+          * @param {xpComp} object
+          * @return
+          * @example
+          * @memberOf Drps.Core
+          */
+         init : function(obj)
+         {
+             this.onload(obj);
+         },
+         /**
+          * this.ffobj 값에 현재 폼 obj 설정
+          * @param {xpComp} object
+          * @return
+          * @example
+          * @memberOf Drps.Core
+          */
+         onload : function(obj)
+         {
+             this.ffobj = obj;
+         },
+         /**
+          * @class 값이 존재하는지 여부 체크 <br>
+          * @param {String} sValue   
+          * @return {Boolean} true/false
+          * @example
+          * var bNull = Drps.Util.isNull("aaa");  // false
+          * @memberOf Drps.Util
+          */
+         isNull : function(sValue)
+         {
+             if (new String(sValue).valueOf() == "undefined") return true;
+             if (sValue == null) return true;
+             
+             var ChkStr = new String(sValue);
+ 
+             if (ChkStr == null) return true;
+             if (ChkStr.toString().length == 0 ) return true;
+             return false;
+         },
+ 
+         /**
+          * @class 입력값을 체크하여 Null인경우 지정한 값을 리턴 <br>
+          * @param {String} inVal
+          * @param {String} nullVal  - Null인경우 대치값
+          * @return {String} 입력값이 Null인경우 지정한값, Null이 아닌경우 입력값
+          * @memberOf Drps.Util
+          */
+         nvl : function(inVal, nullVal)
+         {
+             if(inVal == null) {
+                 inVal = nullVal;
+             }
+             return inVal;
+         },
+ 
+         /**
+          * @class 정규식을 이용한 trim 구현 - 문자열 양 옆의 공백 제거 <br>
+          * @param {String} sValue - 변경하려는 값
+          * @return {String} 문자열
+          * @memberOf Drps.Util
+          */
+         trim : function(sValue)
+         {
+             if (this.isNull(sValue)) return "";
+             return nexacro.trim(sValue);
+         },
+ 
+         /**
+          * @class 정규식을 이용한 trim 구현 - 문자열 전체의 공백 제거 <br>
+          * @param {String} sValue - 변경하려는 값
+          * @return {String} 문자열
+          * @memberOf Drps.Util
+         */
+         allTrim : function(sValue)
+         {
+             var objValue = new String(sValue);
+             var sRtnValue="";
+             var i;
+ 
+             if ( sValue != null ) {
+                 for ( var i = 0; i < objValue.length; i++ ) {
+                     if ( objValue.charAt(i) != " " ) {
+                         sRtnValue = sRtnValue + objValue.charAt(i);
+                     }
+                 }
+             } else {
+                 return -1;
+             }
+             
+             return sRtnValue;
+         },
+ 
+         /**
+          * @class 문자열의 좌측부터 지정한 길이만큼 가져오는 함수
+          * @param {String} sOrg - 원본 문자열
+          * @param {Number} nSize - 얻어올 크기. [Default Value = 0]
+          * @return {String} 문자열
+          * @memberOf Drps.Util
+          */
+         left : function (sOrg, nSize)
+         {
+             return new String(sOrg).substr(0, nSize);
+         },
+ 
+         /**
+          * @class 문자열의 우측부터 지정한 길이만큼 가져오는 함수 <br>
+          * @param {String} sOrg - 원본 문자열
+          * @param {Number} nSize - 출력될 문자열의 길이
+          * @return {String} 결과값
+          * @memberOf Drps.Util
+          */
+         right : function(sOrg, nSize)
+         {
+             if ( this.isNull(sOrg) || this.isNull(nSize) )  return "";
+ 
+             if ( sOrg.length < nSize )
+                 return sOrg;
+             else
+                 return sOrg.substr(sOrg.length-nSize, nSize);
+         },
+ 
+         /**
+          * @class 문자열의 위치를 대소문자 구별하여 거꾸로 부터 찾아 첫번째 나온 index 반환<br>
+          * @param {String} sOrg - 원래 문자열( 예 : "aaBBbbccBB" )
+          * @param {String} sFind - 찾고자 하는 문자열( 예 : "BB" )
+          * @param {Number} nStart - 검색 시작위치 (옵션 : Default=문자열의 끝 )
+          * @return {Number}
+          * @example
+          * var nPos = Drps.Util.posReverse("aaBBbbccBB", "BB"); <br>
+          * 성공 = 찾고자 하는 문자열의 시작위치 ( 예 : 8 ) <br>
+          * 실패 = -1 <br>
+          * @memberOf Drps.Util
+          */
+         posReverse : function (sOrg, sFind, nStart)
+         {
+             var pos;
+ 
+             if (this.isNull(sOrg) || this.isNull(sFind)) 
+             {
+                 return -1;
+             }
+             if (this.isNull(nStart)) 
+             {
+                 nStart = sOrg.length - 1;
+             }
+ 
+             for (pos = nStart; pos >= 0; pos--) 
+             {
+                 if (sOrg.substr(pos, sFind.length) == sFind) 
+                 {
+                     break;
+                 }
+             }
+ 
+             return pos;
+         },
+ 
+         /**
+          * @class 입력받은 Number에 컴마를 추가한다. <br>
+          * @param {Number} nNumber - 숫자
+          * @param {Number} [nDetail] - 반올림할 소숫점 이하의 자릿수.
+          * @return {String} Comma 가 포함하고 있는 숫자
+          * @memberOf Util
+          */
+         appendComma : function(nNumber,nDetail)
+         {
+             if (nNumber == null)    return "";
+             if (nDetail == null)    nDetail = 0;
+             
+             nNumber         = parseFloat(nNumber);
+             nNumber         = nexacro.round(nNumber, nDetail);
+             
+             var strNumber       = new String(nNumber);
+             var arrNumber       = strNumber.split(".");
+             var strFormatNum    = "";
+             var j = 0;
+             
+             for ( i = arrNumber[0].length - 1; i >= 0; i--)
+             {
+                 if (i != strNumber.length && j == 3)
+                 {
+                     strFormatNum = arrNumber[0].charAt(i) + "," + strFormatNum;
+                     j = 0;
+                 }
+                 else
+                 {
+                     strFormatNum = arrNumber[0].charAt(i) + strFormatNum;
+                 }
+                 j++;
+             }
+             
+             if (arrNumber.length > 1)   strFormatNum = strFormatNum + "." + arrNumber[1];
+             
+             return strFormatNum;
+         },
+ 
+         /**
+          * @class 컴마를 제거한다. <br>
+          * @param {String} strValue - 컴마가 포함된 스트링
+          * @return {String} 컴마가 제거된 스트링이 반환된다.
+          * @memberOf Drps.Util
+          */
+         removeComma : function(strValue)
+         {
+             return strValue.replace(/\,/g, "");
+         },
+ 
+         /**
+          * @class 입력 문자열중 숫자값만 남긴다. <br>
+          * @param {String} strValue - 입력문자열
+          * @return {String} 숫자문자열
+          * @memberOf Drps.Util
+          */
+         getDigit : function(strValue)
+         {
+             var regExp = new RegExp("\\D","g");
+             var strRet = strValue.replace(regExp,"");
+ 
+             return strRet;
+         },
+ 
+         /**
+          * @class 특수문자를 제거한다 <br>
+          * @param {String} strValue
+          * @return {String} 특수문자를 제거한 문자열
+          * @memberOf Drps.Util
+          */
+         removeSpecialChar : function(strValue)
+         {
+             var strSpecial = "~!@#$%^&*-+./=_`{|}()\\?<>";
+            
+             for (i = 0; i < strValue.length; i++) {
+                 for (j = 0; j < strSpecial.length; j++) {
+                 if (strValue.charAt(i) == strSpecial.charAt(j))
+                     strValue = strValue.replace(strValue.charAt(i), "");
+                 }
+             }
+ 
+            return strValue;
+         },
+ 
+         /** 
+          * @class HTML TAG 제거 함수 <br>
+          * @param {String} sHtml - 제거대상 문자열
+          * @param {String} sTag - 제거할 tag(없으면 전체 tag제거)
+          * @return {String}
+          * @example
+          * var str = Drps.Util.removeHtmlTag("정상적으로<BR>처리되었습니다.");
+          * @memberOf Drps.Util
+          */
+         removeHtmlTag : function(sHtml, sTag)
+         {
+             if(this.isNull(sTag))
+             {
+                 sHtml = nexacro.replaceAll(sHtml, "<br>","\n"); 
+                 sHtml = nexacro.replaceAll(sHtml, "<BR>","\n"); 
+                 var regExp = new RegExp("<(/)?([0-9a-zA-Z]*)(\\s[0-9a-zA-Z]*=[^>]*)?(\\s)*(/)?>","g"); 
+                 sHtml = sHtml.replace(regExp, "");
+             } 
+             else if(sTag.toUpperCase() == "<BR>")
+             {
+                 sHtml = nexacro.replaceAll(sHtml, "<br>","\n"); 
+                 sHtml = nexacro.replaceAll(sHtml, "<BR>","\n"); 
+             }
+             else
+             {
+                 sHtml = nexacro.replaceAll(sHtml, sTag.toUpperCase(),"");   
+                 sHtml = nexacro.replaceAll(sHtml, sTag.toLowerCase(),"");   
+             }
+             return sHtml;
+         },
+ 
+         /**
+          * @class 배열에 해당 값이 존재하는지 확인한다. <br>
+          * @param {Array} arrVal
+          * @param {String} varVal - 값
+          * @return {Boolean} 배열에 존재여부
+          * @memberOf Drps.Util
+          */
+         isExistInArray : function(arrVal, varVal) 
+         {
+             var retVal = false;
+             var nCnt = arrVal.length;
+             for(var i=0; i<nCnt; i++) {
+                 if (arrVal[i] == varVal) {
+                     retVal = true;
+                     break;
+                 }
+             }
+ 
+             return retVal;
+         },
+ 
+         /**
+          * @class 입력된 10진수를 16진수로 변환하는 함수 <br>
+          * @param {Number} nVal - 10진수
+          * @return {String} 16진수 문자열
+          * @memberOf Drps.Util
+          */
+         _10To16 : function(nVal)
+         {
+             var n;
+             n = (nVal).toString(16);
+ 
+             return n;
+         },
+ 
+         /**
+          * @class 입력된 16진수를 10진수로 변환하는 함수
+          * @param {String} strVal - 16진수 문자열
+          * @return {Number} 10진수 숫자
+          * @memberOf Drps.Util
+          */
+         _16To10 : function(strVal)
+         {
+             var n;
+             n = (strVal).toString(10);
+             
+             return n;
+         },
+ 
+         /**
+         * @class 주어진 nexacro 개체의 type 을 반환 <br>
+         * @param {*} obj Object, Component, Frame, .. 등 nexacro 모든 개체
+         * @return {String} 개체의 type
+         * @example
+         * trace(Drps.Util.typeOf(Button00)); // output : Button
+         * trace(Drps.Util.typeOf(Tab00));    // output : Tab
+         * trace(Drps.Util.typeOf(Tab00.tabpage1));   // output : Tabpage
+         * trace(Drps.Util.typeOf(Dataset00));    // output : Dataset
+         * @memberOf Drps.Util
+         */
+         typeOf : function(obj)
+         {
+             var type;
+             if ( obj && (typeof obj == "object"))
+             {
+                 var s = obj.toString();
+                 if(s == "[object Object]") return type;
+                 
+                 type = s.substr(8, s.length-9);
+             }
+             return type;
+         },
+ 
+         /**
+          * @class nexacro Component 여부 Check <br>
+          * @param {Object} value - 체크할 Object    
+          * @return {boolean}
+          * @memberOf Drps.Util
+          */
+         isNexaComponent : function(value) 
+         {
+             if ( value === null || value === undefined  ) return false;
+             
+             return value instanceof nexacro.Component;
+         },
+         
+         /**
+         * @class Form에서 오브젝트를 삭제한다.
+         * @param {String} 삭제할 오브젝트명
+         * @return
+         * @example  Drps.Util.removeComponent("dsExample")
+         * @memberOf Util
+         */
+         removeComponent : function(objForm, strDatasetNm)
+         {
+             var objRemove = objForm.removeChild(strDatasetNm);
+             if(objRemove)
+             {
+                 objRemove.destroy();
+                 objRemove = null;
+             }
+         },
+         
+         /**
+          * @class   대상에서 오브젝트 반환
+          * @param {Object} p - 오브젝트를 찾을 대상
+          * @param {String} name - 오브젝트네임
+          * @return {Object} 오브젝트
+          * @example
+          * Drps.Util.lookup(this, "dsList"); 
+          * @memberOf Drps.Util
+          */
+         lookup : function(p, name)
+         {
+             var o;
+             while (p)
+             {       
+                 o = p.components;
+                 if ( o && o[name] ) return o[name];
+                 
+                 o = p.objects;
+                 if ( o && o[name] ) return o[name];
+                 
+                 p = p.parent;
+             }
+             return null;
+         },
+ 
+         /**
+          * @class Grid에서 expression으로  표현할때 decode 문처럼 사용할 수 있는 기능
+          * @param N/A 
+          * @return {String} varRtnValue - 반환된 문자열
+          * @example
+          * Drps.Util.decode();   
+          * @memberOf Drps.Util
+          */
+         decode : function ()
+         {
+             var varRtnValue = null;
+ 
+             var arrArgument = this.decode.arguments;
+             var varValue = arrArgument[0];
+             var bIsDefault = false;
+             var nCount = 0;
+ 
+             if ((arrArgument.length % 2) == 0) 
+             {
+                 nCount = arrArgument.length - 1;
+                 bIsDefault = true;
+             }
+             else 
+             {
+                 nCount = arrArgument.length;
+                 bIsDefault = false;
+             }
+ 
+             for (var i = 1; i < nCount; i += 2) 
+             {
+                 if (varValue == arrArgument[i]) 
+                 {
+                     varRtnValue = arrArgument[i + 1];
+                     i = nCount;
+                 }
+             }
+ 
+             if (varRtnValue == null && bIsDefault) 
+             {
+                 varRtnValue = arrArgument[arrArgument.length - 1];
+             }
+ 
+             return varRtnValue;
+         },
+         
+         /**
+         * @class 공통 유효성 검사 (null check)
+         * @param {object} objDiv or objGrid         검사할 div 또는 그리드
+         * @param {object} 매치할 user_valid속성의 값
+         * @param {var} 이후 확장속성 기본은 null check 해당 값에 따라 여러 체크 수행을 할 예정
+         * @return boolean   true면 이상없음 false면 에러 메시지
+         * @example      if(Drps.Util.valid("IQRY"))
+                                         {
+                                                 this.fn_estimate();
+                                         }
+         * @memberOf Drps.Util
+         */
+         valid : function(sOption, sType)
+         {
+             var ffobj = this.ffobj;
+             
+             var com_bool = true;
+             var objJson;
+             var objGrid;
+             
+             var objComps = Drps.Core.getAll(ffobj).components;
+             
+             if (sType == null)
+             {
+                 var leng = objComps.length;
+                 for(var i=0;i<leng;i++)
+                 {
+                     if(this.typeOf(objComps[i]) == "Grid")
+                     {
+                         if(objComps[i].validation != null)
+                         {
+                             objGrid = objComps[i];
+                             var objds = objGrid.getBindDataset();
+                             objJson = objGrid.validation;
+ 
+                             var colidx; 
+                             var dsleng;
+                             for(var j=0;j<objJson.length;j++)
+                             {
+                                 if(!com_bool){ break;}
+ 
+                                 if(objJson[j].group == sOption)
+                                 {
+                                     colidx = objGrid.getBindCellIndex("Body",objJson[j].name);
+                                     dsleng = objds.getRowCount();
+ 
+                                     for(var k=0;k<dsleng;k++)
+                                     {   
+                                         // 변경된 자료에 대해서만 유효성 검사
+                                         if(objds.getRowType(k) == Dataset.ROWTYPE_INSERT || objds.getRowType(k) == Dataset.ROWTYPE_UPDATE)
+                                         {
+                                             if(objds.getColumn(k,objJson[j].name) == null || objds.getColumn(k,objJson[j].name) === "")
+                                             {
+                                                 Drps.Util.alertBox(objJson[j].msg, function() {
+													objds.set_rowposition(k);
+													 objGrid.setCellPos(colidx, k);
+													 objGrid.showEditor();
+													 
+													 // 바인딩된 폼이 있다면 해당 컴포넌트에 포커스
+													 for(let nItem=0;nItem<ffobj.binds.length;nItem++)
+													 {
+														 if(ffobj.binds[nItem].datasetid == objds.name && ffobj.binds[nItem].columnid == objJson[j].name)
+														 {
+															 ffobj.binds[nItem]._comp.setFocus();
+															 break;
+														 }
+													 }
+												 });
+                                                 com_bool = false;
+                                                 return com_bool;
+                                             }
+                                         }
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                     else
+                     {
+                         if(objComps[i].validation != null)
+                         {
+                             objJson = objComps[i].validation;
+                             if(objJson["group"] == sOption)
+                             {
+                                 for(let bind=0;bind<ffobj.binds.length;bind++)
+                                 {
+                                     if(ffobj.binds[bind]._comp == objComps[i])
+                                     {
+                                         ffobj.binds[bind]._dataset.set_enableevent(false);
+                                         objComps[i].set_value(ffobj.binds[bind]._dataset.getColumn(ffobj.binds[bind]._dataset.rowposition,ffobj.binds[bind].columnid));
+                                         ffobj.binds[bind]._dataset.set_enableevent(true);
+                                     }
+                                 }
+                                 
+                                 if(objComps[i].value == null || objComps[i].value === "")
+                                 {
+                                     Drps.Util.alertBox(objJson["msg"],function(){
+										objComps[i].setFocus();
+									 });
+                                     com_bool = false;
+                                     return com_bool;
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
+             
+             return com_bool;
+         },
+ 
+         /**
+         * @class Json변환
+         * @param {String} String Json   문자열로 된 Json
+         * @return Json  변환된 Json
+         * @example      var objJson = Drps.Util.stringToJSON(strJson);
+         * @memberOf Drps.Util
+         */
+//          stringToJSON : function(strJson)
+//          {
+//              return eval("(" + strJson + ")");
+//          },
+ 
+         /**
+         * @class data의 길이를 반환
+         * @param {object} this
+         * @return length
+         * @example Drps.Util.length(값:12345) = 5반환
+         * @memberOf Drps.Util
+         */ 
+         length : function(sArgs)
+         {
+             var sStr = new String(sArgs);
+             //인자가 Null, undefined이면 0 반환
+             if (sStr == null || sStr == "undefined") {return 0;}
+             return sStr.length;
+         },
+         /**
+          * @class 메세지 치환
+          * @param {String} msg - 메세지 
+          * @param {String...} values
+          * @return {String}
+          * @memberOf Message
+          */
+         convertMessage : function(str) {
+             for (var i = 1; i < arguments.length; i++) {
+                 str = str.replace(/{}/, arguments[i]);
+             }
+             return str;
+         },
+         
+         /**
+          * @class 문자열 마스킹 처리
+          * @param {String} msg - 메세지 
+          * @param {String...} values
+          * @return {String}
+          * @memberOf Message
+          */
+         masking : function(strString, strRegExp, nStart, nEnd) {
+             // 정규식이 없다면 문자열값 그대로 리턴
+             if(!strRegExp)
+             {
+                 return strString;
+             }
+             
+             let arrString = strString.split("");
+             let reg = new RegExp(strRegExp, "gi");
+             
+             // end에 값이 없다면 문자열 길이를 end로 설정
+             nEnd = nEnd||arrString.length-1;
+             
+             if(nEnd > arrString.length-1)
+             {
+                 nEnd = arrString.length-1;
+             }
+             
+             for(let i=nStart;i<=nEnd;i++)
+             {
+                 arrString[i] = arrString[i].replace(reg, "*");
+             }
+             
+             return arrString.join("");
+         },
+         
+         /**
+          * @class 사업자번호 검증 
+          * @param {String} sBizNumber - 사업자번호  
+          * @return {boolean} - 사업자번호가 맞다면 true 아니면 false
+          * @example Drps.Util.isBizNumber("123-45-12345")
+          *          Drps.Util.isBizNumber("1234512345")
+          * @memberOf Drps.Util
+          */
+         isBizNumber : function(sBizNumber)
+         {
+             let valueMap = sBizNumber.replace(/-/gi, '').split('').map(function(item) {
+                 return parseInt(item, 10);
+             });
+ 
+             if (valueMap.length === 10) {
+                 let multiply = new Array(1, 3, 7, 1, 3, 7, 1, 3, 5);
+                 let checkSum = 0;
+ 
+                 for (let i = 0; i < multiply.length; ++i) {
+                     checkSum += multiply[i] * valueMap[i];
+                 }
+ 
+                 checkSum += parseInt((multiply[8] * valueMap[8]) / 10, 10);
+                 return Math.floor(valueMap[9]) === (10 - (checkSum % 10));
+             }
+ 
+             return false;
+         },
+         
+         /**
+          * @class 주민등록번호 검증 
+          * @param {String} sRegistNumber - 주민등록번호 
+          * @return {boolean} - 주민등록번호가 맞다면 true 아니면 false
+          * @example Drps.Util.isRegistNumber("123456-1234567")
+          *          Drps.Util.isRegistNumber("1234561234567")
+          * @memberOf Drps.Util
+          */
+         isRegistNumber : function(sRegistNumber)
+         {
+             sRegistNumber = sRegistNumber.replace(/-/gi, '');
+             
+             if(sRegistNumber.match('[^0-9]') || sRegistNumber.length != 13)
+             {
+                 return false;
+             }
+             
+             let arrRegistNumber = sRegistNumber.split("");
+             let arrCompare = [2,3,4,5,6,7,8,9,2,3,4,5]; 
+             let nSum = 0;
+                 
+             // 공식: M = (11 - ((2×A + 3×B + 4×C + 5×D + 6×E + 7×F + 8×G + 9×H + 2×I + 3×J + 4×K + 5×L) % 11)) % 11
+             for (var i = 0; i<12; i++)
+             {
+                 nSum = nSum + (arrRegistNumber[i] * arrCompare[i]); 
+             }
+          
+             nSum = (11 - (nSum % 11)) % 10;
+              
+             if (nSum != arrRegistNumber[12])
+             { 
+                 return false; 
+             }
+          
+             return true;
+         },
+         /**
+          * @class 문자열 길이 반환(byte단위)
+          * @param {String} target - 대상 문자열
+          * @return {Number} byte 단위 길이 반환
+          */
+         getByteLength : function(target)
+         {
+             if(target)
+             {
+                 let byteLength = 0;
+                 for(let i=0;i<target.length;i++)
+                 {
+                     let charCode = target.charCodeAt(i);
+                     if((charCode>>8)==0)
+                     {
+                         byteLength++;
+                     }
+                     else
+                     {
+                         byteLength += 2;
+                     }
+                 }
+                 return byteLength;
+             }
+             else
+             {
+                 return 0;
+             }
+         },
+        /**
+         * 하위 component 활성화 / 비활성화 처리
+         * @param {nexacro.Form} [formObj] : 대상 form
+         * @param {Boolean     } [enable ] : 활성화 여부(true:활성화,false:비활성화)
+         * @param {String      } [filters] : 포함 대상 component type(delimiter:comma)(ALL:전체)(default:ALL)
+         * @return N/A
+         * @example
+         * Drps.Util.setChildEnable(this,false,"Edit,MaskEdit,Calendar");
+         * Drps.Util.setChildEnable(this,false,"ALL");
+         */
+        setChildEnable : function(formObj, enable, filters)
+        {
+            if(formObj==null)
+            {
+                Drps.Core.showError("undefined parameter : formObj - " + formObj);
+                return;
+            }
+            if(!(formObj instanceof nexacro.Form))
+            {
+                Drps.Core.showError("illegal parameter : formObj - " + formObj);
+                return;
+            }
+            if(typeof enable != "boolean")
+            {
+                Drps.Core.showError("illegal parameter : enable - " + typeof enable);
+                return;
+            }
+            if(filters==null)
+            {
+                filters = "ALL";
+            }
+            if(typeof filters!="string")
+            {
+                Drps.Core.showError("illegal parameter : filters - " + typeof filters);
+                return;
+            }
+            let filterArr = filters.split(",");
+            let objComps = Drps.Core.getAll(formObj).components;
+            compLoop : for(let i in objComps)
+            {
+                let objComp = objComps[i];
+                if(typeof objComp.set_enable=="function")
+                {
+                    if(filters==="ALL")
+                    {
+                        objComp.set_enable(enable);
+                    }
+                    else
+                    {
+                        filterLoop : for(let x in filterArr)
+                        {
+                            let filter     = filterArr[x];
+                            let filterType = nexacro[filter];
+                            if(filterType==null){continue filterLoop;}
+                            if(objComp instanceof filterType)
+                            {
+                                objComp.set_enable(enable);
+                                continue compLoop;
+                            }
+                        }
+                    }
+                }
+            }
+             
+        },
+        /**
+         * 화면 메뉴 title 추출
+         * @param {nexacro.Static} [compObj] : title Static
+         * @return {String} : 메뉴명(없을 시 기존 text 반환)
+         */
+        getMenuTitle : function(compObj)
+        {
+             if(compObj==null){return "";}
+             if(!(compObj instanceof nexacro.Static)){return "";}
+             let text     = compObj.text;
+             let formObj  = compObj._refform;
+             let frameObj = formObj.getOwnerFrame();
+             if(!frameObj){return text;}
+             let pageId   = frameObj.id;
+             if(this.isNull(pageId)){return text;}
+             let gdsMenu = nexacro.getApplication().gdsMenu;
+             let row     = gdsMenu.findRow("menuCd",pageId);
+             if(row==-1){return text;}
+             let menuNm  = gdsMenu.getColumn(row, "menuCdNm");
+             if(Drps.Util.isNull(menuNm)){return text;}
+             return menuNm;
+        },
+        /************************************************************************************************
+         * 2. Date 관련 Util
+         ************************************************************************************************/
+         /**
+          * @class 날짜 여부를 확인한다.(년월 or 년월일) <br>
+          * @param {String} strDate - 입력스트링(YYYYMM or YYYYMMDD)
+          * @return {Boolean}
+          * @memberOf Drps.Util
+          */
+         isDate : function(strDate)
+         {
+             if (this.isNull(strDate)) return false;
+             
+             var retVal;
+             switch(strDate.length)
+             {
+                 case 6://년월
+                     retVal =  this.isYM(strDate);
+                     break;
+                 case 8://년월일
+                     retVal =  this.isYMD(strDate);
+                     break;
+                 default:
+                     retVal = false; 
+                     break;
+             }
+ 
+             return retVal;
+         },
+ 
+         /**
+          * @class 날짜 여부를 확인한다. <br>
+          * @param {String} strDate - 8자리의 숫자로 된 날짜(YYYYMMDD)
+          * @return {Boolean}
+          * @memberOf Drps.Util
+          */
+         isYMD : function(strDate)
+         {
+             var retVal = this.getDigit(strDate);
+             
+             if (retVal.length != 8) {
+                 return false;
+             }
+ 
+             var strYM = strDate.substr(0,6);    //년월
+             if (!this.isYM(strYM)) {
+                 return false;
+             }
+             var nDay   = Number(strDate.substr(6,2));   // 일자
+             var nLastDay = Number(this.getLastDate(strYM).substr(6,2));//getLastDay에서 전체 20170331값이 넘어와서 .substr(6,2)추가 20170313
+             if (nDay < 1 || nDay > nLastDay) {
+                 return false;
+             }
+             return true;
+         },
+ 
+         /**
+          * @class 날짜 여부를 확인한다. <br>
+          * @param {String} strDate - 6자리의 숫자로 된 날짜(YYYYMM)
+          * @return {Boolean}
+          * @memberOf Drps.Util
+          */
+         isYM : function(strDate)
+         {
+             var retVal = this.getDigit(strDate);
+                 
+             var retVal = this.getDigit(strDate);
+ 
+             if (retVal.length != 6) {
+                 return false;
+             }
+ 
+             var nYear  = Number(strDate.substr(0,4));   //년도값을 숫자로
+             var nMonth = Number(strDate.substr(4,2));   //월을 숫자로
+ 
+             if((nMonth < 1) || (nMonth > 12)) {
+                 return false;
+             }
+ 
+             return true;
+         },
+
+		/**
+        * @class  시작일자와 종료일자를 비고하여 종료일자가 작으면 false리턴
+        * @param  {Object} 호출 화면의 조회조건 컴포넌트들
+        * @return {Boolean}
+        */
+		getDateCompare : function(sStartDate, sEndDate)
+		{	
+			if (sStartDate == null || sEndDate == null){ return true;}
+			if (sStartDate.length < 4 || sEndDate.length < 4){ return true;}
+			if (nexacro.toNumber(sStartDate) > nexacro.toNumber(sEndDate)){ return false;}
+			
+			return true;
+		},	
+		
+         /**
+          * @class 시간 형식에 맞는지 Check 한다. <br>
+          * @param {String} strTime - 6자리의 숫자로 된 내부시간형식(HHMMSS)
+          * @return {Boolean}
+          * @memberOf Drps.Util
+          */
+         isTime : function(strTime)
+         {
+             if (strTime.length != 6 || !nexacro.isNumeric(strTime)) {
+                 return false;
+             }
+             
+             var t01 = Number(strTime.substring(0, 2));
+             var t02 = Number(strTime.substring(2, 4));
+             var t03 = Number(strTime.substring(4, 6));
+ 
+             if((t01 < 0 || t01 > 23) || (t02 < 0 || t02 > 59) || (t03 < 0 || t03 > 59)) {
+                 return false;
+             } else {
+                 return true;
+             }
+         },
+ 
+         /**
+          * @class 현재일자를 구한다. <br>
+          * @param {String} [sGubn] - date/null : 일자, time : 일자+시간, milli : Milliseconds
+          * @return {String} 8자리 날짜(YYYYMMMDD)문자열
+          * @memberOf Drps.Util
+          */
+         getDate : function(sGubn) 
+         {
+             if(this.isNull(sGubn)) sGubn = "date";
+             var d = new Date();
+             
+             var s;
+             
+             if (sGubn == "date") {
+                 s = d.getFullYear()
+                       + ((d.getMonth() + 1) + "").padLeft(2, '0')
+                       + (d.getDate() + "").padLeft(2, '0');
+             }
+             else if (sGubn == "time") {
+                 s = d.getFullYear()
+                       + ((d.getMonth() + 1) + "").padLeft(2, '0')
+                       + (d.getDate() + "").padLeft(2, '0')
+                       + (d.getHours() + "").padLeft(2, '0')
+                       + (d.getMinutes() + "").padLeft(2, '0')
+                       + (d.getSeconds() + "").padLeft(2, '0');
+             }
+             else if (sGubn == "milli") {
+                 s = d.getFullYear()
+                       + ((d.getMonth() + 1) + "").padLeft(2, '0')
+                       + (d.getDate() + "").padLeft(2, '0')
+                       + (d.getHours() + "").padLeft(2, '0')
+                       + (d.getMinutes() + "").padLeft(2, '0')
+                       + (d.getSeconds() + "").padLeft(2, '0')
+                       + (d.getMilliseconds() + "").padLeft(3, '0');
+             }
+             return (s);
+         },
+ 
+         /**
+          * @class 년월을 입력받아 마지막 일를 반환한다(년월) <br>
+          * @param {String} strDate - 6 / 8 자리의 숫자로 된 날짜(YYYYMM)
+          * @return {String} 해당월의 마지막날 8자리
+          * @memberOf Drps.Util
+          */
+         getLastDate : function(strDate)
+         {
+             var s = "";
+             if (strDate == null) {
+                 var date = (new Date()).addMonth(1);
+             }
+             else {
+                 var date = new Date(parseInt(strDate.substr(0,4)),parseInt(strDate.substr(4,2)),1);
+             }
+ 
+             date = (new Date(date)).addDate((new Date(date)).getDate()*-1);
+ 
+             s = (new Date(date)).getFullYear()
+               + (((new Date(date)).getMonth() + 1) + "").padLeft(2, '0')
+               + ((new Date(date)).getDate() + "").padLeft(2, '0');
+ 
+             return (s);
+         },
+ 
+         /**
+          * @class 현재월 1일 만들기. <br>
+          * @param {String} strDate - Date Format YYYYMM / YYYYMMDD
+          * @return {String} date
+          * @memberOf Drps.Util
+          */
+         getFirstDate : function(strDate)
+         {
+             var s = "";
+ 
+             if (strDate == null) {
+                 s = getToday().substr(0,6) + "01";
+             }
+             else {
+                 var date = new Date(parseInt(strDate.substr(0,4)),parseInt(strDate.substr(4,2))-1,1);
+                 s = (new Date(date)).getFullYear()
+                   + (((new Date(date)).getMonth()+1)+ "").padLeft(2, '0')
+                   + ((new Date(date)).getDate() + "").padLeft(2, '0');
+ 
+             }
+             
+             return (s);
+         },
+ 
+         /**
+          * @class 입력된 날자로부터 요일을 구함 <br>
+          * @param {String} strDate - 'yyyyMMdd' 형태로 표현된 날짜.
+          * @return {Number} 0 = 일요일 ~ 6 = 토요일. 오류가 발생할 경우 -1 Return.
+          * @memberOf Drps.Util
+          */
+         getDay : function(strDate)
+         {
+             var date = new Date();
+ 
+             var iYear = parseInt(strDate.substr(0, 4));
+             var iMonth = parseInt(strDate.substr(4, 2) - 1);
+             var iDate = parseInt(strDate.substr(6, 2));
+             
+             date.setFullYear(iYear,iMonth,iDate);
+             return date.getDay();
+         },
+         
+         /**
+          * @class 입력된 날자로부터 요일명을 구함 <br>
+          * @param {String} strDate - 'yyyyMMdd' 형태로 표현된 날짜.
+          * @param {String} type - (확장속성) 국가 종류
+          * @return {String} 날짜에 맞는 요일
+          * @memberOf Drps.Util
+          */
+         getStringDay : function(strDate, type) {
+             type = type || "KOR";
+             var weekday = new Array(7);
+             if (type == "KOR") {
+                 weekday[0] = "일";
+                 weekday[1] = "월";
+                 weekday[2] = "화";
+                 weekday[3] = "수";
+                 weekday[4] = "목";
+                 weekday[5] = "금";
+                 weekday[6] = "토";
+             }
+             return weekday[Drps.Util.getDay(strDate)];
+         },
+         
+         /**
+          * @class 두 일자간의 차이 일수 계산 <br>
+          * @param {String} sStartDate - yyyyMMdd형태의 From 일자 ( 예 : "20121122" )
+          * @param {String} sEndDate - yyyyMMdd형태의 To 일자   ( 예 : "20121202" )
+          * @return {Number} 숫자 형태의 차이일수( 예 : 10 ) 단, sEndDate < sStartDate이면 음수가 return된다.
+          * @memberOf Drps.Util
+          */
+         getDiffDate : function(sStartDate, sEndDate)
+         {
+             var vFromDate = new Date(parseInt(sEndDate.substring(0,4),  10), parseInt(sEndDate.substring(4,6)-1,  10), parseInt(sEndDate.substring(6,8), 10));
+             var vToDate = new Date(parseInt(sStartDate.substring(0,4),  10), parseInt(sStartDate.substring(4,6)-1,  10), parseInt(sStartDate.substring(6,8), 10));
+             
+             return parseInt((vFromDate - vToDate)/(1000*60*60*24));
+         },
+ 
+         /**
+          * @class 두 일자간의 차이 일수 계산. 단, sStartDate, sEndDate의 일은 포함하지 않고 계산된다. <br>
+          * @param {String} sStartDate - yyyyMMdd형태의 From 일자 ( 예 : "20121122" )
+          * @param {String} sEndDate - yyyyMMdd형태의 To 일자   ( 예 : "20121202" )
+          * @return {Number} 숫자 형태의 차이월수 ( 예 : 10 ) 단, sEndDate < sStartDate이면 음수가 return된다.
+          * @memberOf Drps.Util
+          */
+         getDiffMonth : function(sStartDate, sEndDate)
+         {
+             var nStartMon, nEndMon;
+             
+             nStartMon = parseInt(sStartDate.substr(0,4), 10)*12 + parseInt(sStartDate.substr(4,2), 10);
+             nEndMon = parseInt(sEndDate.substr(0,4), 10)*12 + parseInt(sEndDate.substr(4,2), 10);
+             
+             return (nEndMon - nStartMon);
+         },
+ 
+         /**
+          * @class 입력된 날짜에 OffSet 으로 지정된 만큼의 날짜를 더함 <br>
+          * @param {String} strDate - 'yyyyMMdd' 형태로 표현된 날짜.
+          * @param {Number} nOffSet - 날짜로부터 증가 감소값.
+          * @return {String} date의 문자열 (ex. 20080821)
+          * @memberOf Drps.Util
+          */
+         addDate : function(strDate, nOffSet)
+         {
+             var date = new Date();
+                 
+             var iYear = parseInt(strDate.substr(0, 4));
+             var iMonth = parseInt(strDate.substr(4, 2) - 1);
+             var iDate = parseInt(strDate.substr(6, 2)-(nOffSet*-1));
+             
+             date.setFullYear(iYear,iMonth,iDate);   
+                 
+             return this.dateToStr(date);
+         },
+ 
+         /**
+          * @class 입력된 월에 OffSet 으로 지정된 만큼의 월을 더함 <br>
+          * @param {String} strDate - String Date Format
+          * @param {Number} OffSet - Integer Format
+          * @return {String} date
+          * @memberOf Drps.Util
+          */
+         addMonth : function(strDate, OffSet) 
+         {   
+             var date, d, s, mon, val;
+ 
+             /**
+              * @class 입력일자 해당월의 마지막 일 <br>
+              * @param {String} strMonth - 'yyyyMMdd' 형태로 표현된 날짜.
+              * @return {Number} 해당월의 마지막일자 2자리
+              */
+             var getMonthLastDate = function(strMonth) {
+                 var iLastDay;
+                 var iYear  = parseInt(strMonth.substr(0, 4),10) ;
+                 var iMonth = parseInt(strMonth.substr(4, 2),10);
+                 switch(iMonth)
+                 {
+                     case 2 :
+                         if( ((iYear%4)==0) && ((iYear%100)!=0) || ((iYear%400)==0) )
+                             iLastDay = 29;
+                         else
+                             iLastDay = 28;          
+                         break;
+                     case 4 :
+                     case 6 :
+                     case 9 :
+                     case 11 :
+                         iLastDay = 30;
+                         break;
+                     default:
+                         iLastDay = 31;
+                         break;
+                 }
+                 
+                 return iLastDay;
+             };
+ 
+             if (strDate) {
+                 date = this.strToDate(strDate);
+                 d = (new Date(date)).addMonth(OffSet);
+             } else {
+                 date = this.strToDate(this.getDate());
+                 d = (new Date(date)).addMonth(OffSet);
+             }
+             
+             if (getMonthLastDate(strDate) == date.getDate()) {
+                 var sY = new Date(d).getFullYear();
+                 var sM = new Date(d).getMonth();
+                 var eY = date.getFullYear();
+                 var eM = date.getMonth();
+                 
+                 mon = -((eY - sY)* 12 + (eM - sM));
+                 
+                 if (mon != OffSet) {
+                     val = OffSet - mon;
+                     d = (new Date(d)).addMonth(-1);
+                 }
+                 
+                 var ld = new Date((new Date(d)).getFullYear() 
+                             , (new Date(d)).getMonth()
+                             , getMonthLastDate(this.dateToStr(new Date(d))));
+                 
+                 s = (new Date(ld)).getFullYear()
+                            + (((new Date(ld)).getMonth() + 1) + "").padLeft(2, '0')
+                            + (((new Date(ld)).getDate()) + "").padLeft(2, '0');
+             } else {
+                 s = (new Date(d)).getFullYear()
+                            + (((new Date(d)).getMonth() + 1) + "").padLeft(2, '0')
+                            + (((new Date(d)).getDate()) + "").padLeft(2, '0');
+             }
+                 
+             return (s);
+         },
+ 
+         /**
+          * @class 법정공휴일 구하기 <br>
+          * @param {Number} nYear - yyyy
+          * @return {Array} 휴일정보
+          * @example : 
+          * @memberOf Drps.Util
+          */
+         getHolidays : function(nYear)
+         {
+             var nYear;
+             var aHoliday = new Array();
+ 
+             /////// 음력 체크
+             // 구정
+             aHoliday[0] = this.lunarToSolar((nYear-1) + "1230", false) + "설날";
+             aHoliday[1] = this.addDate(aHoliday[0].substring(0, 8), 1) + "설날";
+             aHoliday[2] = this.addDate(aHoliday[1].substring(0, 8), 1) + "설날";
+             // 석가탄신일
+             aHoliday[3] = this.lunarToSolar(nYear + "0408", false) + "석가탄신일";
+             // 추석
+             aHoliday[4] = this.lunarToSolar(nYear + "0814", false) + "추석";
+             aHoliday[5] = this.addDate(aHoliday[4].substring(0, 8), 1) + "추석";
+             aHoliday[6] = this.addDate(aHoliday[5].substring(0, 8), 1) + "추석";    
+ 
+             /////// 양력 체크
+             aHoliday[7] = nYear+"0101" + "신정";
+             aHoliday[8] = nYear+"0301" + "삼일절";
+             aHoliday[9] = nYear+"0505" + "어린이날";    
+             aHoliday[10] = nYear+"0606" + "현충일";     
+             aHoliday[11] = nYear+"0815" + "광복절"; 
+             aHoliday[12] = nYear +"1003" + "개천절";
+             aHoliday[13] = nYear +"1009" + "한글날";
+             aHoliday[14] = nYear+"1225" + "성탄절";         
+             
+             return aHoliday.sort();
+         },
+ 
+         /**
+          * @class 양력을 음력으로 변환해주는 함수.<br>
+          * [주의사항]<br>
+          *  1. return값이 8자리가 아니고 9자리임에 주의<br>
+          *  2. 처리가능 기간  1841 - 2043년
+          * @param {String | Date} value - yyyyMMdd형태의 양력일자 ( 예 : "20121122" )
+          * @return {String} Flag(평달 = "0", 윤달 = "1") + 'yyyyMMdd'형태의 음력일자
+          * @example
+          * var dt = this.str2Date("20130331");
+          * var str = this.solarToLunar(dt);
+          * trace(str); // output : 020130220
+          * var str1 = "20130331";
+          * var str = this.solarToLunar(str1);
+          * trace(str); // output : 020130220
+          * @memberOf Drps.Util
+          */     
+         solarToLunar :  function(value) 
+         {
+             var sMd         = "31,0,31,30,31,30,31,31,30,31,30,31";
+             var arrMd       = [];
+             var arrBaseInfo = [];
+             var arrDt       = [];   // 매년의 음력일수를 저장할 배열 변수
+             var nTd;                        // 음력일을 계산하기 위해 양력일과의 차이를 저장할 변수
+             var nTd1;                       // 1840년까지의 날수
+             var nTd2;                       // 현재까지의 날수
+             var nTemp;                      // 임시변수
+             var nLy, nLm, nLd;              // 계산된 음력 년, 월, 일을 저장할 변수
+             var sLyoon;                     // 현재월이 윤달임을 표시
+ 
+             var nY, nM, nD;
+ 
+             nY = parseInt(value.substr(0,4), 10);
+             nM = parseInt(value.substr(4,2), 10);
+             nD = parseInt(value.substr(6,2), 10);
+             
+             
+             if (nY < 1841 || nY > 2043) 
+             {
+                 return null;
+             }
+ 
+             arrBaseInfo = this.solarBase();
+             arrMd       = sMd.split(",");
+             arrMd[1]    = 28;
+                     
+             //윤년여부 확인
+             if ((nY % 4) == 0) 
+             {
+                 if ((nY % 100) != 0 || (nY % 400) == 0)
+                 { 
+                     arrMd[1] = 29;
+                 }
+             } 
+ 
+             // 672069 = 1840 * 365 + 1840/4 - 1840/100 + 1840/400 + 23  //1840년까지 날수
+             nTd1 = 672069;   
+                     
+             // 1841년부터 작년까지의 날수
+             nTd2 = (nY - 1) * 365 + parseInt((nY - 1)/4) - parseInt((nY - 1)/100) + parseInt((nY - 1)/400);
+                     
+             // 전월까지의 날수를 더함
+             for (var i = 0; i <= nM - 2; i++)
+             {
+                 nTd2 = nTd2 + parseInt(arrMd[i]);
+             }
+ 
+             // 현재일까지의 날수를 더함
+             nTd2 = nTd2 + nD;
+ 
+             // 양력현재일과 음력 1840년까지의 날수의 차이
+             nTd = nTd2 - nTd1 + 1;
+             
+             // 1841년부터 음력날수를 계산
+             for (var i = 0; i <= nY - 1841; i++)
+             {
+                 arrDt[i] = 0;
+                 for (var j = 0; j <= 11; j++)
+                 {
+                     switch (parseInt(arrBaseInfo[i * 12 + j]))
+                     {
+                         case 1 : nTemp = 29;
+                             break;
+                         case 2 : nTemp = 30;
+                             break;              
+                         case 3 : nTemp = 58;    // 29 + 29
+                             break;              
+                         case 4 : nTemp = 59;    // 29 + 30
+                             break;              
+                         case 5 : nTemp = 59;    // 30 + 29
+                             break;              
+                         case 6 : nTemp = 60;    // 30 + 30
+                             break;              
+                     }
+                     
+                     arrDt[i] = arrDt[i] + nTemp;
+                 }
+             }
+                     
+             // 1840년 이후의 년도를 계산 - 현재까지의 일수에서 위에서 계산된 1841년부터의 매년 음력일수를 빼가면수 년도를 계산
+             nLy = 0;
+             do
+             {
+                 nTd = nTd - arrDt[nLy];
+                 nLy = nLy + 1;
+             }
+             while(nTd > arrDt[nLy]);
+             
+             nLm    = 0;
+             sLyoon = "0";   // 현재월이 윤달임을 표시할 변수 - 기본값 평달
+             do
+             {
+ 
+                 if (parseInt(arrBaseInfo[nLy * 12 + nLm]) <= 2)
+                 {
+                     nTemp = parseInt(arrBaseInfo[nLy * 12 + nLm]) + 28;
+                     if (nTd > nTemp)
+                     {
+                         nTd = nTd - nTemp;
+                         nLm = nLm + 1;
+                     }
+                     else
+                     {
+                         break;
+                     }
+                 }
+                 else
+                 {
+                     switch (parseInt(arrBaseInfo[nLy * 12 + nLm]))
+                     {
+                         case 3 :
+                             m1 = 29;
+                             m2 = 29;
+                             break;
+                         case 4 : 
+                             m1 = 29;
+                             m2 = 30;
+                             break;                  
+                         case 5 : 
+                             m1 = 30;
+                             m2 = 29;
+                             break;                  
+                         case 6 : 
+                             m1 = 30;
+                             m2 = 30;
+                             break;                  
+                     }
+ 
+                     if (nTd > m1)
+                     {
+                         nTd = nTd - m1;
+                         if (nTd > m2)
+                         {
+                             nTd = nTd - m2;
+                             nLm = nLm + 1;
+                         }
+                         else
+                         {
+                             sLyoon = "1";
+                         }
+                     }
+                     else
+                     {
+                         break;
+                     }
+                 }
+             }
+             while(1);
+             
+             nLy = nLy + 1841;
+             nLm = nLm + 1;
+             nLd = nTd;
+ 
+             var sRtn = sLyoon + nLy; 
+             sRtn = sRtn + nLm.toString().padLeft(2, "0"); 
+             sRtn = sRtn + nLd.toString().padLeft(2, "0");    
+             return sRtn;
+         },  
+ 
+         /**
+          * @class 음력을 양력으로 변환. <br>
+          * @param {String | Date} value - yyyyMMdd형태의 음력일자 ( 예 : "20121122" ).
+          * @param {Boolean} leapMonth - 윤달 여부.
+          * @return {String} 'yyyyMMdd'형태의 양력일자
+          * @memberOf Drps.Util
+          */
+         lunarToSolar : function(value, leapMonth)
+         {
+ 
+             var sMd         = "31,0,31,30,31,30,31,31,30,31,30,31";
+             var arrMd       = [];   
+             var arrBaseInfo = [];
+             var nTd         = 0;
+             var nSy, nSm, nSd;              // 계산된 양력 년, 월, 일을 저장할 변수
+             var nY1, nM1, nY2, nY3, nTemp;  // 임시변수 
+             var nLeap;    
+                     
+             var nLy, nLm, nLd;
+ 
+             nLy = parseInt(value.substr(0,4), 10);
+             nLm = parseInt(value.substr(4,2), 10);
+             nLd = parseInt(value.substr(6,2), 10);
+             
+ 
+             if (nLy < 1841 || nLy > 2043)   
+             {
+                 return null;
+             }   
+ 
+             arrBaseInfo = this.solarBase();
+             arrMd       = sMd.split(",");
+             arrMd[1]    = 28;
+             
+             //윤년여부 확인
+             if ((nLy % 4) == 0) 
+             {
+                 if ((nLy % 100) != 0 || (nLy % 400) == 0)
+                 { 
+                     arrMd[1] = 29;
+                 }
+             } 
+                     
+             nY1   = nLy - 1841; //176
+             nM1   = nLm - 1; //02
+             nLeap = 0;
+             
+             if (parseInt(arrBaseInfo[nY1 * 12 + nM1]) > 2)
+             {
+                 //윤년여부 확인
+                 if ((nLy % 4) == 0) 
+                 {
+                     if ((nLy % 100) != 0 || (nLy % 400) == 0)
+                     { 
+                         nLeap = 1;
+                     }
+                 } 
+             }
+             if (nLeap == 1)
+             {
+                 switch (parseInt(arrBaseInfo[nY1 * 12 + nM1]))
+                 {
+                     case 3 : nTemp = 29;
+                         break;
+                     case 4 : nTemp = 30;
+                         break;          
+                     case 5 : nTemp = 29;
+                         break;          
+                     case 6 : nTemp = 30;
+                         break;
+                 }
+             }
+             else
+             {
+                 switch (parseInt(arrBaseInfo[nY1 * 12 + nM1]))
+                 {
+                     case 1 : nTemp = 29;
+                         break;          
+                     case 2 : nTemp = 30;
+                         break;          
+                     case 3 : nTemp = 29;
+                         break;          
+                     case 4 : nTemp = 29;
+                         break;          
+                     case 5 : nTemp = 30;
+                         break;          
+                     case 6 : nTemp = 30;
+                         break;          
+                 }
+             }
+             
+             var tempY1 = nY1 - 1;
+             for (var i = 0; i <= tempY1; i++)
+             {
+                 for (var j = 0; j <= 11; j++)
+                 {
+                     switch (parseInt(arrBaseInfo[i * 12 + j]))
+                     {
+                         case 1 : nTd = nTd + 29;
+                             break;
+                         case 2 : nTd = nTd + 30;
+                             break;              
+                         case 3 : nTd = nTd + 58;
+                             break;              
+                         case 4 : nTd = nTd + 59;
+                             break;              
+                         case 5 : nTd = nTd + 59;
+                             break;              
+                         case 6 : nTd = nTd + 60;
+                             break;              
+                     }
+                 }
+             }
+ 
+             var tempM1 = nM1 - 1;
+             for (var j = 0; j <= tempM1; j++)
+             {
+                 switch (parseInt(arrBaseInfo[nY1 * 12 + j]))
+                 {
+                     case 1 : nTd = nTd + 29;
+                         break;          
+                     case 2 : nTd = nTd + 30;
+                         break;                      
+                     case 3 : nTd = nTd + 58;
+                         break;                      
+                     case 4 : nTd = nTd + 59;
+                         break;                      
+                     case 5 : nTd = nTd + 59;
+                         break;                      
+                     case 6 : nTd = nTd + 60;
+                         break;                      
+                 }
+             }
+ 
+             if (nLeap == 1)
+             {
+                 switch (parseInt(arrBaseInfo[nY1 * 12 + nM1]))
+                 {
+                     case 3 : nTemp = 29;
+                         break;                      
+                     case 4 : nTemp = 29;
+                         break;                      
+                     case 5 : nTemp = 30;
+                         break;                      
+                     case 6 : nTemp = 30;
+                         break;                      
+                 }
+             }
+             
+             nTd = nTd + nLd + 22;
+             
+             if (leapMonth)
+             {
+                 switch (parseInt(arrBaseInfo[nY1 * 12 + nM1]))
+                 {
+                     case 3 : nTd = nTd + 29;
+                         break;                      
+                     case 4 : nTd = nTd + 30;
+                         break;                      
+                     case 5 : nTd = nTd + 29;
+                         break;                      
+                     case 6 : nTd = nTd + 30;
+                         break;                      
+                 }
+             }
+             
+             nY1 = 1840;
+             do
+             {
+                 nY1 = nY1 + 1;
+                 
+                 nLeap = 0;
+                 
+                 //윤년여부 확인
+                 if ((nY1 % 4) == 0) 
+                 {
+                     if ((nY1 % 100) != 0 || (nY1 % 400) == 0)
+                     { 
+                         nLeap = 1;
+                     }
+                 } 
+ 
+                 if (nLeap == 1)
+                 {
+                     nY2 = 366;
+                 }
+                 else
+                 {
+                     nY2 = 365;
+                 }
+ 
+                 if( nTd <= nY2 )
+                 {
+                     break;
+                 }
+                         
+                 nTd = nTd - nY2;
+             }
+             while(1);
+ 
+             nSy      = nY1;
+             arrMd[1] = nY2 - 337;
+             nM1      = 0;
+             
+             do
+             {
+                 nM1 = nM1 + 1;
+                 if (nTd <= parseInt(arrMd[nM1-1]))
+                 {
+                     break;
+                 }
+                 nTd = nTd - parseInt(arrMd[nM1-1]);
+             }
+             while(1);
+             
+             nSm = nM1;
+             nSd = nTd;
+             nY3 = nSy;
+             nTd = nY3 * 365 + parseInt(nY3/4) - parseInt(nY3/100) + parseInt(nY3/400);
+             
+             var tempSm = nSm - 1;
+             for (var i = 0; i <= tempSm; i++)
+             {
+                 nTd = nTd + parseInt(arrMd[i]);
+             }
+ 
+             nTd = nTd + nSd;
+ 
+             var sRtn = nY3;
+             sRtn = sRtn + nSm.toString().padLeft(2, "0"); 
+             sRtn = sRtn + nSd.toString().padLeft(2, "0");    
+ 
+             return sRtn;    
+         },
+ 
+         /**
+          * @class 각 월별 음력 기준 정보 (처리가능 기간  1841 - 2043년) <br>
+          * @return {String}
+          * @memberOf Drps.Util
+          */  
+         solarBase : function ()
+         {
+             var sBase;
+                             
+             //1841
+             sBase = "1,2,4,1,1,2,1,2,1,2,2,1,";
+             sBase += "2,2,1,2,1,1,2,1,2,1,2,1,";
+             sBase += "2,2,2,1,2,1,4,1,2,1,2,1,";
+             sBase += "2,2,1,2,1,2,1,2,1,2,1,2,";
+             sBase += "1,2,1,2,2,1,2,1,2,1,2,1,";
+             sBase += "2,1,2,1,5,2,1,2,2,1,2,1,";
+             sBase += "2,1,1,2,1,2,1,2,2,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,1,2,2,2,1,";
+             sBase += "2,1,2,3,2,1,2,1,2,1,2,2,";
+             sBase += "2,1,2,1,1,2,1,1,2,2,1,2,";
+             //1851
+             sBase += "2,2,1,2,1,1,2,1,2,1,5,2,";
+             sBase += "2,1,2,2,1,1,2,1,2,1,1,2,";
+             sBase += "2,1,2,2,1,2,1,2,1,2,1,2,";
+             sBase += "1,2,1,2,1,2,5,2,1,2,1,2,";
+             sBase += "1,1,2,1,2,2,1,2,2,1,2,1,";
+             sBase += "2,1,1,2,1,2,1,2,2,2,1,2,";
+             sBase += "1,2,1,1,5,2,1,2,1,2,2,2,";
+             sBase += "1,2,1,1,2,1,1,2,2,1,2,2,";
+             sBase += "2,1,2,1,1,2,1,1,2,1,2,2,";
+             sBase += "2,1,6,1,1,2,1,1,2,1,2,2,";
+             //1861
+             sBase += "1,2,2,1,2,1,2,1,2,1,1,2,";
+             sBase += "2,1,2,1,2,2,1,2,2,3,1,2,";
+             sBase += "1,2,2,1,2,1,2,2,1,2,1,2,";
+             sBase += "1,1,2,1,2,1,2,2,1,2,2,1,";
+             sBase += "2,1,1,2,4,1,2,2,1,2,2,1,";
+             sBase += "2,1,1,2,1,1,2,2,1,2,2,2,";
+             sBase += "1,2,1,1,2,1,1,2,1,2,2,2,";
+             sBase += "1,2,2,3,2,1,1,2,1,2,2,1,";
+             sBase += "2,2,2,1,1,2,1,1,2,1,2,1,";
+             sBase += "2,2,2,1,2,1,2,1,1,5,2,1,";
+             //1871
+             sBase += "2,2,1,2,2,1,2,1,2,1,1,2,";
+             sBase += "1,2,1,2,2,1,2,1,2,2,1,2,";
+             sBase += "1,1,2,1,2,4,2,1,2,2,1,2,";
+             sBase += "1,1,2,1,2,1,2,1,2,2,2,1,";
+             sBase += "2,1,1,2,1,1,2,1,2,2,2,1,";
+             sBase += "2,2,1,1,5,1,2,1,2,2,1,2,";
+             sBase += "2,2,1,1,2,1,1,2,1,2,1,2,";
+             sBase += "2,2,1,2,1,2,1,1,2,1,2,1,";
+             sBase += "2,2,4,2,1,2,1,1,2,1,2,1,";
+             sBase += "2,1,2,2,1,2,2,1,2,1,1,2,";
+             //1881
+             sBase += "1,2,1,2,1,2,5,2,2,1,2,1,";
+             sBase += "1,2,1,2,1,2,1,2,2,1,2,2,";
+             sBase += "1,1,2,1,1,2,1,2,2,2,1,2,";
+             sBase += "2,1,1,2,3,2,1,2,2,1,2,2,";
+             sBase += "2,1,1,2,1,1,2,1,2,1,2,2,";
+             sBase += "2,1,2,1,2,1,1,2,1,2,1,2,";
+             sBase += "2,2,1,5,2,1,1,2,1,2,1,2,";
+             sBase += "2,1,2,2,1,2,1,1,2,1,2,1,";
+             sBase += "2,1,2,2,1,2,1,2,1,2,1,2,";
+             sBase += "1,5,2,1,2,2,1,2,1,2,1,2,";
+             //1891
+             sBase += "1,2,1,2,1,2,1,2,2,1,2,2,";
+             sBase += "1,1,2,1,1,5,2,2,1,2,2,2,";
+             sBase += "1,1,2,1,1,2,1,2,1,2,2,2,";
+             sBase += "1,2,1,2,1,1,2,1,2,1,2,2,";
+             sBase += "2,1,2,1,5,1,2,1,2,1,2,1,";
+             sBase += "2,2,2,1,2,1,1,2,1,2,1,2,";
+             sBase += "1,2,2,1,2,1,2,1,2,1,2,1,";
+             sBase += "2,1,5,2,2,1,2,1,2,1,2,1,";
+             sBase += "2,1,2,1,2,1,2,2,1,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,5,2,2,1,2,";
+             //1901
+             sBase += "1,2,1,1,2,1,2,1,2,2,2,1,";
+             sBase += "2,1,2,1,1,2,1,2,1,2,2,2,";
+             sBase += "1,2,1,2,3,2,1,1,2,2,1,2,";
+             sBase += "2,2,1,2,1,1,2,1,1,2,2,1,";
+             sBase += "2,2,1,2,2,1,1,2,1,2,1,2,";
+             sBase += "1,2,2,4,1,2,1,2,1,2,1,2,";
+             sBase += "1,2,1,2,1,2,2,1,2,1,2,1,";
+             sBase += "2,1,1,2,2,1,2,1,2,2,1,2,";
+             sBase += "1,5,1,2,1,2,1,2,2,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,1,2,2,2,1,";
+             //1911
+             sBase += "2,1,2,1,1,5,1,2,2,1,2,2,";
+             sBase += "2,1,2,1,1,2,1,1,2,2,1,2,";
+             sBase += "2,2,1,2,1,1,2,1,1,2,1,2,";
+             sBase += "2,2,1,2,5,1,2,1,2,1,1,2,";
+             sBase += "2,1,2,2,1,2,1,2,1,2,1,2,";
+             sBase += "1,2,1,2,1,2,2,1,2,1,2,1,";
+             sBase += "2,3,2,1,2,2,1,2,2,1,2,1,";
+             sBase += "2,1,1,2,1,2,1,2,2,2,1,2,";
+             sBase += "1,2,1,1,2,1,5,2,2,1,2,2,";
+             sBase += "1,2,1,1,2,1,1,2,2,1,2,2,";
+             //1921
+             sBase += "2,1,2,1,1,2,1,1,2,1,2,2,";
+             sBase += "2,1,2,2,3,2,1,1,2,1,2,2,";
+             sBase += "1,2,2,1,2,1,2,1,2,1,1,2,";
+             sBase += "2,1,2,1,2,2,1,2,1,2,1,1,";
+             sBase += "2,1,2,5,2,1,2,2,1,2,1,2,";
+             sBase += "1,1,2,1,2,1,2,2,1,2,2,1,";
+             sBase += "2,1,1,2,1,2,1,2,2,1,2,2,";
+             sBase += "1,5,1,2,1,1,2,2,1,2,2,2,";
+             sBase += "1,2,1,1,2,1,1,2,1,2,2,2,";
+             sBase += "1,2,2,1,1,5,1,2,1,2,2,1,";
+             //1931
+             sBase += "2,2,2,1,1,2,1,1,2,1,2,1,";
+             sBase += "2,2,2,1,2,1,2,1,1,2,1,2,";
+             sBase += "1,2,2,1,6,1,2,1,2,1,1,2,";
+             sBase += "1,2,1,2,2,1,2,2,1,2,1,2,";
+             sBase += "1,1,2,1,2,1,2,2,1,2,2,1,";
+             sBase += "2,1,4,1,2,1,2,1,2,2,2,1,";
+             sBase += "2,1,1,2,1,1,2,1,2,2,2,1,";
+             sBase += "2,2,1,1,2,1,4,1,2,2,1,2,";
+             sBase += "2,2,1,1,2,1,1,2,1,2,1,2,";
+             sBase += "2,2,1,2,1,2,1,1,2,1,2,1,";
+             //1941
+             sBase += "2,2,1,2,2,4,1,1,2,1,2,1,";
+             sBase += "2,1,2,2,1,2,2,1,2,1,1,2,";
+             sBase += "1,2,1,2,1,2,2,1,2,2,1,2,";
+             sBase += "1,1,2,4,1,2,1,2,2,1,2,2,";
+             sBase += "1,1,2,1,1,2,1,2,2,2,1,2,";
+             sBase += "2,1,1,2,1,1,2,1,2,2,1,2,";
+             sBase += "2,5,1,2,1,1,2,1,2,1,2,2,";
+             sBase += "2,1,2,1,2,1,1,2,1,2,1,2,";
+             sBase += "2,2,1,2,1,2,3,2,1,2,1,2,";
+             sBase += "2,1,2,2,1,2,1,1,2,1,2,1,";
+             //1951
+             sBase += "2,1,2,2,1,2,1,2,1,2,1,2,";
+             sBase += "1,2,1,2,4,2,1,2,1,2,1,2,";
+             sBase += "1,2,1,1,2,2,1,2,2,1,2,2,";
+             sBase += "1,1,2,1,1,2,1,2,2,1,2,2,";
+             sBase += "2,1,4,1,1,2,1,2,1,2,2,2,";
+             sBase += "1,2,1,2,1,1,2,1,2,1,2,2,";
+             sBase += "2,1,2,1,2,1,1,5,2,1,2,2,";
+             sBase += "1,2,2,1,2,1,1,2,1,2,1,2,";
+             sBase += "1,2,2,1,2,1,2,1,2,1,2,1,";
+             sBase += "2,1,2,1,2,5,2,1,2,1,2,1,";
+             //1961
+             sBase += "2,1,2,1,2,1,2,2,1,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,2,1,2,2,1,";
+             sBase += "2,1,2,3,2,1,2,1,2,2,2,1,";
+             sBase += "2,1,2,1,1,2,1,2,1,2,2,2,";
+             sBase += "1,2,1,2,1,1,2,1,1,2,2,1,";
+             sBase += "2,2,5,2,1,1,2,1,1,2,2,1,";
+             sBase += "2,2,1,2,2,1,1,2,1,2,1,2,";
+             sBase += "1,2,2,1,2,1,5,2,1,2,1,2,";
+             sBase += "1,2,1,2,1,2,2,1,2,1,2,1,";
+             sBase += "2,1,1,2,2,1,2,1,2,2,1,2,";
+             //1971
+             sBase += "1,2,1,1,5,2,1,2,2,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,1,2,2,2,1,";
+             sBase += "2,1,2,1,1,2,1,1,2,2,2,1,";
+             sBase += "2,2,1,5,1,2,1,1,2,2,1,2,";
+             sBase += "2,2,1,2,1,1,2,1,1,2,1,2,";
+             sBase += "2,2,1,2,1,2,1,5,2,1,1,2,";
+             sBase += "2,1,2,2,1,2,1,2,1,2,1,1,";
+             sBase += "2,2,1,2,1,2,2,1,2,1,2,1,";
+             sBase += "2,1,1,2,1,6,1,2,2,1,2,1,";
+             sBase += "2,1,1,2,1,2,1,2,2,1,2,2,";
+             //1981
+             sBase += "1,2,1,1,2,1,1,2,2,1,2,2,";
+             sBase += "2,1,2,3,2,1,1,2,2,1,2,2,";
+             sBase += "2,1,2,1,1,2,1,1,2,1,2,2,";
+             sBase += "2,1,2,2,1,1,2,1,1,5,2,2,";
+             sBase += "1,2,2,1,2,1,2,1,1,2,1,2,";
+             sBase += "1,2,2,1,2,2,1,2,1,2,1,1,";
+             sBase += "2,1,2,2,1,5,2,2,1,2,1,2,";
+             sBase += "1,1,2,1,2,1,2,2,1,2,2,1,";
+             sBase += "2,1,1,2,1,2,1,2,2,1,2,2,";
+             sBase += "1,2,1,1,5,1,2,1,2,2,2,2,";
+             //1991
+             sBase += "1,2,1,1,2,1,1,2,1,2,2,2,";
+             sBase += "1,2,2,1,1,2,1,1,2,1,2,2,";
+             sBase += "1,2,5,2,1,2,1,1,2,1,2,1,";
+             sBase += "2,2,2,1,2,1,2,1,1,2,1,2,";
+             sBase += "1,2,2,1,2,2,1,5,2,1,1,2,";
+             sBase += "1,2,1,2,2,1,2,1,2,2,1,2,";
+             sBase += "1,1,2,1,2,1,2,2,1,2,2,1,";
+             sBase += "2,1,1,2,3,2,2,1,2,2,2,1,";
+             sBase += "2,1,1,2,1,1,2,1,2,2,2,1,";
+             sBase += "2,2,1,1,2,1,1,2,1,2,2,1,";
+             //2001
+             sBase += "2,2,2,3,2,1,1,2,1,2,1,2,";
+             sBase += "2,2,1,2,1,2,1,1,2,1,2,1,";
+             sBase += "2,2,1,2,2,1,2,1,1,2,1,2,";
+             sBase += "1,5,2,2,1,2,1,2,2,1,1,2,";
+             sBase += "1,2,1,2,1,2,2,1,2,2,1,2,";
+             sBase += "1,1,2,1,2,1,5,2,2,1,2,2,";
+             sBase += "1,1,2,1,1,2,1,2,2,2,1,2,";
+             sBase += "2,1,1,2,1,1,2,1,2,2,1,2,";
+             sBase += "2,2,1,1,5,1,2,1,2,1,2,2,";
+             sBase += "2,1,2,1,2,1,1,2,1,2,1,2,";
+             //2011
+             sBase += "2,1,2,2,1,2,1,1,2,1,2,1,";
+             sBase += "2,1,6,2,1,2,1,1,2,1,2,1,";
+             sBase += "2,1,2,2,1,2,1,2,1,2,1,2,";
+             sBase += "1,2,1,2,1,2,1,2,5,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,2,2,1,2,2,";
+             sBase += "1,1,2,1,1,2,1,2,2,1,2,2,";
+             sBase += "2,1,1,2,3,2,1,2,1,2,2,2,";
+             sBase += "1,2,1,2,1,1,2,1,2,1,2,2,";
+             sBase += "2,1,2,1,2,1,1,2,1,2,1,2,";
+             sBase += "2,1,2,5,2,1,1,2,1,2,1,2,";
+             //2021
+             sBase += "1,2,2,1,2,1,2,1,2,1,2,1,";
+             sBase += "2,1,2,1,2,2,1,2,1,2,1,2,";
+             sBase += "1,5,2,1,2,1,2,2,1,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,2,1,2,2,1,";
+             sBase += "2,1,2,1,1,5,2,1,2,2,2,1,";
+             sBase += "2,1,2,1,1,2,1,2,1,2,2,2,";
+             sBase += "1,2,1,2,1,1,2,1,1,2,2,2,";
+             sBase += "1,2,2,1,5,1,2,1,1,2,2,1,";
+             sBase += "2,2,1,2,2,1,1,2,1,1,2,2,";
+             sBase += "1,2,1,2,2,1,2,1,2,1,2,1,";
+             //2031
+             sBase += "2,1,5,2,1,2,2,1,2,1,2,1,";
+             sBase += "2,1,1,2,1,2,2,1,2,2,1,2,";
+             sBase += "1,2,1,1,2,1,5,2,2,2,1,2,";
+             sBase += "1,2,1,1,2,1,2,1,2,2,2,1,";
+             sBase += "2,1,2,1,1,2,1,1,2,2,1,2,";
+             sBase += "2,2,1,2,1,4,1,1,2,1,2,2,";
+             sBase += "2,2,1,2,1,1,2,1,1,2,1,2,";
+             sBase += "2,2,1,2,1,2,1,2,1,1,2,1,";
+             sBase += "2,2,1,2,5,2,1,2,1,2,1,1,";
+             sBase += "2,1,2,2,1,2,2,1,2,1,2,1,";
+             //2041
+             sBase += "2,1,1,2,1,2,2,1,2,2,1,2,";
+             sBase += "1,5,1,2,1,2,1,2,2,2,1,2,";
+             sBase += "1,2,1,1,2,1,1,2,2,1,2,2";
+             
+             var arrBase = [];
+             arrBase = sBase.split(",");
+             
+             return arrBase;
+         },
+ 
+         /**
+          * @class 문자를 날짜로 변환. <br>
+          * @param {String} strDate - String Date Format
+          * @return {Date} date
+          * @memberOf Drps.Util
+          */
+         strToDate : function(inDate)
+         {
+             var date =  new Date(parseInt(inDate.substr(0,4)),parseInt(inDate.substr(4,2))-1,parseInt(inDate.substr(6,2)));
+             return date;
+         },
+ 
+         /**
+          * @class Date Type을 String으로 변환 <br>
+          * @param {Date} date
+          * @return {String} 'yyyyMMdd' 형태로 표현된 날짜
+          * @memberOf Drps.Util
+          */
+         dateToStr : function(date)
+         {
+             var strYear = date.getYear().toString();
+             var strMonth = (date.getMonth()+1).toString();
+             var strDate = date.getDate().toString();
+             
+             if(strYear.length==2)
+                 strYear = '19'+strYear;
+             else if(strYear.length==1)
+                 strYear = '190'+strYear;
+                     
+             if(strMonth.length==1)
+                 strMonth = '0'+strMonth;
+             if(strDate.length==1)
+                 strDate = '0'+strDate;
+             
+             return strYear+strMonth+strDate;
+         },
+ 
+         /**
+          * @class 년월일(yyyyMMdd)을 입력하면 해당 주차를 리턴한다. <br>
+          * @param {String} strDate - 8자리 년월일(yyyyMMdd)
+          * @return {String} 6자리 년도주차(yyyyWW)
+          * @memberOf Drps.Util
+          */
+         getWeek : function(strDate) 
+         { 
+             if (strDate.length != 8 || !nexacro.isNumeric(strDate)) {
+                 return "";
+             }
+             
+             var year  = parseInt(strDate.substr(0,4));
+             var month = parseInt(strDate.substr(4,2));
+             var day   = parseInt(strDate.substr(6,8));
+ 
+             var startAt = 1; ///////////// 일요일 표시 부분 / 0 : 일요일(일월화...) / 1 : 월요일(...금토일)
+ 
+             if(startAt == 0) {
+                 day = day + 1;
+             }
+ 
+             var a    = Math.floor((14-month) / 12);
+             var y    = year + 4800 - a;
+             var m    = month + (12 * a) - 3;
+             var b    = Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400);
+             var J    = day + Math.floor(((153 * m) + 2) / 5) + (365 * y) + b - 32045;
+             var d4   = (((J + 31741 - (J % 7)) % 146097) % 36524) % 1461;
+             var L    = Math.floor(d4 / 1460);
+             var d1   = ((d4 - L) % 365) + L;
+             var week = Math.floor(d1/7) + 1;
+             week = week.toString();
+             return year+week.padLeft(2,"0");            
+         },
+ 
+         /**
+          * @class 주민등록번호로 생년월일을 구한다. <br>
+          * @param {String} ssn - 주민등록번호/외국인등록번호 13자리중 최소 7자 입력
+          * @return {String} 8자리 날짜(YYYYMMMDD)문자열
+          * @memberOf Drps.Util
+          */
+         getBirthDateBySSN : function(ssn)
+         {
+             var retVal;
+ 
+             ssn = ssn.replace("-", ""); //하이픈제거
+             
+             if (!nexacro.isNumeric(ssn) || ssn.length < 6) {
+                 return retVal;
+             }
+ 
+             var yymmdd = ssn.substr(0, 6);
+             var century;
+             if (ssn.length > 6) {
+                 var genderFlag = Number(ssn.substr(6, 1));
+                 
+                 switch(genderFlag) {
+                     case 1:
+                     case 2:
+                     case 5:
+                     case 6:
+                         century = "19";
+                         break;
+                     case 3:
+                     case 4:
+                     case 7:
+                     case 8:
+                         century = "20";
+                         break;
+                     case 9:
+                     case 0:
+                         century = "18";
+                         break;
+                 }
+             } else {
+                 var sTemp = this.getDate();
+                 if (sTemp.substr(2, 6) <= yymmdd) {
+                     century = "19";
+                 } else {
+                     century = "20";
+                 }
+             }
+ 
+             retVal = century + yymmdd;
+             
+             if (!this.isDate(retVal)) {
+                 retVal = null;
+             }
+             
+             return retVal;  
+         },
+ 
+         /**
+          * @class 주민번호 뒷 첫번째 자리로 년대를 return 한다. <br>
+          * @param {String} sJuminNo 생년 월일 또는 주민 번호
+          * @return {String} 주민번호 뒷 첫번째 자리로 년대를 return 한다.
+          * @memberOf Drps.Util
+          */
+         getBirthYear : function(sJuminNo)
+         {
+             if (sJuminNo.toString().length != 13){
+                 return "N";
+             }
+             
+             if (!(sJuminNo).match(/^\d{6}\d{7}$/)){
+                 return "N";
+             }
+ 
+             var vGb = sJuminNo.substr(6,1);
+ 
+             if (vGb == '1' || vGb == '2' || vGb == '5' || vGb == '6') {
+                 return '19';
+             } else if (vGb == '3' || vGb == '4' || vGb == '7' || vGb == '8') {
+                 return '20';
+             }
+         },
+ 
+         /**
+          * @class 기준년월일 기준으로 만나이를 구한다. <br>
+          * @param {String} brtYmd - 생년월일
+          * @param {String} stdYmd - 기준일자[생략시 현재일자]
+          * @return {Number} 숫자형 나이
+          * @memberOf Drps.Util
+          */
+         getAge : function(brtYmd, stdYmd)
+         {
+             var retVal = -1;
+             
+             if (!stdYmd) {
+                 stdYmd = this.getDate();
+             }
+ 
+             if (this.isDate(brtYmd) && this.isDate(stdYmd)) {
+                 var yDiff   = Number(stdYmd.substr(0, 4)) - Number(brtYmd.substr(0, 4));
+                 var mdDiff  = Number(stdYmd.substr(4, 4)) - Number(brtYmd.substr(4, 4));
+                    
+                 retVal = yDiff;
+                 if( mdDiff < 0 ) {  //before
+                     retVal = retVal - 1;
+                 }
+             }
+ 
+             return retVal;  
+         },
+        /*************************************************************************************************
+         * 3. Dataset 관련 Util
+         ************************************************************************************************/
+         /**
+         * @class Object에 담겨있는 정보를 통해 공통코드 조회하여 각 데이터셋 생성 후 바인드
+         * @param {Array} JSON을 담고 있는 배열
+         *       - {String}  [component     ] 공통코드를 바인드할 대상이 되는 콤보박스 또는 그리드 (필수)
+         *       - {String}  [commCdId      ] 공통코드ID (필수)
+         *       - {String}  [columnId      ] component가 그리드인 경우 공통코드를 바인드할 대상이 되는 컬럼 (component가 그리드인 경우 필수)
+         *       - {String}  [format        ] 콤보박스 명으로 보여질 부분의 형식 gdsCommCd의 ColumnId를 중괄호에 담는 형식으로 구성 {컬럼ID} default : {commCdNm}
+         *       - {String}  [first         ] 만들어진 데이터셋 첫부분에 보여질 명을 설정 내부 코드 값은 ''
+         *       - {String}  [last          ] 만들어진 데이터셋 끝부분에 보여질 명을 설정 내부 코드 값은 ''
+         * @return
+         * @example 
+         *       Drps.Util.getComcodeDataset([
+                                               { component: this.cmb_acntDivCd_S,        code:"ACNT_DIV_CD" , first:"전체", format:"{commCd}-{commCdNm}" }
+                                             , { component: this.cmb_acntLevlCd,         code:"ACNT_LEVL_CD"}
+                                             , { component: this.grd_AT1001AcntctCd_01,  code:"ACNT_DIV_CD",  columnId : "acntDivCd" first:"전체", format:"{commCd}-{commCdNm}" }
+                                             , { component: this.grd_AT1001AcntctCd_01,  code:"ACNT_LEVL_CD", columnId : "acntLevlCd"}
+                                            ]);
+         * @memberOf Drps.Util
+         */ 
+         getComcodeDataset : function(arrTarget)
+         {//trace("getComcodeDataset : " + arrTarget);trace("ffobj : " + this.ffobj);
+             var ffobj          = this.ffobj;
+             var inputDataset   = new Dataset()            ;  // 동적 데이터셋 객체
+             var inputDatasetNm = "__inputDatasetCommCd__" ;  // 데이터셋 명칭
+             var resultObject   = new Dataset()            ;  // 동적 데이터셋 객체
+             var resultObjectNm = "__resultDatasetCommCd__";  // 데이터셋 명칭
+ 
+             // 입력 데이터셋 설정
+             this.removeComponent(ffobj, inputDatasetNm);
+             inputDataset.set_name(inputDatasetNm);
+             inputDataset.addColumn("code", "STRING");
+             ffobj.addChild(inputDatasetNm, inputDataset);
+             
+             // 결과 데이터셋 설정
+             Drps.Util.removeComponent(ffobj, resultObjectNm);
+             resultObject.set_name (resultObjectNm);
+ 
+             ffobj.addChild(resultObjectNm, resultObject);
+             
+             // 입력 데이터셋 입력값 연결
+             for (var i = 0; i < arrTarget.length; i++)
+             {
+                 var nRow = inputDataset.addRow();
+                 inputDataset.setColumn(nRow, "code", arrTarget[i].code);
+             }
+             
+             // 거래호출
+             ffobj.svcTransaction({
+                  svcID          : "search"
+                , url            : "/comm/code/search.nx"
+                , inDataset      : "codes=" + inputDatasetNm
+                , outDataset     : resultObjectNm + "=dsCommCdList"
+                , callbackFunc   : ""
+                , async          : false // 싱크처리(동기)
+             });
+ 
+             var dataSets = {};
+             for(var i = 0; i < arrTarget.length; i++)
+             {
+                 var tmpObject       = {};
+                 tmpObject.component = arrTarget[i].component               ;
+                 tmpObject.code      = arrTarget[i].code                    ;
+                 tmpObject.columnId  = arrTarget[i].columnId || ""          ;
+                 tmpObject.format    = arrTarget[i].format   || "{commCdNm}";
+                 
+                 // 데이터셋 동적 생성 > "__daComponentName_ColumnId__"
+                 tmpComnentDataset   = new Dataset();
+                 tmpComnentDatasetNm = "__ds" + tmpObject.component.name+"_"+tmpObject.columnId + "__";
+                 var seq = 0;
+                 while(dataSets[tmpComnentDatasetNm])
+                 {
+                     tmpComnentDatasetNm = "__ds" + tmpObject.component.name+"_"+tmpObject.columnId + "_" + (seq++) + "__";
+                 }
+                 Drps.Util.removeComponent(ffobj, tmpComnentDatasetNm);
+                 tmpComnentDataset.set_name(tmpComnentDatasetNm);
+                 ffobj.addChild(tmpComnentDatasetNm, tmpComnentDataset);
+                 dataSets[tmpComnentDatasetNm] = tmpComnentDataset;
+                 
+                 resultObject.filter("commCdId == '"+arrTarget[i].code+"'");
+                 tmpComnentDataset.copyData(resultObject, true);
+                 tmpComnentDataset.addColumn("formatCdNm", "STRING");
+                 
+ 
+                 for(var rowIdx = 0; rowIdx < tmpComnentDataset.rowcount; rowIdx++)
+                 {
+                     tmpComnentDataset.setColumn(rowIdx,"formatCdNm", tmpObject.format);
+                     for(var j = 0; j < tmpComnentDataset.colcount; j++)
+                     {                        
+                         var colId         = tmpComnentDataset.getColID(j);
+                         var colIdExp      = new RegExp("{"+colId+"}","gi");
+                         var strFormatCdNm = tmpComnentDataset.getColumn(rowIdx, "formatCdNm");                        
+                         var strColValue   = tmpComnentDataset.getColumn(rowIdx, colId);
+                         tmpComnentDataset.setColumn(rowIdx, "formatCdNm", strFormatCdNm.replace(colIdExp, strColValue));
+                     }
+                 }
+                 
+                 tmpComnentDataset.set_filterstr("useYn=='Y'");
+ 
+                 //맨앞 또는 맨뒤에 보조행 추가
+                 if(arrTarget[i].first != undefined)
+                 {
+                     var nRow = tmpComnentDataset.insertRow(0);
+                     tmpComnentDataset.setColumn(nRow, "commCd", "");
+                     tmpComnentDataset.setColumn(nRow, "formatCdNm", arrTarget[i].first);
+                 }
+                 else if(arrTarget[i].last != undefined)
+                 {
+                     var nRow = tmpComnentDataset.addRow();
+                     tmpComnentDataset.setColumn(nRow, "commCd", "");
+                     tmpComnentDataset.setColumn(nRow, "formatCdNm", arrTarget[i].last);
+                 }
+                 
+                 // 콤보박스 또는 라디오버튼 일때 바인드
+                 if(this.typeOf(tmpObject.component) == "Combo" || this.typeOf(tmpObject.component) == "Radio")
+                 {
+                     tmpObject.component.set_innerdataset(tmpComnentDatasetNm);
+                     tmpObject.component.set_codecolumn("commCd"    );
+                     tmpObject.component.set_datacolumn("formatCdNm");
+                 }
+                 // 그리드 일때 바인드
+                 else if(this.typeOf(tmpObject.component) == "Grid")
+                 {
+                     var curFormatId = tmpObject.component.formatid;
+                     for(var formatKey in tmpObject.component._formats)
+                     {
+                         tmpObject.component.setFormat(formatKey);
+                         var colIdx = tmpObject.component.getBindCellIndex("Body", tmpObject.columnId);
+                         
+                         tmpObject.component.setCellProperty("Body", colIdx, "combodataset", tmpComnentDatasetNm);
+                         tmpObject.component.setCellProperty("Body", colIdx, "combocodecol", "commCd"           );
+                         tmpObject.component.setCellProperty("Body", colIdx, "combodatacol", "formatCdNm"       );
+                     }
+                     tmpObject.component.setFormat(curFormatId);
+                 }
+             }
+             
+             // 결과 데이터셋 삭제
+             resultObject = null;
+         },
+         
+         /**
+         * @class 선택한 행의 모든 데이터 JSON 형식으로 만들어 리턴
+         * @param {Object} objDs 공통코드그룹을 가지고 있는 데이터셋 객체
+         * @param {String} 체크박스로 선택한 컬럼id
+         * @return
+         * @example Drps.Util.getSelectedDataRowset(objDs,objOption)
+         * @memberOf Drps.Util
+         */ 
+         getSelectedDataRowset : function(objDs, sColId)
+         {            
+             // 컬럼id 기준으로 체크된 자료를 JSON배열로 String화 하여 전달
+             if(sColId)
+             {
+                 let objArr = [];
+                 for(let nRow = 0; nRow<objDs.rowcount; nRow++)
+                 {
+                     let sCheckValue = objDs.getColumn(nRow, sColId);
+                     
+                     
+                     if(sCheckValue == "1" || sCheckValue == "Y")
+                     {
+                         let strColId;
+                         let objRow = {};
+                         for(let i = 0; i < objDs.colcount; i++)
+                         {
+                             strColId = objDs.getColID(i);
+                             objColVl = objDs.getColumn(nRow, strColId);
+                             if ( typeof objColVl == "object" ) {
+                                 objRow[strColId] = ( objColVl || "" ).toString();
+                             } else {
+                                 // primitive type
+                                 objRow[strColId] = objColVl;
+                             }
+                         }
+                         objArr.push(objRow);
+                     }
+                     
+                 }
+                 return JSON.stringify(objArr);
+             }
+             // 특정한 옵션이 없다면 선택한 행의 모든 데이터를 부모화면으로 전달
+             else
+             {
+                 let objRow = {};
+                 let strColId;
+                 for(let i = 0; i < objDs.colcount; i++)
+                 {
+                     strColId = objDs.getColID(i);
+                     objColVl = objDs.getColumn(objDs.rowposition, strColId);
+                     if ( typeof objColVl == "object" ) {
+                         objRow[strColId] = ( objColVl || "" ).toString();
+                     } else {
+                         // primitive type
+                         objRow[strColId] = objColVl;
+                     }
+                 }
+                 return JSON.stringify(objRow);
+             }
+         },
+         
+         /**
+         * @class objDs에 선택된 행의 arrCol에 지정된 colid에서 값을 추출하여 Json 객체로 반환 
+         * @param {Object} objDs 키 값을 Json에 담을 데이터셋 객체
+         * @param {Array} 키값이 담긴 배열
+         * @return
+         * @example Drps.Util.putDatasetRowposKey(objDs, arrCol)
+         * @memberOf Drps.Util
+         */ 
+         putDatasetRowposKey : function(objDs, arrCol)
+         {
+             let objJson = {};
+     
+             for(let i=0;i<arrCol.length;i++)
+             {
+                 objJson[arrCol[i]] = objDs.getColumn(objDs.rowposition, arrCol[i]);
+             }
+             
+             return objJson;
+         },
+         
+         /**
+         * @class objDs에 선택된 행의 arrCol에 지정된 colid에서 값을 추출하여 Json 객체로 반환 
+         * @param {Object} objRow의 값을 기준으로 선택된 행의 위치를 변경할 데이터셋 객체
+         * @param {Object} 키값이 담긴 Json 객체
+         * @return
+         * @example Drps.Util.putDatasetRowposKey(objDs, objRow)
+         * @memberOf Drps.Util
+         */ 
+         findDatasetRowposKey : function(objDs, objRow)
+         {
+             let strFind = "";
+     
+             for(key in objRow)
+             {
+                 strFind += key + "=='"+objRow[key]+"' &&";
+             }
+             
+             if(strFind)
+             {
+                 strFind = strFind.substr(0,strFind.length-3);
+                 var nCurRow = objDs.findRowExpr(strFind);
+                 
+                 if (nCurRow < 0) 
+                 {
+                     nCurRow = 0;
+                     objDs.set_rowposition(nCurRow);
+                     return objRow;
+                 }
+                 else
+                 {
+                     objDs.set_rowposition(nCurRow);
+                     return {};
+                 }
+             }
+         },
+ 
+          /**
+          * @class dataSet의 Row 중에서 변경된 내용이 있는지 여부
+          * @param {Object} objDs - 확인 대상 Dataset
+          * @return {boolean}
+          * @memberOf Drps.Util
+          */   
+         datasetIsUpdated : function (objDs)
+         {
+             if(typeof objDs=="undefined")
+             {
+                 throw new Error("해당 데이터셋이 존재하지 않습니다.");
+             }
+             let ret = false;
+             if (objDs.getDeletedRowCount() > 0) 
+             {
+                 ret = true;
+             }
+             else{
+                 for(var i = 0 ; i < objDs.getRowCountNF() ; i++)
+                 {
+                     if(objDs.getRowTypeNF(i) == Dataset.ROWTYPE_INSERT || objDs.getRowTypeNF(i) == Dataset.ROWTYPE_UPDATE || objDs.getRowTypeNF(i) == Dataset.ROWTYPE_DELETE)
+                     {
+                         ret = true;
+                     }
+                 }
+             }
+             if(ret===true && nexacro.getApplication().__absltClose)
+             {
+                 nexacro.getApplication().__closeCheck = true;
+                 return false;
+             }
+             else
+             {
+                 return ret;
+             }
+         },
+ 
+          /**
+          * @class dataSet의 Row가 변경되었는지 판단하는 함수
+          * @param {Object} ObjDs - 대상 dataset
+          * @param {Number} nRow - row값
+          * @return {boolean}
+          * @memberOf Drps.Util
+          */   
+         isUpdatedRow : function (objDs, nRow)
+         {
+             if (objDs.updatecontrol == true) 
+             {
+                 if (objDs.getRowType(nRow) == 2 || objDs.getRowType(nRow) == 4) 
+                 {
+                     return true;
+                 }
+                 return false;
+             }
+             else 
+             {
+                 for (var i = 0; objDs.getColCount(); i++) 
+                 {
+                     if (this.isUpdateColumn(objDs, nRow, i) == true) 
+                     {
+                         return true;
+                     }
+                 }
+             }
+             return false;
+         },
+ 
+         /**
+          * @class dataSet의 Row 에서 해당 칼럼이 변경되었는지 판단하는 함수
+          * @param {Object} ObjDs - 대상 dataset
+          * @param {Number} nRow - row값
+          * @param {String || Number} Column - 칼럼명 or 칼럼index
+          * @return {boolean}
+          * @memberOf Drps.Util
+          */   
+         isUpdateColumn : function (objDs, nRow, Column)
+         {
+             if (objDs.getRowType(nRow) == 2) 
+             {
+                 if (this.isNull(objDs.getColumn(nRow, Column))) 
+                 {
+                     return false;
+                 }
+             }
+             else 
+             {
+                 if (objDs.getColumn(nRow, Column) == objDs.getOrgColumn(nRow, Column)) 
+                 {
+                     return false;
+                 }
+             }
+             return true;
+         },
+         
+         /**
+          * @class 현재 선택된 행을 새로 추가 될 행에 복사
+          * @param {Object} ObjDs - 대상 dataset
+          * @param {Array} arrColumn - 복사 제외되는 컬럼배열
+          * @return
+          * @example Drps.Util.addCopyRow(this.dsUserList, ["userId", "passwd", "passwdChngDttm", "passwdErrCnt", "preAccsDttm", "preAccsIp"]);
+          * @memberOf Drps.Util
+          */ 
+         addCopyRow : function(objDs, arrColumn)
+         {
+             let nRowPos = objDs.rowposition;
+             
+             if(nRowPos == -1)
+             {
+                 objDs.addRow();
+                 return;
+             }
+             
+             let nAddRow = objDs.addRow();
+             objDs.set_enableevent(false);
+             for(let nCol=0;nCol<objDs.colcount;nCol++)
+             {
+                 let sColId = objDs.getColID(nCol);
+                 
+                 // arrColumn에 없는 컬럼ID의 자료만 복사한다.
+                 if(arrColumn.indexOf(sColId) == -1)
+                 {
+                     objDs.setColumn(nAddRow, sColId, objDs.getColumn(nRowPos, sColId));
+                 }
+             }
+             objDs.set_enableevent(true);
+         },
+         /**
+          * @class dataset을 object로 반환
+          * @param {nexacro.Dataset} [objDs] : 대상 dataset
+          * @return {Object} : 변환 Object
+          *          - {Object}   [Const Columns] : Const Columns
+          *             - {Object<K,V>} : const column key, value
+          *          - {Object[]} [Rows         ] : data row array
+          *             - {Object<K,V>} : record object
+          */
+         datasetToJson : function(objDs)
+         {
+             if(typeof objDs=="undefined"){return null;}
+             if(!(objDs instanceof nexacro.Dataset)){return null;}
+ 
+             let eolStr  = nexacro._getSSVRecordSeparator();  // end of line charcode
+             let eocStr  = nexacro._getSSVUnitSeparator();  // end of column charcode
+             let nullStr = String.fromCharCode(3);   // undefined charcode
+ 
+             let dsFull  = new Dataset;
+                 dsFull.loadXML(objDs.saveXML(null,"view"));
+             let ssvStr   = dsFull.saveSSV(null,"view");
+             let ssvArr   = ssvStr.split(eolStr);
+             let constObj = {};
+             let colArr   = [];
+             let dataStart = -1;
+ 
+             for(let i=0;i<ssvArr.length;i++)
+             {
+                 let ssvStr = ssvArr[i];
+                 let lineArr = ssvStr.split(eocStr);
+                 if(lineArr[0]==="_Const_")
+                 {
+                     for(let x=1;x<lineArr.length;x++)
+                     {
+                         let constArr = lineArr[x].split("=");
+                         let constKey   = constArr[0].split(":")[0];
+                         let constValue = constArr[1]||"";
+ 
+                         if(constKey==nullStr)
+                         {
+                             constKey="";
+                         }
+ 
+                         if(constValue==nullStr)
+                         {
+                             constValue="";
+                         }
+ 
+                         if(constKey)
+                         {
+                             constObj[constKey] = constValue;
+                         }
+                     }
+                 }
+                 else if(lineArr[0]==="_RowType_")
+                 {
+                     for(let x=0;x<lineArr.length;x++)
+                     {
+                         colArr.push(lineArr[x].split(":")[0]);
+                     }
+                     dataStart = i+1;
+                     break;
+                 }
+             }
+ 
+             let retObj = {};
+ 
+             if(Object.keys(constObj).length)
+             {
+                 retObj["Const Columns"] = constObj;
+             }
+ 
+             let dataArr = [];
+ 
+             for(let i=dataStart;i<ssvArr.length;i++)
+             {
+                 let recordStr = ssvArr[i];
+                 let recordArr = recordStr.split(eocStr);
+                 if(recordArr[0]!=="N"){continue;}
+                 let recordObj = {};
+                 for(let x=1;x<colArr.length;x++)
+                 {
+                     let key   = colArr[x];
+                     let value = recordArr[x]||"";
+                     if(value==nullStr)
+                     {
+                         value="";
+                     }
+                     recordObj[key] = value;
+                 }
+                 dataArr.push(recordObj);
+             }
+             retObj.Rows = dataArr
+             return retObj;
+         },
+         /**
+          * date 문자열 formatting
+          * @param {String} [dateStr] : date 문자열
+          * @param {String} [type   ] : format type(default:yyyy-MM-DD HH24:MI:SS.FF3)
+          * @return {String} format 결과 String
+          * @example Drps.Util.formatDateStr("20200101","yyyy-MM-DD")
+          */
+         formatDateStr : function(dateStr, type)
+         {
+             dateStr = dateStr||"";
+             if(dateStr===""){return "";}
+             let propObj = {};
+                 propObj.yyyy = dateStr.substring( 0, 4)||"0000";
+                 propObj.MM   = dateStr.substring( 4, 6)||"00";
+                 propObj.DD   = dateStr.substring( 6, 8)||"00";
+                 propObj.HH24 = dateStr.substring( 8,10)||"00";
+                 propObj.MI   = dateStr.substring(10,12)||"00";
+                 propObj.SS   = dateStr.substring(12,14)||"00";
+                 propObj.FF3  = dateStr.substring(14,17)||"000";
+             if(type==null)
+             {
+                 type = "";
+                 switch(dateStr.length)
+                 {
+                     case 17:
+                         type = ":FF3"  + type;
+                     case 14:
+                         type = ":SS"   + type;
+                     case 12:
+                         type = ":MI"   + type;
+                     case 10:
+                         type = " HH24" + type;
+                     case  8:
+                         type = "-DD"   + type;
+                     case  6:
+                         type = "-MM"   + type;
+                     case  4:
+                         type = "yyyy"  + type;
+                         break;
+                     default:
+                         type="";
+                 }
+             }
+             
+             return type.replace(
+                                 /(yyyy|MM|DD|HH24|MI|SS|FF3)/g
+                                ,function(key)
+                                 {
+                                     return propObj[key];
+                                 }
+                                );
+             
+         },
+         /**
+          * imgUrl column 추가
+          * @param {nexacro.Dataset} [objDs  ] : 대상 dataset
+          * @param {Array          } [options] : url 추가 옵션
+          *                                      - {Object}
+          *                                        - {String} [filePath] : filePath Column명
+          *                                        - {String} [fileNm  ] : fileNm   Column명
+          *                                        - {String} [fileUrl ] : url      Column명
+          * @return N/A
+          * @example
+          * Drps.Util.setImgUrlOfPath(
+          *                          this.dsPrintBzconActno02
+          *                         ,[
+          *                           {filePath:"serverFilePath011",fileNm:"serverFileNm011",fileUrl:"serverFileUrl011"}
+          *                          ,{filePath:"serverFilePath012",fileNm:"serverFileNm012",fileUrl:"serverFileUrl012"}
+          *                          ,{filePath:"serverFilePath021",fileNm:"serverFileNm021",fileUrl:"serverFileUrl021"}
+          *                          ,{filePath:"serverFilePath022",fileNm:"serverFileNm022",fileUrl:"serverFileUrl022"}
+          *                          ,{filePath:"serverFilePath031",fileNm:"serverFileNm031",fileUrl:"serverFileUrl031"}
+          *                          ,{filePath:"serverFilePath032",fileNm:"serverFileNm032",fileUrl:"serverFileUrl032"}
+          *                          ]
+          *                         );
+          */
+         setImgUrlOfPath:function(objDs, options)
+         {
+             objDs.set_updatecontrol(false);
+             objDs.set_enableevent(false);
+             for(let i in options)
+             {
+                 let option = options[i];
+                 if(objDs.getColIndex(option.fileUrl)==-1)
+                 {
+                     objDs.addColumn(option.fileUrl,"string",256);
+                 }
+                 for(let x=0;x<objDs.getRowCount();x++)
+                 {
+                     let filePath = objDs.getColumn(x,option.filePath);
+                     let fileNm   = objDs.getColumn(x,option.fileNm  );
+                     
+                     let fileUrl  = nexacro.getEnvironment().services.svcurl.url;
+                         fileUrl += "/common/downloadFile.do?filePath=";
+                         fileUrl += filePath;
+                         fileUrl += "&fileNm=";
+                         fileUrl += fileNm;
+                     
+                     objDs.setColumn(x,option.fileUrl,fileUrl);
+                 }
+             }
+             objDs.set_enableevent(true);
+             objDs.set_updatecontrol(true);
+         },
+         /**
+          * imgUrl column 추가
+          * @param {nexacro.Dataset} [objDs  ] : 대상 dataset
+          * @param {Array          } [options] : url 추가 옵션
+          *                                      - {Object}
+          *                                        - {String} [atchFileId] : 첨부파일ID   Column명
+          *                                        - {String} [fileSeqNo ] : 파일일련번호 Column명
+          *                                        - {String} [fileUrl ]   : url          Column명
+          * @return N/A
+          * @example
+          * Drps.Util.setImgUrlOfId(
+          *                        this.dsFileinfoOutput
+          *                       ,[
+          *                         {atchFileId:"atchFileId",fileSeqNo:"fileSeqNo",fileUrl:"fileUrl"}
+          *                        ]
+          *                       );
+          */
+         setImgUrlOfId:function(objDs, options)
+         {
+             objDs.set_updatecontrol(false);
+             objDs.set_enableevent(false);
+             for(let i in options)
+             {
+                 let option = options[i];
+                 if(objDs.getColIndex(option.fileUrl)==-1)
+                 {
+                     objDs.addColumn(option.fileUrl,"string",256);
+                 }
+                 for(let x=0;x<objDs.getRowCount();x++)
+                 {
+                     let atchFileId = objDs.getColumn(x,option.atchFileId);
+                     let fileSeqNo  = objDs.getColumn(x,option.fileSeqNo );
+                     
+                     let fileUrl  = nexacro.getEnvironment().services.svcurl.url;
+                         fileUrl += "/common/downloadFileId.do?atchFileId=";
+                         fileUrl += atchFileId;
+                         fileUrl += "&fileSeqNo=";
+                         fileUrl += fileSeqNo;
+                     
+                     objDs.setColumn(x,option.fileUrl,fileUrl);
+                 }
+             }
+             objDs.set_enableevent(true);
+             objDs.set_updatecontrol(true);
+         },
+        /*************************************************************************************************
+         * 4. Grid 관련 Util
+         ************************************************************************************************/
+         /**
+         * @class 데이터셋을 초기화하고 건수 결과를 표시할 객체에 건수를 업데이트
+         * @param {Object} sSti      건수 결과를 표시할 텍스트 객체
+         * @param {Object} sDs       건수를 확인 및 초기화할 데이터셋 객체
+         * @return 
+         * @example  Drps.Util.gridClear(this.sti_RowCnt, this.DS_XX1020);
+         * @memberOf Drps.Util
+         */
+         gridClear : function(sSti, sDs)
+         {
+             sDs.clearData();
+             this.gridRowCountText(sSti, sDs);
+         },
+ 
+         /**
+         * @class 데이터셋의 건수를 확인하여 건수 결과를 표시할 텍스트 객체에 건수를 업데이트. 
+         * @param {Object} sSti      건수 결과를 표시할 텍스트 객체
+         * @param {Object} sDs       건수를 확인할 데이터셋 객체
+         * @return 
+         * @example  Drps.Util.gridRowCountText(this.sti_RowCnt, this.DS_XX1020);
+         * @memberOf Drps.Util
+         */
+         gridRowCountText : function(sSti, sDs)
+         {
+             this.setGridRowCountLabel(sSti,sDs.rowcount);
+         },
+         
+         /**
+          * @class 건수 텍스트 세팅
+          * @param {nexacro.Component} [sSti] : 건수 결과를 표시할 텍스트 객체
+          * @param {Number           } [nCnt] : 건수
+          */
+         setGridRowCountLabel : function(sSti, nCnt)
+         {
+             sSti.set_text("[<b v='true'>" + nCnt + "</b>]건");
+         },
+ 
+         /**
+         * @class 그리드 헤더의 체크박스를 해제한다.
+         * @param {Object} objGrid      헤더 체크박스를 체크해제 할 그리드 객체
+         * @return 
+         * @example  Drps.Util.gridClearCheckbox(this.grdTest);
+         * @memberOf Drps.Util
+         */
+         gridClearCheckbox : function(objGrid)
+         {
+             for(let i = 0; i < objGrid.getCellCount("head"); i++)
+             {
+                 if(objGrid.getCellProperty("head", i, "displaytype") == "checkboxcontrol")
+                 {
+                     objGrid.setCellProperty("head", i, "text", 0);
+                 }
+             }
+         },
+ 
+         /**
+         * @class 마스터의 키를 디테일에 입력
+         * @param {Object}   Object Grid     마스터 그리드
+         * @param {Object}   Object Static       디테일 그리드
+         * @param {Array}    Array Column        배열로 된 키 컬럼ID
+         * @param {int}      int Option      옵션 - 데이터 타입 (Dataset.ROWTYPE_INSERT)
+         * @return N/A
+         * @example  Drps.Util.datasetKeyValueSetting(this.ds_SY_COMPOUPM,this.ds_SY_COMPOUPD, ["POPU_CODE"], Dataset.ROWTYPE_INSERT);
+         * @memberOf Drps.Util
+         */
+         datasetKeyValueSetting : function(objMds, objDds, arrSetCol, sOption)
+         {
+             var nLen = arrSetCol.length;
+             for(var i=0;i<nLen;i++)
+             {
+                 var nkey = objMds.getColumn(objMds.rowposition, arrSetCol[i]);
+                 for(var j=0;j<objDds.rowcount;j++)
+                 {
+                     if(sOption == null || objDds.getRowType(j) == sOption)
+                     {
+                         objDds.setColumn(j, arrSetCol[i], nkey);
+                     }
+                 }
+             }
+         },
+ 
+         /**
+         * @class 그리드 체크박스에서 1, 0 이 아닌 다른 값으로 표현해야 하는 경우 1, 0 값을 다른값으로 대체 함
+         * @param {Object} objDs         체크박스 값을 대체하려고 하는 데이터셋 객체
+         * @param {Object} objEvent  체크박스 값을 대체 시 데이터셋 변경 이벤트 객체
+         * @param {String} sTrueValue    체크 상태 시의 값              - 값이 없다면 Y
+         * @param {String} sFalseValue   체크 해제 상태 시의 값         - 값이 없다면 N
+         * @return 
+         * @example  Drps.Util.setCheckYN(obj, e);
+         * @memberOf Drps.Util
+         */
+         setCheckYN : function(objDs, objEvent, sTrueValue, sFalseValue)
+         {
+             if(!sTrueValue)
+             {
+                 sTrueValue = 'Y';
+             }
+             
+             if(!sFalseValue)
+             {
+                 sFalseValue = 'N';
+             }
+            
+             objDs.enableevent = false;
+             if(objEvent.newvalue == '1')
+             {
+                 objDs.setColumn(objEvent.row,objEvent.columnid,'Y');
+             } 
+             else if(objEvent.newvalue == '0')
+             {
+                 objDs.setColumn(objEvent.row,objEvent.columnid,'N');
+             }
+             
+             objDs.enableevent = true;
+         },
+ 
+         /**
+         * @class 공통 그리드 초기 세팅
+         * @param {Array} JSON을 담고 있는 배열
+         *       - {Object}  [component     ] 개별 설정하려는 그리드
+         *       - {Array}   [option        ] 옵션코드가 담긴 문자열 배열
+         *               options : "userGrid" - 컬럼크기변경, 오토엔터, 컬럼이동 설정을 사용자가 직접설정
+         *               options : "userExprBackground" - INSERT, UPDATE행의 색상 변경을 사용하지 않도록 설정
+         *               options : "userSort" - 컬럼헤더 더블클릭 시 정렬되지 않도록 설정
+         *               options : "userAllCheck" - 체크박스 컬럼헤더 클릭 시 전체선택, 전체선택해제를 사용하지 않도록 설정
+         *               options : "userFit" - 그리드 사이즈 조절 시 자동 autofittype 설정을 사용하지 않도록 설정
+         * @return
+         * @example 
+         *      Drps.Util.setDefaultGrid(); // 현재 화면의 모든 그리드를 공통그리드로 설정
+         *      Drps.Util.setDefaultGrid([
+                                           { component: this.grdAcntctCdList, options:["userGrid"]}
+                                         , { component: this.grdAcntctCdListDetail, options:["userGrid", "userExprBackground", "userSort", "userAllCheck"]}
+                                        ]);      // 배열안의 그리드의 옵션에 따라 공통그리드 기능을 제한적으로 설정
+         * @memberOf Drps.Util
+         */
+         setDefaultGrid : function(arrTarget)
+         {
+ 
+             var ffobj = this.ffobj;
+             var objComps = Drps.Core.getAll(ffobj).components;
+             
+             var leng = objComps.length;
+             for(var i=0;i<leng;i++)
+             {
+                 if(this.typeOf(objComps[i]) == "Grid")
+                 {
+                     let objJson = {};
+                     let objGrid = objComps[i];
+                     let curFormatId = objGrid.formatid;
+                     for(let formatId in objGrid._formats){
+                         objGrid.setFormat(formatId);
+                         if(arrTarget)
+                         {
+                             for(var j=0;j<arrTarget.length;j++)
+                             {
+                                 if(arrTarget[j].component.name == objGrid.name)
+                                 {
+                                     objJson.options = arrTarget[j].options;
+                                     break;
+                                 }
+                             }
+                         }
+                         
+                         objJson.options = objJson.options || "";
+                         
+                         // userGrid 옵션이 없다면 공통그리드 설정
+                         if(objJson.options.indexOf("userGrid") == -1)
+                         {
+                             objGrid.set_cellsizingtype("col");
+                             objGrid.set_autoenter("select");
+                             objGrid.set_cellmovingtype("col");
+                             objGrid.setCellProperty("Body", nCell, "combodisplayrowcount", 10);
+                         }
+                         
+                         // userExprBackground 옵션이 없다면 공통그리드 설정
+                         if(objJson.options.indexOf("userExprBackground") == -1)
+                         {
+                             for(var nCell = 0; nCell < objGrid.getCellCount("Body"); nCell++)
+                             {
+                                 objGrid.setCellProperty("Body", nCell, "editautoselect", true);
+                                 
+                                 // 공통그리드를 사용하지 않는 경우
+                                 var colClass = objGrid.getCellProperty("Body", nCell, "cssclass");
+                                 if(colClass && colClass.startsWith("expr:"))
+                                 {
+                                     objGrid.setCellProperty("Body", nCell, "cssclass", "expr:("+colClass.substr(5)+") + ',' + Drps.Util.exprGridBackground(comp,currow)");
+                                 }
+                                 else if(colClass && colClass.length>0)
+                                 {
+                                     objGrid.setCellProperty("Body", nCell, "cssclass", "expr:("+nexacro.wrapQuote(colClass)+") + ',' + Drps.Util.exprGridBackground(comp,currow)");
+                                 }
+                                 else
+                                 {
+                                     objGrid.setCellProperty("Body", nCell, "cssclass", "EXPR(Drps.Util.exprGridBackground(comp,currow))");
+                                 }
+                             }
+                         }
+                         
+                         // userSort 옵션이 없다면 헤더 더블클릭 시 정렬 설정
+                         if(objJson.options.indexOf("userSort") == -1)
+                         {
+                             objGrid.addEventHandler("onheaddblclick",this.gridSort,ffobj);
+                         }
+                         else
+                         {
+                             objGrid.removeEventHandler( "onheaddblclick",this.gridSort,ffobj);
+                         }
+                         
+                         // userAllCheck 옵션이 없다면 체크박스 헤더 클릭 시 전체 체크/미체크 설정
+                         if(objJson.options.indexOf("userAllCheck") == -1)
+                         {
+                             objGrid.addEventHandler("onheadclick",this.gridCheckAll,ffobj);
+                         }
+                         else
+                         {
+                             objGrid.removeEventHandler( "onheadclick",this.gridCheckAll,ffobj);
+                         }
+                         
+                         // userFit 옵션이 없다면 사이즈에 따라 autofit기능 활성화/비활성화 설정 
+                         if(objJson.options.indexOf("userFit") == -1)
+                         {
+                             var nAllWidth = 0;
+                             
+                             for(var nCell = 0; nCell < objGrid.getCellCount("Body"); nCell++)
+                             {
+                                 nAllWidth += objGrid.getFormatColSize(nCell);
+                             }
+                             
+                             objGrid.__allWidth = nAllWidth;
+                             
+                             if(objGrid.getOffsetWidth() > nAllWidth)
+                             {
+                                 objGrid.set_autofittype("col");
+                             }
+                             else
+                             {
+                                 objGrid.set_autofittype("none");
+                             }
+                             
+                             objGrid.addEventHandler("onsize",this.gridAutofit,ffobj);
+                         }
+                         else
+                         {
+                             objGrid.removeEventHandler( "onsize",this.gridAutofit,ffobj);
+                         }
+                     }
+                     objGrid.setFormat(curFormatId);
+                 }
+             }
+         },
+         
+         /**
+         * @class 데이터셋의 상태(INSERT, UPDATE)에 따라 그리드 셀 class 동적 변경
+         * @param {Object} objGrid class를 동적으로 변경 할 그리드 객체
+         * @param {INT} Row 위치 값
+         * @return class 명
+         * @example  Drps.Util.exprGridBackground(comp, currow)
+         * @memberOf Util
+         */
+         exprGridBackground : function(objGrid, nRow)
+         {
+             var ffobj = Drps.Util.ffobj;
+             var dsBind = Eco.XComp.lookup(ffobj,objGrid.binddataset);
+             var nRowType = dsBind.getRowType(nRow);
+             var sRtnVal = "";
+ 
+             switch(nRowType)
+             {
+                 case Dataset.ROWTYPE_INSERT : sRtnVal = "expr_grid_insert"; break;
+                 case Dataset.ROWTYPE_UPDATE : sRtnVal = "expr_grid_update"; break;
+             }
+             return sRtnVal
+         },
+         
+         /**
+         * 그리드의 Sort를 처리한다.
+         * @param  {event} grid event
+         * @return N/A
+         * @example
+         * @memberOf Util
+         */
+         gridSort : function(obj, e)
+         {
+             // 컬럼의 정렬방식을 'head'의 text에 "↑,↓"여부로 판단.
+             // 이미지로 대체 가능.
+             var ffobj = Drps.Util.ffobj;
+             var strType = obj.getCellProperty("head", e.cell, "displaytype");
+             var sConstAscMark = "▲";
+             var sConstDescMark = "▼";
+             
+             if(strType == "tree" ||strType == "checkbox" || strType == "checkboxcontrol")
+             {
+                 return;
+             }
+ 
+             //var bindDs = Eco.XComp.lookup(ffobj,obj.binddataset);
+             var bindDs = obj.getBindDataset();
+             if(bindDs.rowcount == 0)
+             {
+                 return false;
+             }
+             
+             var bindText = obj.getCellProperty("body", e.col, "text");
+             if(!bindText)
+             {
+                 return;
+             }
+             var BodyColId = bindText.toString().split(":");
+             bindDs.set_enableevent(false);
+             
+             for(var i = 0; i < obj.getCellCount("head"); i++)
+             {
+                 if(obj.getCellText(-1, i) == "undefined" || obj.getCellText(-1, i) == null)
+                 {
+                     continue;
+                 }
+ 
+                 var strHeadText = obj.getCellText(-1, i);
+ 
+                 if(i == e.cell)
+                 {
+                     if(strHeadText.substr(strHeadText.length - 1) == sConstAscMark)
+                     {
+                         obj.setCellProperty("head", i, "text", strHeadText.substr(0, strHeadText.length - 1) + sConstDescMark);
+                         bindDs.set_keystring(("S:-" + BodyColId[1]));
+                     }else if(strHeadText.substr(strHeadText.length - 1) == sConstDescMark){
+                         obj.setCellProperty("head", i, "text", strHeadText.substr(0, strHeadText.length - 1) + sConstAscMark);
+                         bindDs.set_keystring(("S:+" + BodyColId[1]));
+                     }else{
+                         obj.setCellProperty("head", i, "text", strHeadText + sConstAscMark);
+                         bindDs.set_keystring(("S:+" + BodyColId[1]));
+                     }
+                 }else{
+                     // 정렬표시 삭제
+                     if (strHeadText.substr(strHeadText.length - 1) == sConstAscMark || strHeadText.substr(strHeadText.length - 1) == sConstDescMark)
+                     {
+                         obj.setCellProperty("head", i, "text", strHeadText.substr(0, strHeadText.length - 1));
+                     }
+                 }
+             }
+             bindDs.set_rowposition(0);
+             bindDs.set_enableevent(true);
+         },
+         
+        /**
+         * Grid Head중 check box가 있을 경우, check box 클릭 이벤트 발생시 전체 row에 대한 check/uncheck 설정 함수
+         * @param  {object} grid
+         * @return N/A
+         * @example
+         * @memberOf Util
+         */
+         gridCheckAll : function(obj, e)
+         {
+             var ffobj = Drps.Util.ffobj;
+             var strVal;
+             var strBodyExprVal;
+             var strChkCol;
+             var dsObj;
+ 
+             if(obj.readonly == true) return;
+             
+             //dsObj = Eco.XComp.lookup(ffobj,obj.binddataset);
+             dsObj = obj.getBindDataset();
+ 
+             var strType = obj.getCellProperty("head", e.cell, "displaytype");
+ 
+             if(strType != "checkboxcontrol" || dsObj.rowcount == 0) return;
+ 
+             // Head셋팅
+             strVal = obj.getCellProperty("head", e.cell, "text");
+             strBodyExprVal = obj.getCellProperty("body", e.col, "expr");
+             
+             var bodyCellInfo = obj._curFormat._bodycells[e.col];
+             var trueValue  = bodyCellInfo.checkboxtruevalue;
+             if(typeof trueValue.valueOf=="function")
+             {
+                 trueValue = trueValue.valueOf();
+             }
+             var falseValue = bodyCellInfo.checkboxfalsevalue;
+             if(typeof falseValue.valueOf=="function")
+             {
+                 falseValue = falseValue.valueOf();
+             }
+             if(strBodyExprVal && strBodyExprVal.indexOf("'Y'") > -1)
+             {
+                 if (strVal == "1")
+                 {
+                     obj.setCellProperty("head", e.cell, "text", '0');
+                     strVal = "N";
+                 }else{
+                     obj.setCellProperty("head", e.cell, "text", '1');
+                     strVal = "Y";
+                 }
+             }
+             else if(trueValue || falseValue)
+             {
+                 if (strVal == "1")
+                 {
+                     obj.setCellProperty("head", e.cell, "text", '0');
+                     strVal = falseValue;
+                 }else{
+                     obj.setCellProperty("head", e.cell, "text", '1');
+                     strVal = trueValue;
+                 }
+             }
+             else
+             {
+                 if (strVal == "1")
+                 {
+                     obj.setCellProperty("head", e.cell, "text", '0');
+                     strVal = "0";
+                 }else{
+                     obj.setCellProperty("head", e.cell, "text", '1');
+                     strVal = "1";
+                 }
+             }
+             
+             strChkCol = Drps.Util.nvl(obj.getCellProperty("body", e.col, "text"), "");
+             strChkCol = strChkCol.split("bind:").join("");
+             
+             // Body셋팅
+             dsObj.set_enableevent(false);
+             for (var i = 0; i < dsObj.rowcount; i++)
+             {
+                 if(obj.getCellPropertyValue(i,e.col,"edittype") != "none")
+                 {
+                     dsObj.setColumn(i, strChkCol, strVal);
+                 }
+             }
+             
+             dsObj.set_enableevent(true);
+ 
+             if(obj.allCheckCallback != null)
+             {
+                 obj.allCheckCallback(ffobj,strChkCol);
+             }
+         },
+         
+         /**
+         * Grid 사이즈가 조절될때 그리드에 설정한 컬럼전체 값보다 현재 그리드 사이즈가 커지면
+         *       autofittype 을 "col"로 설정 아니면 "none" 설정
+         * @param  {object} grid
+         * @param  {object} event
+         * @return N/A
+         * @example
+         * @memberOf Util
+         */
+         gridAutofit : function(obj, e)
+         {
+             var sAutoFitType = obj.autofittype;
+             
+             if(e.cx > obj.__allWidth)
+             {
+                 if(sAutoFitType == "none")
+                 {
+                     obj.set_autofittype("col");
+                 }
+             }
+             else
+             {
+                 if(sAutoFitType == "col")
+                 {
+                     obj.set_autofittype("none");
+                 }
+             }
+         },
+         
+         /**
+          * 프로그래밍으로 dataset을 만든단다.
+          * 폼에 dsName이 있는 경우 해당 dataset을 그대로 사용한다.
+          * 
+          * 단건 Drps.Util.createDataset(this, "dsTemp",  { commCdId: "", commCd : ""} );
+          * 다건 Drps.Util.createDataset(this, "dsTemp", [{ commCdId: "", commCd : ""}] );
+          *      Drps.Util.createDataset(this, "dsTemp");
+          * this.svcTransaction({
+          *       svcID       : "svcID"
+          *     , url         : "...."
+          *     , inDataset   : "dsBasSmple=dsTemp"
+          *     , outDataset  : "dsTemp=dsBasSmpleList"
+          *     , callbackFunc: "fnCallback"
+          *   });
+          *
+          * this.fnCallback = function(svcID, errorCode, errorMsg) {
+          *    trace(dsTemp.saveXML());
+          * }
+          */
+         createDataset : function(objForm, dsName, param) {
+             param = param || {};
+             
+             var dsTemp = Drps.Util.lookup(objForm, dsName);
+             if ( dsTemp == null ) {
+                 dsTemp      = new Dataset;
+                 dsTemp.name = dsName;
+                 objForm.addChild(dsName, dsTemp);
+             }
+             
+             dsTemp.clear();
+             
+             if ( ! Array.isArray(param) ) {
+                 param = [param];
+             }
+             
+             var arrColumn = Object.keys(param[0]);
+             for (var i = 0; i < arrColumn.length; i++) {
+                 dsTemp.addColumn(arrColumn[i], "STRING");
+             }
+             
+             for (var i = 0; i < param.length; i++ ) {
+                 var row = dsTemp.addRow();
+                 var arrValue = Object.values(param[i]);
+                 for (var k = 0; k < arrColumn.length; k++) {
+                     dsTemp.setColumn(row, arrColumn[k], arrValue[k]);
+                 }
+             }
+             
+             return dsTemp;
+         },
+         /**
+          * 팝업 거래를 호출 하여 값을 리턴한다. 2건 이상 리턴시 팝업창을 호출한다.
+          * 
+          */
+         popupTransaction : function(objForm, options) {
+             var tmpInDataset  = "__intmp__" + options.inDataset ;
+             var tmpOutDataset = "__outtmp__" + options.outDataset;
+             var inDs  = Drps.Util.createDataset(objForm, tmpInDataset , options.parameter );
+             var outDs = Drps.Util.createDataset(objForm, tmpOutDataset                    );
+             objForm.svcTransaction({
+                 url         : options.url                                   // 거래 URL
+               , inDataset   : options.inDataset + "=" + tmpInDataset        // 입력데이터셋 - "서버=화면 서버1=화면1...N"
+               , outDataset  : tmpOutDataset     + "=" + options.outDataset  // 출력데이터셋 - "화면=서버 화면1=서버1...N"
+               , pageSize    : 2                                             // 페이징처리
+               , async       : false
+             });
+             
+             let rtnObj = {};
+             if ( outDs.getRowCount() == 1 ) {
+                 let strColId;
+                 for ( let i = 0; i < outDs.colcount; i++ )
+                 {
+                     strColId = outDs.getColID(i);
+                     objColVl = outDs.getColumn(outDs.rowposition, strColId);
+                     if ( typeof objColVl == "object" ) {
+                         rtnObj[strColId] = ( objColVl || "" ).toString();
+                     } else {
+                         // primitive type
+                         rtnObj[strColId] = objColVl;
+                     }
+                 }
+             } else {
+                 rtnObj = Drps.Util.openPopup(options.popupUrl, options.popupUrl, options.parameter);
+             }
+             return rtnObj || {} ;
+         }
+         ,
+         /**
+          * @class checkbox expression
+          * @param {nexacro._GridCellControl} [cellInfo  ] : 해당 cell info
+          * @param {String}                   [trueValue ] : truevalue
+          * @param {String}                   [falseValue] : falsevalue
+          * @return N/A
+          * @example
+          * Drps.Util.setGridCheckValue(this,"Y","N")
+          */
+         setGridCheckValue : function(cellInfo, trueValue, falseValue)
+         {
+             let expr = cellInfo.expr;
+             if(typeof expr!="object"){return "";}
+             expr._bindtype = 0;
+             expr._value = null;
+             delete expr._bindexpr;
+             cellInfo.set_checkboxtruevalue (trueValue);
+             cellInfo.set_checkboxfalsevalue(falseValue);
+         }
+         ,
+         
+        /*************************************************************************************************
+         * 5. POPUP 성격
+         ************************************************************************************************/        
+         
+         /**
+          * @class alert 팝업오픈
+          * @param {String} [msg    ] - 메세지 내용
+          * @param {String} [title  ] - title text(default:퇴직연금시스템 알림)
+          * @param {String} [type   ] - error 여부("INFO" : 정보성, "ERR" : error)(default:INFO)
+          * @param {String} [btnText] - 버튼 text(default:확인)
+          * @return N/A
+          * @example
+          * Drps.Util.alert("확인하세요");
+          * Drps.Util.alert("확인하세요","확인");
+          * Drps.Util.alert("확인하세요","확인","err");
+          * @memberOf Drps.Message
+          */
+         alert : function ( msg, title, type , btnText)
+         {
+             let strMsg = msg;
+             title      = title||"퇴직연금시스템 알림";
+             type       = (type||"INFO").toUpperCase();
+             btnText    = btnText||"확인";
+             
+             if( Drps.Util.isNull(strMsg) ) strMsg = "확인";
+             if(typeof strMsg!="string")
+             {
+                 strMsg = strMsg.toString();
+             }
+             // 줄바꿈 변경
+             strMsg = strMsg.replace(/\\n/g, String.fromCharCode(10));
+             
+             let idSeq = 0;
+             let strPopId = "messageAlert";
+             let popupFrames = nexacro.getPopupFrames(this.ffobj);
+             while(popupFrames[strPopId])
+             {
+                 strPopId = "messageAlert_"+(++idSeq);
+             }
+             
+             let strMsgUrl = "Comm::Comm_Alert.xfdl";
+ 
+             let objArg = {paramContents:strMsg,title:title,type:type,btnText:btnText};
+             let objOption = {popuptype:"modalwindow",showtitlebar:false};
+ 
+             this.openPopup( strPopId,strMsgUrl,objArg,null,objOption);
+         },
+         
+         /**
+          * @class confirm 팝업오픈
+          * @param {String} [msg      ] - 메세지 내용
+          * @param {String} [title    ] - title text(default:퇴직연금시스템 확인)
+          * @param {String} [trueText ] - 확인버튼 text(default:확인)
+          * @param {String} [falseText] - 취소버튼 text(default:취소)
+          * @return N/A
+          * @example
+          * Drps.Util.confirm("확인하세요");
+          * Drps.Util.confirm("확인하세요","확인");
+          * @memberOf Drps.Message
+          */
+         confirm : function ( msg, title, trueText, falseText)
+         {
+             let strMsg = msg;
+             title     = title    ||"퇴직연금시스템 확인";
+             trueText  = trueText ||"확인";
+             falseText = falseText||"취소";
+             if( Drps.Util.isNull(strMsg) ) strMsg = "확인";
+             // 줄바꿈 변경
+             strMsg = strMsg.replace(/\\n/g, String.fromCharCode(10));
+             if(typeof strMsg!="string")
+             {
+                 strMsg = strMsg.toString();
+             }
+             
+             let idSeq = 0;
+             let strPopId = "messageConfirm";
+             let popupFrames = nexacro.getPopupFrames(this.ffobj);
+             while(popupFrames[strPopId])
+             {
+                 strPopId = "messageConfirm_"+(++idSeq);
+             }
+ 
+             let strMsgUrl ="Comm::Comm_Confirm.xfdl";
+             
+             let objArg = {paramContents:strMsg,title:title,trueText:trueText,falseText:falseText};
+             let objOption = {popuptype:"modalwindow",showtitlebar:false};
+             
+             return this.openPopup( strPopId,strMsgUrl,objArg,null,objOption);
+         },
+         
+         /**
+          * @class prompt 팝업오픈
+          * @param {Object} [options] - 팝업옵션
+          *                 - {String} [msg      ] - 메세지 내용
+          *                 - {String} [title    ] - title text(default:퇴직연금시스템 확인)
+          *                 - {String} [label    ] - prompt label text
+          *                 - {String} [trueText ] - 확인버튼 text(default:확인)
+          *                 - {String} [falseText] - 취소버튼 text(default:취소)
+          * @return N/A
+          * @example
+          * Drps.Util.prompt({
+          *                   msg       : "확인하세요"
+          *                 , title     : "확인"
+          *                 , label     : "확인결과 : "
+          *                 });
+          * @memberOf Drps.Message
+          */
+         prompt : function ( options )
+         {
+             options       = options          ||{};
+             let strMsg    = options.msg      ||"";
+             let title     = options.title    ||"퇴직연금시스템 확인";
+             let label     = options.label    ||"";
+             let trueText  = options.trueText ||"확인";
+             let falseText = options.falseText||"취소";
+ 
+             if( Drps.Util.isNull(strMsg) ) strMsg = "확인";
+             if(typeof strMsg!="string")
+             {
+                 strMsg = strMsg.toString();
+             }
+             
+             // 줄바꿈 변경
+             strMsg = strMsg.replace(/\\n/g, String.fromCharCode(10));
+             
+             let idSeq       = 0;
+             let strPopId    = "messagePrompt";
+             let popupFrames = nexacro.getPopupFrames(this.ffobj);
+             while(popupFrames[strPopId])
+             {
+                 strPopId = "messagePrompt_"+(++idSeq);
+             }
+ 
+             let strMsgUrl ="Comm::Comm_Prompt.xfdl";
+             
+             let objArg = {paramContents:strMsg,title:title,promptLabel:label,trueText:trueText,falseText:falseText};
+             let objOption = {popuptype:"modalwindow",showtitlebar:false};
+             
+             return this.openPopup( strPopId,strMsgUrl,objArg,null,objOption);
+         },
+         
+         /**
+          * @class waitCursor
+          * @param {nexacro.Form} [formObj] : 대상 form
+          * @param {Boolean}      [view   ] : cursor 표시여부(true:표시,false:미표시)
+          * @return N/A
+          * @example
+          * Drps.Util.waitCursor(this,true);
+          */
+         waitCursor : function ( formObj, view )
+         {
+             if(formObj==null)
+             {
+                 Drps.Core.showError("undefined parameter : formObj - " + formObj);
+                 return;
+             }
+             if(!(formObj instanceof nexacro.Form))
+             {
+                 Drps.Core.showError("illegal parameter : formObj - " + formObj);
+                 return;
+             }
+             if(typeof view != "boolean")
+             {
+                 Drps.Core.showError("illegal parameter : view - " + typeof view);
+                 return;
+             }
+             if(view)
+             {
+                 let idSeq       = 0;
+                 let strPopId    = "waitCursor";
+                 let popupFrames = nexacro.getPopupFrames(formObj);
+                 while(popupFrames[strPopId])
+                 {
+                     strPopId = "waitCursor_"+(++idSeq);
+                 }
+ 
+                 let strMsgUrl ="Comm::Comm_WaitCursor.xfdl";
+                 
+                 let objArg = {};
+                 let objOption = {popuptype:"modalwindow",showtitlebar:false,overlaycolor:"transparent"};
+                 
+                 this.openPopup( strPopId,strMsgUrl,objArg,null,objOption,formObj);
+                 formObj.setWaitCursor(true);
+             }
+             else
+             {
+                 formObj.setWaitCursor(false);
+             }
+         },
+		 
+		 
+		 alertBox : function ( msg, _callback, title, type , btnText)
+         {
+             let strMsg = msg;
+             title      = title||"퇴직연금시스템 알림";
+             type       = (type||"INFO").toUpperCase();
+             btnText    = btnText||"확인";
+             
+             if( Drps.Util.isNull(strMsg) ) strMsg = "확인";
+             if(typeof strMsg!="string")
+             {
+                 strMsg = strMsg.toString();
+             }
+             // 줄바꿈 변경
+             strMsg = strMsg.replace(/\\n/g, String.fromCharCode(10));
+             
+             let idSeq = 0;
+             let strPopId = "messageAlert";
+             let popupFrames = nexacro.getPopupFrames(this.ffobj);
+             while(popupFrames[strPopId])
+             {
+                 strPopId = "messageAlert_"+(++idSeq);
+             }
+             
+             let strMsgUrl = "Comm::Comm_Alert.xfdl";
+ 
+             let objArg = {paramContents:strMsg,title:title,type:type,btnText:btnText};
+             let objOption = {popuptype:"modal",showtitlebar:false};
+ 
+             this.openPopup( strPopId,strMsgUrl,objArg,_callback,objOption);
+         },
+         
+         /**
+          * @class confirm 팝업오픈
+          * @param {String} [msg      ] - 메세지 내용
+          * @param {String} [title    ] - title text(default:퇴직연금시스템 확인)
+          * @param {String} [trueText ] - 확인버튼 text(default:확인)
+          * @param {String} [falseText] - 취소버튼 text(default:취소)
+          * @return N/A
+          * @example
+          * Drps.Util.confirm("확인하세요");
+          * Drps.Util.confirm("확인하세요","확인");
+          * @memberOf Drps.Message
+          */
+         confirmBox : function ( msg, _callback, title, trueText, falseText)
+         {
+             let strMsg = msg;
+             title     = title    ||"퇴직연금시스템 확인";
+             trueText  = trueText ||"확인";
+             falseText = falseText||"취소";
+             if( Drps.Util.isNull(strMsg) ) strMsg = "확인";
+             // 줄바꿈 변경
+             strMsg = strMsg.replace(/\\n/g, String.fromCharCode(10));
+             if(typeof strMsg!="string")
+             {
+                 strMsg = strMsg.toString();
+             }
+             
+             let idSeq = 0;
+             let strPopId = "messageConfirm";
+             let popupFrames = nexacro.getPopupFrames(this.ffobj);
+             while(popupFrames[strPopId])
+             {
+                 strPopId = "messageConfirm_"+(++idSeq);
+             }
+ 
+             let strMsgUrl ="Comm::Comm_Confirm.xfdl";
+             
+             let objArg = {paramContents:strMsg,title:title,trueText:trueText,falseText:falseText};
+             let objOption = {popuptype:"modal",showtitlebar:false};
+             this.openPopup( strPopId,strMsgUrl,objArg,_callback,objOption);
+         },
+		 
+         
+         /**
+          * @class 팝업오픈
+          * @param {String} sPopupId - 팝업ID
+          * @param {String} sUrl  - 팝업URL
+          * @param {String} [oArg] - 전달값
+          * @param {String} [sPopupCallback] - 팝업콜백
+          * @param {Object} [oOption] - 팝업옵션 <br>
+          *  oOption.top : 상단 좌표 <br>
+          *  oOption.left : 좌측 좌표 <br>
+          *  oOption.width : 넓이 <br>
+          *  oOption.height : 높이 <br>
+          *  oOption.popuptype : 팝업종류(modal:showModal, modeless:application.open, modalwindow:showModalWindow) <br>
+          *  oOption.layered : 투명 윈도우 <br>
+          *  oOption.opacity : 투명도 <br>
+          *  oOption.autosize : autosize <br>
+          * @param {nexacro.Form} [opener] - opener form(default ffobj)
+          * @return N/A
+          * @example
+          * Drps.Util.openPopup(this);
+          * @memberOf Drps.Popup
+          * 2020.01.14 김준권 popup title icon hidden
+          *                   popup showtitlebar option에 추가
+          * 2020.01.29 김준권 popup default modalwindow로 변경
+          */
+         openPopup : function ( sPopupId, sUrl, oArg, sPopupCallback, oOption, opener)
+         {
+             var ffobj = opener||this.ffobj;
+             var objApp = nexacro.getApplication();
+             var nLeft = -1;
+             var nTop = -1;
+             var nWidth = -1;
+             var nHeight = -1;
+             var bShowTitle = false;
+             var bShowTitleIcon = false; // 2020.01.14 김준권
+             var bShowStatus = false;    
+             var sPopupType = "modal";
+             var bLayered = false;
+             var nOpacity = 100;
+             var bAutoSize = false;
+             var bResizable = false;
+             var sOverlayColor = null;
+             let oPopupCallback = this._popupCallback;
+             var sTitleText = "";
+             
+             oArg    = oArg   ||{};
+             oOption = oOption||{};
+             
+             if(!oArg._params)
+             {
+                 oArg._params = {_openerId:ffobj._openerId||ffobj._pageId};
+             }
+             else
+             {
+                 oArg._params._openerId = ffobj._openerId||ffobj._pageId;
+             }
+ 
+             for (var key in oOption) {
+                if (oOption.hasOwnProperty(key)) {
+                     switch (key) 
+                     {
+                         case "top":             
+                             nTop = parseInt(oOption[key]);
+                             break;
+                         case "left":
+                             nLeft = parseInt(oOption[key]);
+                             break;
+                         case "width":
+                             nWidth = parseInt(oOption[key]);
+                             break;
+                         case "height":
+                             nHeight = parseInt(oOption[key]);
+                             break;
+                         case "popuptype":
+                             sPopupType = oOption[key];
+                             break;
+                         case "layered":
+                             bLayered = oOption[key];
+                             break;
+                         case "opacity":
+                             nOpacity =oOption[key];
+                             break;
+                         case "autosize":
+                             bAutoSize = oOption[key];
+                             break;
+                         case "showtitlebar":
+                             bShowTitle = oOption[key];
+                         case "resizable" :
+                             bResizable = oOption[key];
+                         case "overlaycolor" :
+                             sOverlayColor = oOption[key];
+                     }   
+                 }
+             }
+			 
+             var sOpenalign = "";
+             if(nLeft == -1 && nTop == -1) 
+             {       
+                 sOpenalign = "center middle";
+                 nLeft   =  (objApp.mainframe.width / 2) - Math.round(nWidth / 2);
+                 nTop    = (objApp.mainframe.height / 2) - Math.round(nHeight / 2) ;     
+             }else{
+                 nLeft   =  ffobj.getOffsetLeft() + nLeft;
+                 nTop   =  ffobj.getOffsetTop() + nTop;
+             }
+                     
+             if(nWidth == -1 || nHeight == -1)
+             {
+                 bAutoSize = true;
+             }
+                 
+             var objParentFrame = ffobj.getOwnerFrame()||nexacro.getApplication().gvRoot;
+             
+             if(this.isNull(sPopupCallback))
+             {
+                 oPopupCallback = oPopupCallback.bind(this);
+             }
+             else if(typeof sPopupCallback==="function")
+             {
+                 oPopupCallback = sPopupCallback;
+             }
+             else if(typeof sPopupCallback==="string" && ffobj[sPopupCallback])
+             {
+                 oPopupCallback = ffobj[sPopupCallback];
+             }
+             else
+             {
+                 oPopupCallback = sPopupCallback;
+             }
+			 
+             if(sPopupType == "modeless")
+             {
+                 // var sOpenStyle= "showtitlebar=true showstatusbar=false resizable=true autosize=true"; // 2020.01.14 김준권
+                 // var sOpenStyle= "showtitlebar=true showstatusbar=false resizable=true autosize=true showtitleicon=false";
+                 var sOpenStyle  = "showtitlebar="+bShowTitle;
+                     sOpenStyle += " layered="+bLayered;
+                     sOpenStyle += " showstatusbar=false";
+                     sOpenStyle += " resizable=true";
+                     sOpenStyle += " autosize="+bAutoSize;
+                     sOpenStyle += " showtitleicon=false";
+                         
+                 nexacro.open(sPopupId,sUrl,objParentFrame,oArg,sOpenStyle,nLeft, nTop, nWidth, nHeight, ffobj);
+             }
+             else if(sPopupType == "modalwindow")
+             {
+                 if(typeof oOption.showtitlebar=="undefined")
+                 {
+                     bShowTitle = true;
+                 }
+                 
+                 var newChild = new nexacro.ChildFrame;
+                 newChild.init(sPopupId, nLeft, nTop, nWidth, nHeight, null, null, sUrl);
+                 newChild.set_dragmovetype("all");
+                 newChild.set_showtitlebar(bShowTitle);    //titlebar는 안보임
+                 newChild.set_showtitleicon(bShowTitleIcon); //titleicon 표시여부 // 2020.01.14 김준권
+                 newChild.set_autosize(bAutoSize);   
+                 newChild.set_resizable(bResizable);    //resizable 안됨
+                 if(!this.isNull(sTitleText)) newChild.set_titletext(sTitleText);
+                 newChild.set_showstatusbar(bShowStatus);    //statusbar는 안보임
+                 newChild.set_openalign(sOpenalign);
+                 newChild.set_layered(bLayered);
+                 if(sOverlayColor==null)
+                 {
+                     // newChild.set_overlaycolor("transparent");
+                 }
+                 else
+                 {
+                     newChild.set_overlaycolor(sOverlayColor);
+                 }
+ 
+                 var mainFrameWin = ffobj._getRootWindow();
+                 var oldFocusList = mainFrameWin.getCurrentFocusPaths();
+                 var oldFocus     = null;
+                 if(oldFocusList.length)
+                 {
+                     oldFocus = oldFocusList[oldFocusList.length-1];
+                 }
+                 
+                 let gvRoot     = nexacro.getApplication().gvRoot;
+                 let openstatus = gvRoot.openstatus;
+                 if(gvRoot && typeof gvRoot.set_openstatus=="function" && openstatus!="maximize")
+                 {
+                    gvRoot.set_openstatus("restore");
+                 }
+ 
+                 var rtn = system.showModalWindow(newChild, sPopupId, objParentFrame, oArg, ffobj);
+                 if(oldFocus && typeof oldFocus.setFocus=="function")
+                 {
+                     oldFocus.setFocus(false);
+                 }
+
+                 try
+                 {
+                     return Function('"use strict";return ('+rtn+')')();
+                 }catch(e)
+                 {
+                     return rtn;
+                 }
+ 
+             }   
+             else if(sPopupType == "modal")
+             {
+                 if(typeof oOption.showtitlebar=="undefined")
+                 {
+                     bShowTitle = true;
+                 }
+                 
+                 var newChild = new nexacro.ChildFrame;
+                 newChild.init(sPopupId, nLeft, nTop, nWidth, nHeight, null, null, sUrl);
+                 
+                 newChild.set_dragmovetype("all");
+                 newChild.set_showtitlebar (bShowTitle);
+                 newChild.set_showtitleicon(bShowTitleIcon);
+                 newChild.set_autosize(bAutoSize);   
+                 newChild.set_resizable(bResizable);
+                 if(!this.isNull(sTitleText)) newChild.set_titletext(sTitleText);
+                 newChild.set_showstatusbar(bShowStatus);
+                 newChild.set_openalign(sOpenalign);
+                 newChild.set_layered(bLayered);
+				 newChild.set_overlaycolor(sOverlayColor);
+                 newChild.showModal(sPopupId, objParentFrame, oArg, ffobj, oPopupCallback); 
+             }
+             else
+             {
+                 trace("illegal popup type : " + sPopupType);
+                 return null;
+             }
+         },
+ 
+         _popupCallback : function()
+         {
+             var ffobj = this.ffobj;
+             //trace("ffobj : " + ffobj);
+             let argLength = arguments.length;
+             for(let i=0;i<argLength;i++)
+             {
+                 //trace("arg() : " + arguments[i]);
+             }
+         },
+         
+         /**
+          * @class url을 받아 ie브라우저로 페이지를 호출
+          * @param {String} sUrl
+          * @example
+          * Drps.Popup.webOpen('http://www.naver.com');
+          * @memberOf Drps.Popup
+          */
+         webOpen : function(sUrl)
+         {
+             system.execDefaultBrowser(sUrl);
+         },
+         
+         /**
+         * @class 팝업오픈 함수 기본설정 - 현재 화면객체에 "__tmp"+popupId로 파라미터들을 세팅하여 이후 공통팝업오픈 함수 호출 시 사용
+         * @param {Object} 호출 화면 객체
+         * @param {Array} JSON을 담고 있는 배열
+         *       - {dataset} [dataset       ] 팝업화면에서 받아온 자료를 세팅할 데이터 셋
+         *       - {String}  [popupId       ] 팝업ID 고유한 문자열로 설정
+         *       - {String}  [codeParam     ] 코드값을 주고 받을 컬럼 "=" 구분자로 구별하며 왼쪽의 값은 부모창은 코드컬럼 오른쪽의 값은 팝업에서 받아올 코드컬럼
+         *       - {String}  [nameParam     ] 명값을 주고 받을 컬럼 "=" 구분자로 구별하며 왼쪽의 값은 부모창은 명컬럼 오른쪽의 값은 팝업에서 받아올 명컬럼
+         *       - {Array}   [addParam      ] 추가값을 주고 받을 컬럼 "=" 구분자로 구별하며 왼쪽의 값은 부모창은 추가컬럼 오른쪽의 값은 팝업에서 받아올 추가컬럼이며 다수 값 처리를 위해 Array형식으로 넣어야함
+         *       - {String}  [popupTran     ] 팝업 조회 시 사용하는 Transaction Url
+         *       - {String}  [inDataset     ] 팝업 조회 시 사용하는 inDataset
+         *       - {String}  [outDataset    ] 팝업 조회 시 사용하는 outDataset
+         *       - {Object}  [searchParam   ] 팝업 조회 시 사용하는 파라미터 key 값은 팝업화면에서 사용하는 컬럼값
+         *                                       , value 값은 "." 구분자로 구별하며 왼쪽은 부모창에서 참조할 값이 들어있는 데이터셋, 오른쪽은 부모창에서 참조할 값 컬럼
+         *       - {String}  [popupUrl      ] 팝업 화면 호출 시 사용할 url
+         *       - {String}  [autoable      ] 팝업 화면 호출 전 건수를 체크하여 1건일 경우 자동으로 세팅할 것인지 여부 ( 기본값은 false)
+         * @return
+         * @example 
+         *       Drps.Util.setCommonPopup(this, {
+                       dataset: this.dsAcntctCdList
+                     , popupId : "AT1044P02UpperAcntctCd"
+                     , codeParam: "upperAcntctCd=acntctCd"
+                     , nameParam: "upperAcntctNm=acntctNm"
+                     , addParam: ["acntLevlCd=acntLevlCd", "drcrDivCd=drcrDivCd"]
+                     , popupTran: "/AT1044/selectListUpperAcntct.do"
+                     , inDataset: "dsAcntctCd"
+                     , outDataset: "dsAcntctCdList"
+                     , searchParam: {acctYear: "dsAcntctCd.acctYear", acntctNm: "dsAcntctCdList.upperAcntctNm"}
+                     , popupUrl: "AT::AT1044P02.xfdl"
+                     , autoable: true
+                 });
+         * @memberOf Drps.Util
+         */
+         setCommonPopup : function (objForm, arrJson)
+         {
+             if ( ! Array.isArray(arrJson) ) {
+                 arrJson = [arrJson];
+             }
+             
+             for(let i=0;i<arrJson.length;i++)
+             {
+                 let objParam = {};
+                 objParam.__objPopupId = "__tmp"+arrJson[i].popupId;
+                 objParam.__objDs = arrJson[i].dataset;
+                 objParam.__sCodeParam = arrJson[i].codeParam;
+                 objParam.__sNameParam = arrJson[i].nameParam;
+                 objParam.__arrAddParam = arrJson[i].addParam||[];
+                 objParam.__sPopupTran = arrJson[i].popupTran;
+                 objParam.__sInDataset = arrJson[i].inDataset;
+                 objParam.__sOutDataset = arrJson[i].outDataset;
+                 objParam.__objSearchParam = arrJson[i].searchParam||{};
+                 objParam.__sPopupUrl = arrJson[i].popupUrl;
+                 objParam.__autoable = arrJson[i].autoable||false;
+                 objForm[objParam.__objPopupId] = objParam;
+             }
+         },
+         
+         /**
+         * @class 팝업오픈 공통 함수
+         * @param {Object} 호출 화면 객체
+         * @param {String} 팝업ID 고유한 문자열로 설정
+         * @param {boolean} 버튼 클릭시 false, 데이터 변경 시 true
+         *               false 인 경우 명칭에 값이 있더라도 팝업의 명칭 값을 비우고 무조건 팝업 오픈, 팝업에서 취소 시 기존 부모창의 데이터를 수정하지 않음
+         *               true 인 경우 
+         *                       - 1. 건수 조회 후 1건이면 팝업을 호출하지 않고 받은 1건의 데이터를 세팅 아니면 팝업 호출
+         *                       - 2. 입력한 값이 그대로 팝업의 명칭 값에 올라감
+         *                       - 3. 입력값을 팝업창으로부터 받아온 값을 기존 부모창에 세팅
+         *                       - 4. 팝업창에서 취소 시 기존 부모창의 데이터도 지움
+         *                       - 5. 후작업을 위해 팝업 호출 후 데이터를 반환함
+         * @return {Object} 팝업 호출 후 리턴받는 객체
+         * @example 
+         *       Drps.Util.openCommonPopup(this, "AT1044P02UpperAcntctCd", false);
+         * @memberOf Drps.Util
+         */
+         openCommonPopup : function (objForm, sPopupId, IsValue)
+         {
+             let objParam = objForm["__tmp"+sPopupId];
+             let arrAddParam = objParam.__arrAddParam;
+             
+             let objSearch = {};
+             
+             let objDs = objParam.__objDs;
+             let rcvCodeColumn = objParam.__sCodeParam.split("=")[0];
+             let rtnCodeColumn = objParam.__sCodeParam.split("=")[1];
+             
+             let rcvNameColumn = objParam.__sNameParam.split("=")[0];
+             let rtnNameColumn = objParam.__sNameParam.split("=")[1];
+             
+             // nameParam의 부모창 컬럼id와 searchParam의 부모창 컬럼id가 일치하는 경우를 수정하는 값의 파라미터로 인식함
+             let sSearchNameParam;
+              // 파라미터 오브젝트 생성
+             for(let key in objParam.__objSearchParam)
+             {
+                 let paramSplit = objParam.__objSearchParam[key].split(".");
+                 let paramDs = objForm[paramSplit[0]];
+                 let paramColumn = paramSplit[1];
+                 
+                 if(rcvNameColumn == paramColumn)
+                 {
+                     sSearchNameParam = key;
+                 }
+                 objSearch[key] = paramDs.getColumn(paramDs.rowposition, paramColumn);
+             }
+             
+             // 임시 데이터셋 생성
+             Drps.Util.createDataset(objForm, "__dsTempInput", objSearch);
+             Drps.Util.createDataset(objForm, "__dsTempOutput");
+             
+             // 명 데이터 수정 시
+             if(IsValue)
+             {
+                 // 명 데이터가 빈값이라면 코드값도 빈값처리
+                 if(!objDs.getColumn(objDs.rowposition, rcvNameColumn))
+                 {
+                     objDs.set_enableevent(false);
+                     objDs.setColumn(objDs.rowposition, rcvCodeColumn, "");
+                     for(let i=0;i<arrAddParam.length;i++)
+                     {
+                         objDs.setColumn(objDs.rowposition, arrAddParam[i].split("=")[0], "");
+                     }
+                     objDs.set_enableevent(true);
+                     return;
+                 }
+                 
+                 // 자동세팅기능 사용여부
+                 if(objParam.__autoable)
+                 {
+                     // 건수 조회를 위한 통신 호출
+                     objForm.svcTransaction({
+                           svcID          : "__commonPopupCntSearch"
+                         , url            : objParam.__sPopupTran
+                         , inDataset      : objParam.__sInDataset+"=__dsTempInput"
+                         , outDataset     : "__dsTempOutput="+objParam.__sOutDataset
+                         , pageSize       : 2 
+                         , async          : false
+                     });
+                 }
+             }
+             
+             
+             objDs.set_enableevent(false);
+             
+             let objData;
+             
+             // 1건 조회 시 받아온 자료를 명, 코드에 세팅
+             if ( objForm.__dsTempOutput.getRowCount() == 1) {
+                 let codeValue = objForm.__dsTempOutput.getColumn(0, rtnCodeColumn);
+                 let nameValue = objForm.__dsTempOutput.getColumn(0, rtnNameColumn);
+                 
+                 objDs.setColumn(objDs.rowposition, rcvCodeColumn, codeValue);
+                 objDs.setColumn(objDs.rowposition, rcvNameColumn, nameValue);
+                 
+                 for(let i=0;i<arrAddParam.length;i++)
+                 {
+                     let addValue = objForm.__dsTempOutput.getColumn(0, arrAddParam[i].split("=")[1]);
+                     
+                     objDs.setColumn(objDs.rowposition, arrAddParam[i].split("=")[0], addValue);
+                 }
+                 
+                 objData = Drps.Util.strToJson(Drps.Util.getSelectedDataRowset(objForm.__dsTempOutput));
+             } 
+             // 1건이 아니면 팝업 호출
+             else 
+             {
+                 let objArg = {};
+                 
+                 // 버튼을 통해 팝업을 호출한 경우 명 값을 팝업파라미터에서 삭제
+                 if(!IsValue)
+                 {
+                     delete objSearch[sSearchNameParam];
+                 }
+             
+                 // 팝업호출
+                 objData = Drps.Util.openPopup(sPopupId, objParam.__sPopupUrl, objSearch);    
+                 
+                 // 데이터가 있다면 받은 데이터 세팅
+                 if (objData) 
+                 {
+                     objDs.setColumn(objDs.rowposition, rcvCodeColumn, objData[rtnCodeColumn]);
+                     objDs.setColumn(objDs.rowposition, rcvNameColumn, objData[rtnNameColumn]);
+                     
+                     for(let i=0;i<arrAddParam.length;i++)
+                     {
+                         objDs.setColumn(objDs.rowposition, arrAddParam[i].split("=")[0], objData[arrAddParam[i].split("=")[1]]);
+                     }
+                 }
+                 // 받은 데이터가 없다면
+                 else
+                 {
+                     // 버튼을 통해 팝업을 호출한 경우 취소시 빈값처리를 하지 않는다.
+                     if(IsValue)
+                     {
+                         objDs.setColumn(objDs.rowposition, rcvCodeColumn, "");
+                         objDs.setColumn(objDs.rowposition, rcvNameColumn, "");
+                         
+                         for(let i=0;i<arrAddParam.length;i++)
+                         {
+                             objDs.setColumn(objDs.rowposition, arrAddParam[i].split("=")[0], "");
+                         }
+                     }
+                 }
+             }
+             
+             objDs.set_enableevent(true);
+             
+             // 후처리를 위해 팝업에서 받은 값을 그대로 반환
+             return objData;
+         },
+         
+         /**
+          * @class toastrAlert 팝업오픈
+          * @param {String} [msg  ] - 메세지 내용
+          * @return N/A
+          * @example
+          * Drps.Util.toastrAlert("저장되었습니다.");
+          * @memberOf Drps.Message
+          */
+         toastrAlert : function (msg, infoGb)
+         {
+             let ffobj  = Drps.Util.ffobj;
+             let left   = system.screenToClientX(ffobj, 0)*-1;
+             let top    = system.screenToClientY(ffobj, 0)*-1;
+             let height = ffobj.getOffsetHeight();
+             
+             let currViewObj = {};
+             if(typeof nexacro.getApplication().gfnGetCurrView=="function")
+             {
+                 currViewObj = nexacro.getApplication().gfnGetCurrView();
+             }
+ 
+             if(typeof currViewObj.left == "number")
+             {
+                 left   = currViewObj.left;
+             }
+             if(typeof currViewObj.top == "number")
+             {
+                 top    = currViewObj.top;
+             }
+             if(typeof currViewObj.height == "number")
+             {
+                 height = currViewObj.height;
+             }
+ 
+             if(!this.isNull(currViewObj.view))
+             {
+                 switch(currViewObj.view)
+                 {
+                     case "login":
+                         var gvLogin = nexacro.getApplication().gvLogin;
+                         if(gvLogin && gvLogin.getForm())
+                         {
+                             ffobj = gvLogin.getForm();
+                         }
+                         break;
+                     case "contents":
+                     case "main":
+                         var gvHome = nexacro.getApplication().gvHome;
+                         if(gvHome && gvHome.getForm())
+                         {
+                             ffobj = gvHome.getForm();
+                         }
+                         break;
+                 }
+             }
+ 
+             let strMsg = msg;
+             
+             if( Drps.Util.isNull(strMsg) ) strMsg = "저장되었습니다.";
+             
+             // 줄바꿈 변경
+             strMsg = strMsg.replace(/\\n/g, String.fromCharCode(10));
+             
+             let idSeq = 0;
+             let strPopId = "messageToastrAlert";
+             let popupFrames = nexacro.getPopupFrames(ffobj);
+             
+             while(popupFrames[strPopId])
+             {
+                 let toastrFrame = popupFrames[strPopId];
+                 let toastrLeft  = toastrFrame.left;
+                 let toastrTop   = toastrFrame.top;
+                 
+                 toastrFrame.move(toastrLeft,toastrTop-52);
+                 strPopId = "messageToastrAlert_"+(++idSeq);
+             }
+             
+             let strMsgUrl = "Comm::Comm_ToastrInfo.xfdl";
+			 
+			 if(infoGb == "E") {
+				strMsgUrl = "Comm::Comm_ToastrAlert.xfdl";
+			 }
+			 
+ 
+             let objArg = {paramContents:strMsg};
+             
+             // 현재 열려있는 부모창의 left를 추출 후 50px 우측으로 설정
+             //let nLeft = left + 50;
+             let nLeft = 300 + 40;
+             // 현재 열려있는 부모창의 높이를 추출 후 50px 상단으로 설정
+             let nTop = height - 40;
+             
+             let objOption = {popuptype:"modal", showtitlebar:false, left: nLeft, top: nTop,overlaycolor: "transparent"};
+ 
+             this.openPopup( strPopId,strMsgUrl,objArg,null,objOption);
+         },
+		 
+		 /* 화면 파람 가져오기.*/
+		 getParamsObj : function (_that)
+         {
+			let paramObj = {};
+			try {
+				paramObj = _that.getOwnerFrame()._params;
+			} catch(e) {
+				return  {};
+			}
+			return paramObj;
+		 },
+         
+         /**
+          * 23.12.06 LDW
+          * @class  사업자 및 법인번호 마스킹처리
+          * @param  {String} bizNo - 사업자 또는 법인번호
+          * @return {String} bizNoFormat - 마스킹처리된 사업자 또는 법인번호
+          * @example
+          * Drps.Util.GetFormatBizNo("1234567890123"); => (13자리) 123456-7890123
+          * Drps.Util.GetFormatBizNo("1234567890");    => (10자리) 123-45-67890
+          * @memberOf Drps.Util
+          */
+         GetFormatBizNo : function(bizNo)
+         {
+            var bizNoFormat = nexacro.trim(bizNo);
+            
+            if(bizNoFormat.length == 13) {
+                bizNoFormat = bizNoFormat.substring(0, 6) + "-" + bizNoFormat.substring(6, 13);
+            } else if(bizNoFormat.length == 10) {
+                bizNoFormat = bizNoFormat.substring(0, 3) + "-" + bizNoFormat.substring(3, 5) + "-" + bizNoFormat.substring(5, 10);
+            }
+            
+            return bizNoFormat;
+         },
+		 
+         /**
+          * @class String -> JSON 변환
+          * @param {String} strJson
+          * @return objJson
+          */
+         strToJson : function(strJson)
+         {
+			if(typeof strJson == "boolean"){
+				return strJson;
+			}
+			let objJson = null;
+			if(strJson != undefined && strJson != ""){
+				try {
+					objJson = JSON.parse(strJson);
+				} catch(e) {
+					objJson = null;
+				}
+			}
+			return objJson;
+         },
+         /**
+          * @class 전화번호 유효성 체크
+          * @param {String} sValue
+          * @return Boolean
+          */
+		isPhone : function(sValue) 
+        {
+            if (Drps.Util.isNull(sValue)) return false;
+
+            let regExp = /^(01[016789]|02|0[3-9]{1}[0-9]{1}|050[2-9])([0-9]{3,4})([0-9]{4})$/;
+            let tempValue = sValue.toString().replace(/[^0-9]/g, "");
+
+            return regExp.test(tempValue);
+        }
+      });
+ }

@@ -1,0 +1,1722 @@
+/**
+*  컨설팅 표준화 작업
+*  @FileName 		core.js 
+*  @Creator 			soojeong
+*  @CreateDate 	2017.03.08
+*  @Desction   
+************** 소스 수정 이력 ***************************************************
+*  date          		Modifier                Description
+*******************************************************************************
+*  2017.03.08     	soojeong 	           최초 생성 
+*  2017.10.17     	kyk       	           주석 정비
+*******************************************************************************
+*/
+
+/**
+ * @fileoverview 프로젝트 메인프레임관련 공통함수
+ */
+if (!JsNamespace.exist("Drps.Core"))
+{
+    /**
+     * @namespace
+     * @name Drps.Core
+     * @author
+     * @memberof!  <global>
+     */
+     JsNamespace.declare("Drps.Core",{
+        /**
+         * Form 공통 Init
+         * @param {nexacro.Form} [formObj] : 대상 form
+         * @return N/A
+         * init 본함수 : _formInit
+         */
+        formInit : function(formObj)
+        {
+            if(!formObj){return;}
+            let pageId       = this.getIdOfWorkForm (formObj);
+            let quickViewId  = this.getIdOfQuickView(formObj);
+            let popupId      = this.getIdOfPopupForm(formObj);
+            let msgPopupId   = this.getIdOfMsgPopupForm(formObj);
+            let globalFormId = this.getIdOfGlobalForm(formObj);
+            if(pageId || quickViewId || popupId){
+                if(!msgPopupId && !globalFormId)
+                {
+                    Drps.Util.init(formObj);
+                }
+                this._formInit(formObj);
+            }
+        },
+        /**
+         * Form 공통 Init
+         * @param {nexacro.Form} [formObj] : 대상 form
+         * @return N/A
+         * 화면 open 공통
+         * - 화면 open 이력 추가
+         * titleText 처리
+         * - bottom Tab text와 동기화
+         * 하위 컴포넌트 처리
+         * - Grid       : initGrid
+         * - Button     : initButton
+         * - Calendar   : initCalendar
+		 * - WebBrowser : initWebBrowser
+         * - Spin       : initSpin
+         * - Combo      : initCombo
+         * - Tab        : _initRecursion
+         * - Form       : _initRecursion
+         * - Frame      : _initRecursion
+         * - Div        : _initRecursion
+         */
+        _formInit : function(formObj)
+        {
+            formObj._userInit = true;
+            
+            let pageId        = this.getIdOfWorkForm(formObj);
+            if(pageId)
+            {
+                if(!formObj._pageId)
+                {
+                    formObj._pageId = pageId;
+                }
+                let bottomForm  = nexacro.getApplication().gvBottom;
+                let bottomTab   = bottomForm.Tab_menu00;
+                let tabIndex    = bottomTab.tabindex;
+                let tabPage     = bottomTab.tabpages[tabIndex];
+                let tabPageName = tabPage.text;
+                let mainFrame   = nexacro.getApplication().gvMain;
+                let pageFrame   = mainFrame[pageId];
+                
+                pageFrame.set_titletext(tabPageName);
+                
+                // form id 추출
+                let scrinId = pageFrame._formUrl||formObj._orgurl||"";
+                if(scrinId.indexOf("::") > -1)
+                {
+                    scrinId = scrinId.split("::")[1];
+                }
+                if(scrinId.endsWith(".xfdl"))
+                {
+                    scrinId = scrinId.split(".xfdl")[0];
+                }
+                if(Drps.Util.isNull(scrinId))
+                {
+                    scrinId = "undefined";
+                }
+
+                // 화면 이력 추가
+//                 formObj.tisLongTransaction(
+//                                            {
+//                                             svcID          : "insertHist"
+//                                            ,url            : "/BC1002/insertPgmReadngHist.do"
+//                                            ,argument       : "scrinId=" + scrinId
+//                                            ,isToastr       : false
+//                                            ,showWaitCursor : false
+//                                            ,httptimeout    : 30
+//                                            }
+//                                           );
+                
+            }
+            
+            let compObjs = formObj.components;
+            let compArr  = [];
+            let formArr  = [];
+            
+            for(let i=0;i<compObjs.length;i++)
+            {
+                let compObj = compObjs[i];
+                // Form
+                if(compObj instanceof nexacro.Form)
+                {
+                    formArr.push(compObj);
+                }
+                // Frame, Div
+                else if(compObj.form && compObj.form instanceof nexacro.Form)
+                {
+                    compArr.push(compObj);
+                    formArr.push(compObj.form);
+                }
+                // Tab
+                else if(compObj instanceof nexacro.Tab)
+                {
+                    compArr.push(compObj);
+                    let tabpages = compObj.tabpages;
+                    if(tabpages && tabpages.length)
+                    {
+                        for(let x=0;x<tabpages.length;x++)
+                        {
+                            let tabpage = tabpages[x];
+                            let tabForm = tabpage.form;
+                            if(tabForm)
+                            {
+                                formArr.push(tabForm);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    compArr.push(compObj);
+                }
+            }
+            
+            // compArr loop
+            for(let i=0;i<compArr.length;i++)
+            {
+                let compObj = compArr[i];
+                // Grid
+                if(compObj instanceof nexacro.Grid)
+                {
+                    this.initGrid(compObj);
+                }
+                // Button
+                else if(compObj instanceof nexacro.Button)
+                {
+                    this.initButton(compObj);
+                }
+                // Calendar
+                else if(compObj instanceof nexacro.Calendar)
+                {
+                    this.initCalendar(compObj);
+                }
+                // WebBrowser
+                else if(compObj instanceof nexacro.WebBrowser)
+                {
+                    this.initWebBrowser(compObj);
+                }
+                // Spin
+                else if(compObj instanceof nexacro.Spin)
+                {
+                    this.initSpin(compObj);
+                }
+                // Combo
+                else if(compObj instanceof nexacro.Combo)
+                {
+                    this.initCombo(compObj);
+                }
+            }
+            
+            // formArr loop (recursion) 
+            for(let i=0;i<formArr.length;i++)
+            {
+                let form = formArr[i];
+                form._pageId = formObj._pageId;
+                if(typeof form.__fixedProps=="undefined")
+                {
+                    form.__fixedProps = {};
+                }
+                form.__fixedProps["_pageId"] = form._pageId;
+                this._initRecursion(form);
+            }
+            
+        },
+        _initRecursion : function(formObj)
+        {
+            if(formObj._userInit){return;}
+            this._formInit(formObj);
+        },
+        /**
+         * Grid Init
+         * @param {nexacro.Grid} [gridObj] 대상 grid
+         * @return N/A
+         * 최초조회 처리
+         * _isSearched = false
+         */
+        initGrid : function(gridObj)
+        {
+            gridObj._isSearched = false;
+        },
+        /**
+         * Grid 연속조회 세팅
+         * @param {nexacro.Grid}   [gridObj ] : 대상 grid
+         * @param                  [userNext] 
+         *        {nexacro.Button}            : 연속조회 Button
+         *     or {Function}                  : 연속조회시 호출 Function
+         *     or {String}                    : Button id 혹은 Function 명
+         * @param {nexacro.Form}   [formObj ] : userNext 선언된 form(미입력시 ffobj 적용)
+         * next 조회 처리
+         * -- Button   : click 이벤트 수행
+         * -- Function : 해당 function 호출
+         */
+        setGridNext : function(gridObj, userNext, formObj)
+        {
+            if(!formObj || !(formObj instanceof nexacro.Form))
+            {
+                formObj = Drps.Util.ffobj;
+            }
+
+            if(typeof userNext==="string")
+            {
+                let allObj  = this.getAll(Drps.Util.ffobj,userNext);
+                let targets = allObj.targets;
+                for(let i=0;i<targets.length;i++)
+                {
+                    let targetObj = targets[i];
+                    let rootForm  = targetObj.rootForm;
+                    let target    = targetObj.target;
+                    if(rootForm===Drps.Util.ffobj){
+                        if(typeof target==="function" || (target instanceof nexacro.Button))
+                        {
+                            userNext = target;
+                            break;
+                        }
+                    }
+                    else if(rootForm===formObj)
+                    {
+                        if(typeof target==="function" || (target instanceof nexacro.Button))
+                        {
+                            userNext = target;
+                            break;
+                        }
+                    }
+                }
+            }
+            if(userNext){
+                if(userNext instanceof nexacro.Button)
+                {
+                    gridObj._nextFuncTmp = function(obj,e)
+                    {
+                        if(e.type && e.type.endsWith("last") && gridObj._nextPageYn=="Y")
+                        {
+                            userNext.click();
+                        }
+                    };
+                }
+                else if(typeof userNext === "function")
+                {
+                    userNext = userNext.bind(formObj);
+                    gridObj._nextFuncTmp = function(obj,e)
+                    {
+                        if(e.type && e.type.endsWith("last") && gridObj._nextPageYn=="Y")
+                        {
+                            userNext();
+                        }
+                    };
+                }
+                if(gridObj._nextFuncTmp)
+                {
+                    if(gridObj._nextFunc && typeof gridObj._nextFunc==="function")
+                    {
+                        gridObj.removeEventHandler("onvscroll",gridObj._nextFunc,gridObj);
+                    }
+                    gridObj._nextFunc = gridObj._nextFuncTmp;
+                    gridObj.addEventHandler("onvscroll",gridObj._nextFunc,gridObj);
+                    delete gridObj._nextFuncTmp;
+                }
+            }
+        },
+        /**
+         * Button Init
+         * @param {nexacro.Button} [btnObj ] : 대상 button
+         * @return N/A
+         * HOTKEY 제어
+         * - HOTKEY 전용버튼 생성[hidden 처리]
+         */
+        initButton : function(btnObj)
+        {
+            if(btnObj==null){return;}
+            if(!(btnObj instanceof nexacro.Button)){return;}
+            if(btnObj.hotkey)
+            {
+                let btnId = "__hotKey"+btnObj.hotkey+"__";
+                if(!Drps.Util.ffobj[btnId])
+                {
+                    let hotkeyBtn = new Button();
+                    hotkeyBtn.init(btnId);
+                    hotkeyBtn.set_hotkey(btnObj.hotkey);
+                    hotkeyBtn.set_visible(false);
+                    Drps.Util.ffobj.addChild(btnId, hotkeyBtn);
+                    hotkeyBtn.keyBtns = [btnObj];
+                    if(hotkeyBtn._onHotkeyEvent)
+                    {
+                        hotkeyBtn.removeEventHandler("onclick",hotkeyBtn._onHotkeyEvent,hotkeyBtn);
+                    }
+                    hotkeyBtn._onHotkeyEvent = function(obj, e)
+                                               {
+                                                   for(let i=0;i<obj.keyBtns.length;i++)
+                                                   {
+                                                       let btnObj = obj.keyBtns[i];
+
+                                                       if(btnObj._isVisible())
+                                                       {
+                                                           btnObj.setFocus();
+                                                           btnObj.click();
+                                                           return;
+                                                       }
+                                                   }
+                                               };
+                    hotkeyBtn.addEventHandler("onclick",hotkeyBtn._onHotkeyEvent,hotkeyBtn);
+                    hotkeyBtn.show();
+                }
+                let hotkeyObj = Drps.Util.ffobj[btnId];
+                setHotkeys :
+                {
+                    btnObj.set_hotkey("");
+                    for(let i=0;i<hotkeyObj.keyBtns.length;i++)
+                    {
+                        if(hotkeyObj.keyBtns[i]===btnObj)
+                        {
+                            break setHotkeys;
+                        }
+                    }
+                    hotkeyObj.keyBtns.push(btnObj);
+                }
+            }
+        },
+        _setAuthCover : function(btnObj)
+        {
+            if(btnObj==null){return;}
+            if(!(btnObj instanceof nexacro.Button)){return;}
+            let formObj = btnObj.parent;
+            if(formObj instanceof nexacro.Form)
+            {
+                // formObj = formObj;
+            }
+            else if(formObj.form && (formObj.form instanceof nexacro.Form))
+            {
+                formObj = formObj.form;
+            }
+            else
+            {
+                return;
+            }
+            
+            let cover = new Static();
+            cover.init(btnObj.id+"_cover"
+                      ,btnObj.left
+                      ,btnObj.top
+                      ,btnObj.width
+                      ,btnObj.height
+                      ,btnObj.right
+                      ,btnObj.bottom
+                      );
+            formObj.addChild(btnObj.id+"_cover",cover);
+            cover.set_cssclass("sta_disabled");
+            cover.set_text(btnObj.text);
+            cover.set_fittocontents(btnObj.fittocontents);
+            cover.show();
+            
+            btnObj.click = nexacro._emptyFn;
+
+        },
+        /**
+         * Calendar Init
+         * @param {nexacro.Calendar} [calendarObj] : 대상 calendar
+         * @return N/A
+         * dateFormat yyyy-MM일 시
+         * - value 6자리 slice 처리
+         * - 월팝업으로 변경(미구현)
+         */
+        initCalendar : function(calendarObj)
+        {
+            let formObj = calendarObj.parent;
+            if(formObj instanceof nexacro.Form)
+            {
+                // formObj = formObj;
+            }
+            else if(formObj.form && (formObj.form instanceof nexacro.Form))
+            {
+                formObj = formObj.form;
+            }
+            else
+            {
+                return;
+            }
+            
+            let dateformat = calendarObj.dateformat;
+            if(dateformat=="yyyy-MM")
+            {
+                let maskObj = calendarObj._masktypeobj;
+                if(maskObj && typeof maskObj.__changeNormalizeValueTmp=="undefined")
+                {
+                    maskObj.__changeNormalizeValueTmp = maskObj.changeNormalizeValue;
+                    maskObj.changeNormalizeValue = function(v)
+                                                   {
+                                                       v = maskObj.__changeNormalizeValueTmp(v)||"";
+                                                       return v.substring(0,6);
+                                                   };
+                }
+                
+                if(typeof calendarObj.__onValueChangeTmp=="undefined")
+                {
+                    calendarObj.__onValueChangeTmp = calendarObj._on_value_change;
+                    calendarObj._on_value_change = function (prevalue, postvalue) {
+                        postvalue = postvalue.substring(0,6);
+                        this.__onValueChangeTmp(prevalue, postvalue);
+                    };
+                }
+                if(typeof calendarObj.__convertValueTypeTmp=="undefined")
+                {
+                    calendarObj.__convertValueTypeTmp = calendarObj._convertValueType;
+                    calendarObj._convertValueType = function (v, dateobj, bapplyrule)
+                    {
+                        let ret = calendarObj.__convertValueTypeTmp(v, dateobj, bapplyrule);
+                        if(typeof ret=="string")
+                        {
+                            return ret.substring(0,6);
+                        }
+                        else
+                        {
+                            return ret;
+                        }
+                    }
+                }
+                
+                calendarObj._monthPickerTmp = new PopupDiv();
+                let calendarId    = calendarObj.id;
+                let monthPickerId = calendarObj.id+"_month_";
+                calendarObj._monthPickerTmp.init(
+                                                 monthPickerId
+                                                ,0
+                                                ,0
+                                                ,0
+                                                ,0
+                                                );
+                if(calendarObj._monthPicker)
+                {
+                    formObj.removeChild(calendarObj._monthPicker.id);
+                    calendarObj._monthPicker.destroy();
+                }
+                calendarObj._monthPicker = calendarObj._monthPickerTmp;
+                delete calendarObj._monthPickerTmp;
+                formObj.addChild(monthPickerId,calendarObj._monthPicker);
+                calendarObj._monthPicker.show();
+                calendarObj._monthPicker.set_async(false);
+                calendarObj._monthPicker.set_url("Comm::monthcalendar_inner.xfdl");
+                let monthPickerForm = calendarObj._monthPicker.form;
+                monthPickerForm.fnSetCurrYear ();
+                monthPickerForm.fnSetCurrMonth();
+                calendarObj._monthPicker.resize(155,160);
+                if(typeof formObj["__" + calendarObj.id+"MonthPickerCallback__"]=="undefined")
+                {
+                    formObj["__" + calendarObj.id+"MonthPickerCallback__"] = function(pickerId, retVal)
+                                                                             {
+                                                                                 if(retVal)
+                                                                                 {
+                                                                                     let oldValue = calendarObj.value;
+                                                                                     if(oldValue!==retVal)
+                                                                                     {
+                                                                                         calendarObj._on_value_change(oldValue,retVal);
+                                                                                     }
+                                                                                     calendarObj._changeStatus("mouseover", false);
+                                                                                     calendarObj.calendaredit._changeStatus("mouseover", false);
+                                                                                     calendarObj.dropbutton._changeStatus("mouseover", false);
+                                                                                 }
+                                                                             };
+                }
+                calendarObj._onDropDownFuncTmp = function(obj,e)
+                                                 {
+                                                     if(obj._monthPicker)
+                                                     {
+                                                         let monthForm = obj._monthPicker.form;
+
+                                                         obj._monthPicker.trackPopupByComponent(obj,0,obj.getOffsetHeight(),null,null,"__" + calendarObj.id+"MonthPickerCallback__");
+                                                         if(obj.calendaredit && obj.calendaredit.value)
+                                                         {
+                                                             let strYear = obj.calendaredit.value.substring(0,4);
+                                                             let strMonth = obj.calendaredit.value.substring(4,6);
+                                                             monthForm.fnInitDate(strYear,strMonth);
+                                                         }
+                                                         else if(obj.value)
+                                                         {
+                                                             let strYear = obj.calendaredit.value.substring(0,4);
+                                                             let strMonth = obj.value.substring(4,6);
+                                                             monthForm.fnInitDate(strYear,strMonth);
+                                                         }
+                                                     }
+                                                     return false;
+                                                 };
+                if(calendarObj._onDropDownFunc && typeof calendarObj._onDropDownFunc==="function")
+                {
+                    calendarObj.removeEventHandler("ondropdown",calendarObj._onDropDownFunc,calendarObj);
+                }
+                calendarObj._onDropDownFunc = calendarObj._onDropDownFuncTmp;
+                calendarObj.addEventHandler("ondropdown",calendarObj._onDropDownFunc,calendarObj);
+                
+                if(calendarObj.value && calendarObj.value.length > 6)
+                {
+                    calendarObj.set_value(calendarObj.value);
+                }
+            }
+            else
+            {   let maskObj = calendarObj._masktypeobj;
+                if(maskObj && typeof maskObj.__changeNormalizeValueTmp=="function")
+                {
+                    maskObj.changeNormalizeValue = maskObj.__changeNormalizeValueTmp;
+                    delete maskObj.__changeNormalizeValueTmp;
+                }
+                if(typeof calendarObj.__onValueChangeTmp=="function")
+                {
+                    calendarObj._on_value_change = calendarObj.__onValueChangeTmp;
+                    delete calendarObj.__onValueChangeTmp;
+                }
+                
+                if(typeof calendarObj.__convertValueTypeTmp=="function")
+                {
+                    calendarObj._convertValueType = calendarObj.__convertValueTypeTmp;
+                    delete calendarObj.__convertValueTypeTmp;
+                }
+                
+                if(typeof formObj["__" + calendarObj.id+"MonthPickerCallback__"]=="function")
+                {
+                    delete formObj["__" + calendarObj.id+"MonthPickerCallback__"];
+                }
+                
+                if(calendarObj._monthPicker && (calendarObj._monthPicker instanceof nexacro.PopupDiv))
+                {
+                    formObj.removeChild(calendarObj._monthPicker.id);
+                    calendarObj._monthPicker.destroy();
+                    delete calendarObj._monthPicker;
+                }
+                
+                if(calendarObj._onDropDownFunc && typeof calendarObj._onDropDownFunc==="function")
+                {
+                    calendarObj.removeEventHandler("ondropdown",calendarObj._onDropDownFunc,calendarObj);
+                    delete calendarObj._onDropDownFunc;
+                }
+                
+                if(calendarObj.value && calendarObj.value.length == 6)
+                {
+                    calendarObj.set_value(calendarObj.value+"01");
+                }
+            }
+        },
+        /**
+         * WebBrowser Init
+         * @param {nexacro.WebBrowser} [webBrowserObj] : 대상 WebBrowser
+         * @return N/A
+         * onload flag 부여
+         */
+        initWebBrowser : function(webBrowserObj)
+        {
+            webBrowserObj._loadEventFuncTmp = function(obj, e)
+                                              {
+                                                  obj._isLoaded = true;
+                                              };
+            if(typeof webBrowserObj._loadEventFunc=="function")
+            {
+                webBrowserObj.removeEventHandler("onloadcompleted",webBrowserObj._loadEventFunc,webBrowserObj);
+            }
+            webBrowserObj._loadEventFunc = webBrowserObj._loadEventFuncTmp;
+            webBrowserObj.addEventHandler("onloadcompleted",webBrowserObj._loadEventFunc,webBrowserObj);
+            delete webBrowserObj._loadEventFuncTmp;
+        },
+        /**
+         * Spin Init
+         * @param {nexacro.Spin} [spinObj] : 대상 Spin
+         * @return N/A
+         * 하위 edit onchange 시 enter key event 유도
+         */
+        initSpin : function(spinObj)
+        {
+            if(spinObj==null){return;}
+            if(!(spinObj instanceof nexacro.Spin)){return;}
+            let spinEdit = spinObj.spinedit;
+            if(spinEdit && (spinEdit instanceof nexacro.MaskEdit))
+            {
+                if(typeof spinEdit.__onValueChangeTmp != "function")
+                {
+                    spinEdit.__onValueChangeTmp = spinEdit._on_value_change;
+                    spinEdit._on_value_change = function(pretext, prevalue, posttext, postvalue)
+                                                {
+                                                    let ret = spinEdit.__onValueChangeTmp(pretext, prevalue, posttext, postvalue);
+                                                    if(ret===true)
+                                                    {
+                                                        if(this.parent && (this.parent instanceof nexacro.Spin))
+                                                        {
+                                                            let parentSpin = this.parent;
+                                                            if(typeof parentSpin._on_edit_onkeydown=="function")
+                                                            {
+                                                                parentSpin.set_value(postvalue);
+                                                                let e={keycode:nexacro.Event.KEY_ENTER};
+                                                                parentSpin._on_edit_onkeydown(parentSpin,e);
+                                                            }
+                                                        }
+                                                    }
+                                                    return ret;
+                                                };
+                }
+            }
+            
+        },
+        /**
+         * Combo Init
+         * @param {nexacro.Combo} [comboObj] : 대상 Combo
+         * @return N/A
+         * innerdataset 보이지 않는 행도 display 가능하도록 변경
+         */
+        initCombo : function(comboObj)
+        {
+            if(comboObj==null){return;}
+            if(!(comboObj instanceof nexacro.Combo)){return;}
+            comboObj.__setTextTmp = comboObj._setText;
+            comboObj._setText = function(v)
+                                {
+                                    let inDs      = this.getInnerDataset();
+                                    if(Drps.Util.isNull(v) && inDs && (inDs instanceof nexacro.Dataset))
+                                    {
+                                        let codeColNm = this.codecolumn;
+                                        let dataColNm = this.datacolumn;
+                                        let code      = this.value;
+                                        let targetRow = inDs.findRowNF(codeColNm,code,0);
+                                        if(targetRow > -1)
+                                        {
+                                            v = inDs.getColumnNF(targetRow, dataColNm);
+                                        }
+                                    }
+                                    this.__setTextTmp(v);
+                                };
+        },
+        /**
+         * 업무화면 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {String} 업무화면 form 일 시 업무화면 ID
+         *                  업무화면 form 아닐 시 null
+         * 업무화면여부
+         * - 업무 Form depth : frameSet > childFrame > form > Div > 업무 Form
+         */
+        getIdOfWorkForm : function(formObj)
+        {
+            if(!formObj){return null;}
+            if(formObj instanceof nexacro.TitleBarControl){return null;}
+            if(formObj instanceof nexacro.Form)
+            {
+                if(formObj.name=="form"){return null;}
+                let mainFrame = nexacro.getApplication().gvMain;
+                let parentObj = formObj.parent;
+                if(parentObj && (parentObj instanceof nexacro.Div))
+                {
+                    let gParentObj = parentObj.parent;
+                    if(gParentObj && (gParentObj instanceof nexacro.Form))
+                    {
+                        let ggParentObj = gParentObj.parent;
+                        if(ggParentObj && (ggParentObj instanceof nexacro.ChildFrame))
+                        {
+                            if(ggParentObj.parent===mainFrame)
+                            {
+                                return ggParentObj.id;
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        },
+        /**
+         * 업무화면 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {Boolean} 업무화면 여부
+         * 업무화면여부
+         * - 업무 Form depth : frameSet > childFrame > form > Div > 업무 Form
+         */
+        isWorkForm : function(formObj)
+        {
+            if(!formObj){return false;}
+            if(formObj instanceof nexacro.TitleBarControl){return false;}
+            if(formObj instanceof nexacro.Form)
+            {
+                let mainFrame = nexacro.getApplication().gvMain;
+                let parentObj = formObj.parent;
+                if(parentObj && (parentObj instanceof nexacro.Div))
+                {
+                    let gParentObj = parentObj.parent;
+                    if(gParentObj && (gParentObj instanceof nexacro.Form))
+                    {
+                        let ggParentObj = gParentObj.parent;
+                        if(ggParentObj && (ggParentObj instanceof nexacro.ChildFrame))
+                        {
+                            if(ggParentObj.parent===mainFrame)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        },
+        /**
+         * 메인화면 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {String} 메인화면 form 일 시 하위업무화면 form ID
+         *                  메인화면 form 아닐 시 null
+         * 메인화면여부
+         * - 업무 Form depth : frameSet > childFrame > 메인 Form
+         */
+        getIdOfMainForm : function(formObj)
+        {
+            if(!formObj){return null;}
+            if(formObj instanceof nexacro.TitleBarControl){return null;}
+            if(formObj instanceof nexacro.Form)
+            {
+                if(formObj.name=="form"){return null;}
+                let mainFrame = nexacro.getApplication().gvMain;
+                let parentObj = formObj.parent;
+                if(parentObj && (parentObj instanceof nexacro.ChildFrame))
+                {
+                    if(parentObj.parent===mainFrame)
+                    {
+                        return parentObj.id;
+                    }
+                }
+            }
+            return null;
+        },
+        /**
+         * QuickView 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {String} quickview form 일 시 해당 form name
+         *                  quickview form 아닐 시 null
+         */
+        getIdOfQuickView : function(formObj)
+        {
+            if(!formObj){return null;}
+            if(formObj instanceof nexacro.TitleBarControl){return null;}
+            if(formObj instanceof nexacro.Form){
+                let parent = formObj.parent;
+                if(parent && (parent instanceof nexacro.ChildFrame) && parent.id=="QuickViewFrame")
+                {
+                    return formObj.name;
+                }
+            }
+            return null;
+        },
+        /**
+         * Popup 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {String} popup form 일 시 opener frame ID (없을 시 해당 form name)
+         *                  popup form 아닐 시 null
+         */
+        getIdOfPopupForm : function(formObj)
+        {
+            if(!formObj){return null;}
+            if(formObj instanceof nexacro.TitleBarControl){return null;}
+            if(formObj instanceof nexacro.Form){
+                let parent   = formObj.parent;
+                if(parent && (parent instanceof nexacro.ChildFrame))
+                {
+                    let parentId = parent.id;
+                    let gParent = parent.parent;
+                    if(gParent && (gParent instanceof nexacro.ChildFrame))
+                    {
+                        let popupArr = nexacro.getPopupFrames(gParent);
+                        if(popupArr[parentId]===parent)
+                        {
+                            if(gParent._pageId)
+                            {
+                                return gParent._pageId;
+                            }
+                            return formObj.name;
+                        }
+                    }
+                }
+            }
+            return null;
+        },
+        /**
+         * Global 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {String} global form 일 시 form ID
+         *                  global form 아닐 시 null
+         */
+        getIdOfGlobalForm : function(formObj)
+        {
+            let application = nexacro.getApplication();
+            let gvArray = application.all._idArray;
+            for(let i=0;i<gvArray.length;i++)
+            {
+                let gv  = gvArray[i];
+                let obj = application[gv];
+                if(obj && (obj instanceof nexacro.ChildFrame))
+                {
+                    obj = obj.getForm();
+                }
+                
+                if(obj && obj===formObj)
+                {
+                    return obj.name||"form";
+                }
+            }
+            return null;
+        },
+        /**
+         * message Popup 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {String} message popup form 일 시 opener frame ID (없을 시 해당 form name)
+         *                  message popup form 아닐 시 null
+         * message popup 여부
+         * form url : Comm::Comm_Alert.xfdl
+         *            Comm::Comm_Confirm.xfdl
+         *            Comm::Comm_Confirm_Risk.xfdl
+         *            Comm::Comm_ToastrAlert.xfdl
+         *            Comm::Comm_Prompt.xfdl
+         *            Comm::Comm_WaitCursor.xfdl
+         */
+        getIdOfMsgPopupForm : function(formObj)
+        {
+            let popupId = this.getIdOfPopupForm(formObj);
+            if(popupId){
+                let parent   = formObj.parent;
+                if(parent && (parent instanceof nexacro.ChildFrame))
+                {
+                    let formUrl = parent.formurl;
+                    switch(formUrl)
+                    {
+                        case "Comm::Comm_Alert.xfdl"       :
+                        case "Comm::Comm_Confirm.xfdl"     :
+                        case "Comm::Comm_Confirm_Risk.xfdl":
+                        case "Comm::Comm_ToastrAlert.xfdl" :
+                        case "Comm::Comm_Prompt.xfdl"      :
+                        case "Comm::Comm_WaitCursor.xfdl"  :
+                            return popupId;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            return null;
+        },
+        /**
+         * url form 검증
+         * @param  {nexacro.Form} [formObj] : 검증대상 form
+         * @return {String} url로 호출된 form 일 시 해당 form name
+         *                  url로 호출된 form 아닐 시 null
+         */
+        getIdOfUrlForm : function(formObj)
+        {
+            if(formObj==null){return null;}
+            if(!(formObj instanceof nexacro.Form)){return null;}
+            if(formObj instanceof nexacro.TitleBarControl){return null;}
+            let parent = formObj.parent;
+            if(parent && (parent instanceof nexacro.Frame))
+            {
+                if(parent.formurl)
+                {
+                    return formObj.name||"urlForm";
+                }
+            }
+            else if(parent.url)
+            {
+                return formObj.name||"urlForm";
+            }
+            return null;
+        }, 
+        /**
+         * Form 하위 component 전체 조회
+         * @param  : {nexacro.Form} [formObj  ] 대상 form
+         * @param  : {String}       [targetKey] 검색 key
+         * @return : {Object}
+         *           - {nexacro.Component[]} [components] : 하위   component 배열
+         *           - {nexacro.Dataset  []} [lDatasets ] : 하위   dataset   배열
+         *           - {nexacro.Dataset  []} [gDatasets ] : global dataset   배열
+         *           - {nexacro.BindItem []} [binds     ] : 하위   binding   배열
+         *           - {nexacro.Form     []} [urlForms  ] : 하위   form      배열 (url 호출 form에 한함)
+         *           - {Object           []} [targets   ] : 검색결과(검색 key 존재 시)
+         *             - {String} [rootForm  ] : 부모 form
+         *             - {Object} [target    ] : 검색결과 object
+         */
+        getAll : function(formObj, targetKey)
+        {
+            if(formObj==null || !(formObj instanceof nexacro.Form))
+            {
+                let nullObj = {};
+                nullObj.components  = [];
+                nullObj.lDatasets   = [];
+                nullObj.gDatasets   = [];
+                nullObj.binds       = [];
+                nullObj.urlForms    = [];
+                return nullObj;
+            }
+            
+            let application = nexacro.getApplication();
+            let appObjs     = application.all;
+            let gDatasetArr = [];
+            let formQueue   = [];
+            let compArr     = [];
+            let lDatasetArr = [];
+            let bindArr     = [];
+            let formArr     = [];
+            let targetArr   = [];
+            let targetKeys  = [];
+            
+            if(targetKey)
+            {
+                targetKeys = targetKey.split(".");
+            }
+        
+            // global dataset
+            for(let i=0;i<appObjs.length;i++)
+            {
+                let appObjId = appObjs._idArray[i];
+                let appObj   = application[appObjId];
+                if(appObj && (appObj instanceof nexacro.Dataset))
+                {
+                    gDatasetArr.push(appObj);
+                }
+            }
+            
+            // Form
+            formQueue.push(formObj);
+            formArr.push  (formObj);
+            
+            //////////////////////////////////////////////////////////////////////////
+            // component loop START
+            //
+            
+            // components sort by taborder function
+            let lfnSortComp = function(comps)
+                              {
+                                  if(!comps){return [];}
+                                  if(!comps.length){return [];}
+                                  let compsObjTmp = {};
+                                  let seq = 0;
+                                  for(let i=0;i<comps.length;i++)
+                                  {
+                                      let comp     = comps[i];
+                                      let tabOrder = parseInt(comp.taborder);
+                                      if(isNaN(tabOrder))
+                                      {
+                                          tabOrder = "NaN";
+                                      }
+                                      else if(tabOrder < 0)
+                                      {
+                                          tabOrder = "-1";
+                                      }
+                                      else if(tabOrder>seq)
+                                      {
+                                          seq = tabOrder;
+                                      }
+                                      if(typeof compsObjTmp[tabOrder]=="undefined")
+                                      {
+                                          compsObjTmp[tabOrder] = [];
+                                      }
+                                      compsObjTmp[tabOrder].push(comp);
+                                  }
+                                  
+                                  let compsArrTmp = [];
+                                  for(let i=0;i<=seq;i++)
+                                  {
+                                      if(typeof compsObjTmp[i]=="object" && (compsObjTmp[i] instanceof Array))
+                                      {
+                                          let compsTmp = compsObjTmp[i];
+                                          for(let x=0;x<compsTmp.length;x++)
+                                          {
+                                              let compTmp = compsTmp[x];
+                                              compsArrTmp.push(compTmp);
+                                          }
+                                      }
+                                  }
+                                  if(typeof compsObjTmp["-1"]=="object" && (compsObjTmp["-1"] instanceof Array))
+                                  {
+                                      let compsTmp = compsObjTmp["-1"];
+                                      for(let x=0;x<compsTmp.length;x++)
+                                      {
+                                          let compTmp = compsTmp[x];
+                                          compsArrTmp.push(compTmp);
+                                      }
+                                  }
+                                  if(typeof compsObjTmp["NaN"]=="object" && (compsObjTmp["NaN"] instanceof Array))
+                                  {
+                                      let compsTmp = compsObjTmp["NaN"];
+                                      for(let x=0;x<compsTmp.length;x++)
+                                      {
+                                          let compTmp = compsTmp[x];
+                                          compsArrTmp.push(compTmp);
+                                      }
+                                  }
+                                  return compsArrTmp;
+                              };
+            let components = lfnSortComp(formObj.components);
+            while(components.length)
+            {
+                let component = components.shift();
+                compArr.push(component);
+                // Frame, Div
+                if(component.form && (component.form instanceof nexacro.Form))
+                {
+                    formQueue.push(component.form);
+                    if(component.url || component.formurl)
+                    {
+                        formArr.push(component.form);
+                    }
+                    let innerComponents = lfnSortComp(component.form.components);
+                    components = innerComponents.concat(components);
+                }
+                // Tab
+                else if(component instanceof nexacro.Tab)
+                {
+                    let tabPages = component.tabpages;
+                    if(tabPages && tabPages.length)
+                    {
+                        // tabpage loop
+                        let tabComponents = [];
+                        for(let x=0;x<tabPages.length;x++)
+                        {
+                            let tabPage = tabPages[x];
+                            let tabForm = tabPage.form;
+                            if(tabForm && (tabForm instanceof nexacro.Form))
+                            {
+                                formQueue.push(tabForm);
+                                if(tabPage.url || tabPage.formurl)
+                                {
+                                    formArr.push(tabForm);
+                                }
+                                let tabInnerComponents = lfnSortComp(tabForm.components);
+                                tabComponents = tabComponents.concat(tabInnerComponents);
+                            }
+                        }
+                        components = tabComponents.concat(components);
+                    }
+                }
+            }
+            //
+            // component loop END
+            //////////////////////////////////////////////////////////////////////////
+            
+            // Queue
+            while(formQueue.length)
+            {
+                let form = formQueue.shift();
+                if(targetKey)
+                {
+                    let target = form[targetKey];
+                    if(target)
+                    {
+                        targetArr.push({rootForm:form,target:target});
+                    }
+                    if(targetKeys.length)
+                    {
+                        let targetTmp = form[targetKeys[0]];
+                        if(targetTmp)
+                        {
+                            let isTarget  = true;
+                            for(let i=1;i<targetKeys.length;i++)
+                            {
+                                let targetKeyTmp = targetKeys[i];
+                                targetTmp = targetTmp[targetKeyTmp];
+                                if(targetTmp)
+                                {
+                                    continue;
+                                }
+                                isTarget = false;
+                            }
+                            if(isTarget)
+                            {
+                                targetArr.push({rootForm:form,target:targetTmp});
+                            }
+                        }
+                    }
+                }
+                
+                let objects = form.objects;
+                if(objects && objects.length)
+                {
+                    // objects loop
+                    for(let i=0;i<objects.length;i++)
+                    {
+                        let object = objects[i];
+                        if(object instanceof nexacro.Dataset)
+                        {
+                            lDatasetArr.push(object);
+                        }
+                    }
+                }
+                
+                let binds = form.binds;
+                if(binds && binds.length)
+                {
+                    // bind loop
+                    for(let i=0;i<binds.length;i++)
+                    {
+                        let bind = binds[i];
+                        bindArr.push(bind);
+                    }
+                }
+            }
+            
+            let returnObj = {};
+            returnObj.components  = compArr    ;
+            returnObj.lDatasets   = lDatasetArr;
+            returnObj.gDatasets   = gDatasetArr;
+            returnObj.binds       = bindArr    ;
+            returnObj.urlForms    = formArr    ;
+            if(targetKey)
+            {
+                returnObj.targets = targetArr  ;
+            }
+            
+            return returnObj;
+        },
+        /**
+         * 로그 공통
+         * @param {All   } [target]
+         * @param {Number} [stack ] : trace stack (default:2)
+         * @return N/A
+         * @example
+         * Drps.Core.trace(this);
+         * Drps.Core.trace("aaa");
+         * Drps.Core.trace(123);
+         * Drps.Core.trace(this.Grd_menu00);
+         * Drps.Core.trace(this.ds_menu00);
+         */
+        trace : function( target, stack )
+        {
+            let maxSpace = 10000;
+            let space    = 0;
+            let buff     = 30;
+            let maxStack = 0;
+            if(typeof stack=="number" && stack > 0)
+            {
+                maxStack = stack;
+            }
+            
+            let tracelog = nexacro.getApplication().__traceLog;
+            
+            if(tracelog==null)
+            {
+                nexacro.getApplication().__traceLog = [];
+                tracelog = nexacro.getApplication().__traceLog;
+            }
+            
+            let traceSeq  = 0;
+            let lastTrace = tracelog[tracelog.length-1];
+            if(typeof lastTrace=="object")
+            {
+                traceSeq = lastTrace.seq + 1;
+            }
+            if(traceSeq>buff+2)
+            {
+                traceSeq = 0;
+            }
+            let traceObj = {seq:traceSeq, trace:target};
+            tracelog.push(traceObj);
+            
+            if(typeof target=="object" && maxStack!==1)
+            {
+                traceObj.traceSub = [];
+                let traceSub      = traceObj.traceSub;
+                let traceCntArr   = [];
+                for(let key in target)
+                {
+                    traceCntArr.push(target[key]);
+                    space++;
+                }
+                let maxStackTmp = 2;
+                while(traceCntArr.length && space < maxSpace && maxStack!==2)
+                {
+                    let traceCntTmp = [];
+                    while(traceCntArr.length)
+                    {
+                        let traceTmp = traceCntArr.shift();
+                        if(typeof traceTmp=="object")
+                        {
+                            for(let key in traceTmp)
+                            {
+                                traceCntTmp.push(traceTmp[key]);
+                                space++;
+                            }
+                        }
+                    }
+                    traceCntArr = traceCntTmp;
+                    maxStackTmp++;
+                    if(maxStack > 0 && maxStackTmp >= maxStack)
+                    {
+                        break;
+                    }
+                }
+                maxStack = maxStackTmp;
+                let stack    = [];
+                let stackArr = [];
+                for(let key in target)
+                {
+                    stackArr.push({key:key,value:target[key]});
+                }
+                stack.push(stackArr);
+                
+                while(stack.length)
+                {
+                    let levl     = stack.length+1;
+                    let stackArr = stack.pop();
+                    while(stackArr.length)
+                    {
+                        let stackTrace    = stackArr.shift();
+                        let stackTraceObj = stackTrace.value;
+                        let stackTraceStr = stackTraceObj;
+                        if(stackTraceObj==null)
+                        {
+                            stackTraceStr = "";
+                        }
+                        else if(typeof stackTraceObj=="function")
+                        {
+                            stackTraceStr = stackTraceObj.toString();
+                        }
+                        else if(typeof stackTraceObj.toString=="function")
+                        {
+                            try
+							{
+							    stackTraceStr = stackTraceObj.toString();
+							}
+							catch(e)
+							{
+							    stackTraceStr = "undefined";
+							}
+                        }
+                        else if(typeof stackTraceObj=="object")
+                        {
+                            stackTraceStr = String.valueOf(stackTraceObj);
+                        }
+                        
+                        if(typeof stackTraceStr=="string")
+                        {
+                            stackTraceStr = stackTraceStr.replace(/<\/(col|row)>/gi,"&lt;/$1&gt;");
+                        }
+                        
+                        traceSub.push({levl:levl,key:stackTrace.key,value:stackTraceStr});
+                        
+                        if(levl>=maxStack)
+                        {
+                            continue;
+                        }
+                        else if(typeof stackTraceObj=="object")
+                        {
+                            stack.push(stackArr);
+                            let stackArrTmp = [];
+                            for(let key in stackTraceObj)
+                            {
+                                stackArrTmp.push({key:key,value:stackTraceObj[key]});
+                            }
+                            stack.push(stackArrTmp);
+                            break;
+                        }
+                    }
+                }
+                
+            }
+            
+            if(tracelog.length>buff)
+            {
+                tracelog.shift();
+            }
+            
+            trace(target);
+        },
+        /**
+         * 설  명 : 인자를 넘겨줄 경우에 넘겨주는 규칙대로 인자/값을 설정
+         * Params : p_name - 설정할 파리미터명
+                    p_value - 설정할 값
+         * Return : Parameter String
+         * 예  시 : paramStr += Drps.Core.setParam("sql_xml", "gspl_sql_common");
+         */
+        setParam : function(p_name, p_value)
+        {
+            return p_name + "=" + nexacro.wrapQuote(p_value) + " ";
+        },
+        /**
+         * 로그인 정보 조회
+         * @return {Object} 로그인 사용자정보 Object
+         */
+        getLoginInfo : function()
+        {
+            let gdsLoginInfo = nexacro.getApplication().gdsLoginInfo;
+            if(gdsLoginInfo.getRowCount()==0){return null;}
+            let returnObj = {};
+            for(let i=0;i<gdsLoginInfo.getColCount();i++)
+            {
+                let colID = gdsLoginInfo.getColID(i);
+                returnObj[colID] = gdsLoginInfo.getColumn(0,i);
+            }
+
+            return returnObj;
+        },
+        /**
+         * 현재 선택된 권한코드 조회
+         *   1순위: Form_Top 의 Div_title00.form.cmbAuth.value (사용자가 콤보로 변경한 권한)
+         *   2순위: gdsAuth 의 현재 rowposition 행 authCd
+         *   3순위: gdsLoginInfo 의 authCd 후보 컬럼 (최초 로그인 권한)
+         * @return {String} 권한코드 (없으면 "")
+         * @example
+         *      let authCd = Drps.Core.getCurrentAuthCd();
+         *      if(authCd == "DRPS_ROLE_00007"){ ... }
+         * @memberOf Drps.Core
+         */
+        getCurrentAuthCd : function()
+        {
+            let app = nexacro.getApplication();
+            if(!app){ return ""; }
+
+            // 1순위: Form_Top 의 cmbAuth.value
+            try {
+                let gvTop   = app.gvTop;
+                let topForm = gvTop ? (typeof gvTop.getForm == "function" ? gvTop.getForm() : gvTop) : null;
+                if(topForm && topForm.Div_title00 && topForm.Div_title00.form && topForm.Div_title00.form.cmbAuth)
+                {
+                    let cmbVal = topForm.Div_title00.form.cmbAuth.value;
+                    if(cmbVal != undefined && cmbVal != null && cmbVal != "")
+                    {
+                        return cmbVal;
+                    }
+                }
+            } catch(ex) {
+                trace("[Drps.Core.getCurrentAuthCd] gvTop 접근 예외: " + ex.message);
+            }
+
+            // 2순위: gdsAuth (rowposition 또는 first row)
+            if(app.gdsAuth && app.gdsAuth.getRowCount() > 0)
+            {
+                let rowPos = app.gdsAuth.rowposition;
+                if(rowPos < 0){ rowPos = 0; }
+                let v2 = app.gdsAuth.getColumn(rowPos, "authCd");
+                if(v2 != undefined && v2 != null && v2 != "")
+                {
+                    return v2;
+                }
+            }
+
+            // 3순위: gdsLoginInfo 후보 컬럼
+            if(app.gdsLoginInfo && app.gdsLoginInfo.getRowCount() > 0)
+            {
+                let ds = app.gdsLoginInfo;
+                let candidates = ["authCd", "auth_grp_id", "auth_cd", "authGrpId", "role_id"];
+                for(let i=0; i<candidates.length; i++)
+                {
+                    let v = ds.getColumn(0, candidates[i]);
+                    if(v != undefined && v != null && v != "")
+                    {
+                        return v;
+                    }
+                }
+            }
+
+            return "";
+        },
+        /**
+         * form 종료전 체크 공통
+         * @param  {nexacro.Form} [formObj] 종료대상 form
+         * @return {Boolean     } 종료가능여부(true:가능,false:불가능)
+         */
+        formCloseCheck : function(formObj)
+        {
+			let pageId = this.getIdOfMainForm(formObj);
+            try{
+                let ret = true;
+                if(pageId)
+                {
+                    ret = formObj.fnCloseCheck("onBeforeCloseForm");
+                }
+                else if(formObj.onBeforeCloseForm && typeof formObj.onBeforeCloseForm=="function")
+                {
+                    ret = formObj.onBeforeCloseForm();
+                }
+                
+                if(nexacro.getApplication().__closeCheck)
+                {
+                    return "datasetUpdated";
+                }
+                
+                if(ret===false)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }catch(e){
+                let stackArr   = ["////////////////////////////////////////"];
+                    stackArr.push("// 화면담당자 프로그램 수정 요망");
+                    stackArr.push("// function : onBeforeCloseForm");
+                    stackArr.push("// " + e.message);
+                    stackArr.push("////////////////////////////////////////");
+                for(let i in e.stack)
+                {
+                    stackArr.push(e.stack[i]);
+                }
+                this.trace("\n" + stackArr.join("\n"));
+                Drps.Util.alertBox(stackArr.join("\n"),null,"onBeforeCloseForm ERROR", "ERR");
+                throw e;
+            }finally{
+                delete nexacro.getApplication().__closeCheck;
+            }
+        },
+        /**
+         * 화면 open
+         * @param {Object      } [options] 호출 option
+         *                        - {String } [formId       ] : 호출 form id(필수)
+         *                        - {String } [url          ] : 호출 form url
+         *                        - {String } [title        ] : 호출 form titleText
+         *                        - {Object } [paramContents] : 전송 parameter
+         *                        - {Boolean} [reload       ] : 화면 reload 여부(true:reload, false:reload 안함)(default:true)
+         * @return N/A
+         * @example
+         * Drps.Core.openForm({formId : "M00222"})
+         * Drps.Core.openForm({
+         *                    formId : "userOpen"
+         *                   ,url    : "XX::XX1010M01.xfdl"
+         *                   ,title  : "테스트화면"
+         *                   })
+         * Drps.Core.openForm({
+         *                    formId        : "userOpen"
+         *                   ,url           : "XX::XX1010M01.xfdl"
+         *                   ,title         : "테스트화면"
+         *                   ,paramContents : {aaa:"bbb"}
+         *                   })
+         * Drps.Core.openForm({
+         *                    formId        : "userOpen"
+         *                   ,url           : "XX::XX1010M01.xfdl"
+         *                   ,title         : "테스트화면"
+         *                   ,paramContents : {aaa:"bbb"}
+         *                   ,reload        : false
+         *                   })
+         */
+        openForm : function(options)
+        {
+            let ffobj = Drps.Util.ffobj;
+            options = options||{};
+            options.formId        = options.formId||"";
+            options.url           = options.url   ||"";
+            options.title         = options.title ||"";
+            options.paramContents = options.paramContents||{};
+            options.reload        = options.reload;
+            if(options.reload!==false)
+            {
+                options.reload=true;
+            }
+            
+            if(!options.formId)
+            {
+                this.trace("formId 미존재");
+                return;
+            }
+            
+            options.paramContents._openerId = ffobj._openerId||ffobj._pageId;
+            
+            if(this.getIdOfWorkForm(Drps.Util.ffobj))
+            {
+                nexacro.getApplication().gfnOpen(options.formId, options.url, options.title, options.paramContents, options.reload);
+            }
+            else
+            {
+                Drps.Util.openPopup(
+                                   options.formId
+                                  ,options.url
+                                  ,{_params:options.paramContents}
+                                  ,null
+                                  ,{
+                                    width    :1350
+                                   ,height   :840
+                                   }
+                                  );
+            }
+            
+        },
+
+        /**
+         * status바 메세지 세팅
+         * @param {String} [strMsg] - 메세지 내용
+         * @memberOf Message
+         */
+        setStatus : function(strMsg)
+        {
+            let gdsProcCntn = nexacro.getApplication().gdsProcCntn;
+            let maxRow = gdsProcCntn.getConstColumn("maxRow");
+            while(gdsProcCntn.getRowCount()>=maxRow)
+            {
+                gdsProcCntn.deleteRow(0);
+            }
+            let currow = gdsProcCntn.addRow(0);
+            gdsProcCntn.setColumn(currow,"procCntn",strMsg);
+            gdsProcCntn.applyChange();
+            gdsProcCntn.set_rowposition(currow);
+        },
+        
+        /**
+        * @class 사용자별 화면내 버튼, 개인정보 권한 처리
+        * @param {Object} 호출 화면 객체
+        * @param {Array} JSON을 담고 있는 배열
+        *       - {button}  [button        ] 권한을 설정할 버튼 객체
+        *       - {String}  [auth          ] 부여할 권한
+        *               "IQRY"   - 조회권한
+        *               "EXCEL"  - 엑셀 다운로드 권한
+        *               "OUTPUT" - 출력권한(보고서)
+        *               "PROC"   - 처리권한
+        * @return
+        * @example 
+        *       Drps.Core.setUserAuth(this,[
+                      {button: this.divHeader.form.btnClear  , auth: "IQRY"  }
+                    , {button: this.divSearch.form.btnSearch , auth: "IQRY"  }
+                    , {button: this.btnAdd                   , auth: "PROC"  }
+                    , {button: this.btnAdd01                 , auth: "PROC"  }
+                    , {button: this.btnDel                   , auth: "PROC"  }
+                    , {button: this.btnDel01                 , auth: "PROC"  }
+                    , {button: this.btnSave                  , auth: "PROC"  }
+                    , {button: this.btnExcel                 , auth: "EXCEL" }
+                    , {button: this.btnExcel01               , auth: "EXCEL" }
+                ]);
+        * @memberOf Drps.Core
+        */
+        setUserAuth : function(objForm, arrJson)
+        {
+            let strMenuCd = objForm._openerId;
+            let objGDs = nexacro.getApplication().gdsMenu;
+            let nRow = objGDs.findRow("menuCd", strMenuCd);
+            
+            let arrAuth = [];
+            
+            // 권한이 없는 경우 비활성화 대상에 포함
+            if(objGDs.getColumn(nRow, "iqryAuthYn") == "N")
+            {
+                arrAuth.push("IQRY");
+            }
+            
+            if(objGDs.getColumn(nRow, "excelAuthYn") == "N")
+            {
+                arrAuth.push("EXCEL");
+            }
+            
+            if(objGDs.getColumn(nRow, "outptAuthYn") == "N")
+            {
+                arrAuth.push("OUTPUT");
+            }
+            
+            if(objGDs.getColumn(nRow, "procAuthYn") == "N")
+            {
+                arrAuth.push("PROC");
+            }
+            
+            // 권한없는 버튼에 대해 마스킹처리
+            for(let i=0;i<arrJson.length;i++)
+            {
+                if(arrAuth.indexOf(arrJson[i].auth) > -1)
+                {
+                    Drps.Core._setAuthCover(arrJson[i].button);
+                }
+            }
+            
+            // 그리드 
+            let arrGrid = Drps.Core.getAll(objForm).components.filter(function(val){
+                                return Drps.Util.typeOf(val) == "Grid"
+                          });
+            
+            // 개인정보권한이 있다면 그리드 마스킹은 그대로 두고 툴팁에 마스킹을 해제하여 보여줌
+            if(objGDs.getColumn(nRow, "indvInfoAuthYn") == "Y")
+            {
+                for(let i=0;i<arrGrid.length;i++)
+                {
+                    let objGrid = arrGrid[i];
+                    for(var nCell = 0; nCell < objGrid.getCellCount("Body"); nCell++)
+                    {
+                        let strDisplyType = objGrid.getCellProperty("Body", nCell, "displaytype");
+                        let strText = objGrid.getCellProperty("Body", nCell, "expr")||"";
+                        
+                        // 툴팁에 마스킹을 해제하여 보여줌
+                        if(strDisplyType == "mask" || (strText && strText.indexOf("masking") > -1))
+                        {
+                            // 개인정보 마스킹이 있는경우에만 마스킹해제하여 툴팁에 넣어둠
+                            if(objGrid.getCellProperty("Body", nCell, "maskeditformat").match(/{|}/))
+                            {
+                                objGrid.setCellProperty("Body", nCell, "tooltiptext", objGrid.getCellProperty("Body", nCell, "text"));
+                            }
+                            // 함수를 이용한 한글마스킹일때 마스킹을 해제하여 보여줌
+                            else if(strText.match(/\'.*\'|\".*\"/))
+                            {
+                                objGrid.setCellProperty("Body", nCell, "tooltiptext", objGrid.getCellProperty("Body", nCell, "text"));
+                            }
+                        }
+                        /*if(strDisplyType == "mask")
+                        {
+                            let strFormat = objGrid.getCellProperty("Body", nCell, "maskeditformat");
+                            
+                            // 숫자형 포멧이면 마스킹 문자인 중괄호를 제거
+                            strFormat = strFormat.replace(/{|}/gi, "");
+                            objGrid.setCellProperty("Body", nCell, "maskeditformat", strFormat);
+                        }
+                        // 문자열을 마스킹 한 경우 정규식을 초기화
+                        else if(strText && strText.indexOf("masking") > -1)
+                        {
+                            strText = strText.replace(/\'.*\'|\".*\"/gi, '""');
+                            objGrid.setCellProperty("Body", nCell, "expr", strText);
+                        }*/
+                    }
+                }
+                
+                // 마스크에디트 
+                let arrMask = Drps.Core.getAll(objForm).components.filter(function(val){
+                    return Drps.Util.typeOf(val) == "MaskEdit"
+                });
+                
+                for(let i=0;i<arrMask.length;i++)
+                {
+                    let objMask = arrMask[i];
+                    // 마스킹 문자인 중괄호를 제거
+                    objMask.set_format(objMask.format.replace(/{|}/gi, ""));
+                }
+                
+            }
+            
+            
+        },
+        
+        /**
+        * @class 사용자별 화면 내 정보 반환
+        * @param {Object} 호출 화면 객체
+        * @param {String} 키값 - 부여할 권한 또는 gdsMenu의 vo명 null 값이면 현재 화면의 gdsMenu값을 Json으로 반환
+        * @return Object
+        * @example 
+        *       Drps.Core.getMenuInfo(this,"iqryAuthYn");
+        *       Drps.Core.getMenuInfo(this,"excelAuthYn");
+        *       Drps.Core.getMenuInfo(this,"outptAuthYn");
+        *       Drps.Core.getMenuInfo(this,"procAuthYn");
+        *       Drps.Core.getMenuInfo(this,"indvInfoAuthYn");
+        * @memberOf Drps.Core
+        */
+        getMenuInfo : function(objForm, strKey)
+        {
+            let strMenuCd = objForm._openerId;
+            let objGDs = nexacro.getApplication().gdsMenu;
+            let nRow = objGDs.findRow("menuCd", strMenuCd);
+            
+            if(strKey)
+            {
+                return objGDs.getColumn(nRow, strKey);
+            }
+            //  현재 메뉴의 모든 정보를 반환
+            else
+            {
+                let objMenuInfo = {};
+                for(let i = 0; i < objGDs.colcount; i++)
+                {
+                    let strColId = objGDs.getColID(i);
+                    let objColVl = objGDs.getColumn(nRow, strColId);
+                    if ( typeof objColVl == "object" ) {
+                        objMenuInfo[strColId] = ( objColVl || "" ).toString();
+                    } else {
+                        // primitive type
+                        objMenuInfo[strColId] = objColVl;
+                    }
+                }
+                return objMenuInfo;
+            }
+        },
+        
+        /**
+         * error 표시
+         * @param {String} [errMsg] - error message
+         * error trace 처리
+         */
+        showError : function(errMsg)
+        {
+            try{
+                throw new Error(errMsg);
+            }catch(e){
+                let errStr  = "\n//////////////////////////////////////////////////////////////\n";
+                    errStr +=   "// Script Error\n";
+                    errStr +=   "// " + e.toString() + "\n";
+                    errStr +=   "//////////////////////////////////////////////////////////////\n";
+                    errStr +=   e.stack.join("\n");
+                    
+                Drps.Util.alertBox(errStr,null, "에러발생", "ERR");
+                throw e;
+                
+            }
+        }
+    });
+}

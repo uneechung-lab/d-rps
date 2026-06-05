@@ -156,7 +156,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
   return (
     <div style={styles.container}>
       {/* Top Search Toolbar */}
-      <div style={styles.topToolbar} className="card">
+      <div style={styles.topToolbar} className="card toolbar-card">
         <div style={styles.toolbarRow}>
           <div className="form-group" style={{ flex: 1, margin: 0 }}>
             <label className="form-label">계약번호</label>
@@ -187,7 +187,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
             />
           </div>
 
-          <div style={styles.toolbarActions}>
+          <div style={styles.toolbarActions} className="toolbar-actions">
             <button onClick={onOpenSearch} className="btn btn-primary" style={styles.actionBtn}>
               <SearchIcon size={16} />
               계약 찾기
@@ -531,8 +531,8 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
           </div>
 
           {/* Form Actions Toolbar */}
-          <div style={styles.actionsBar}>
-            <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={styles.actionsBar} className="actions-bar">
+            <div className="left-actions" style={{ display: 'flex', gap: '12px' }}>
               <button type="button" onClick={handleFormPrint} className="btn btn-secondary">
                 <PrinterIcon size={16} />
                 계약서 출력
@@ -541,7 +541,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 계약취소
               </button>
             </div>
-            <div style={styles.rightActions}>
+            <div style={styles.rightActions} className="right-actions">
               <button type="button" onClick={handleNewContract} className="btn btn-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
