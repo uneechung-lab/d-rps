@@ -599,6 +599,7 @@ input, select, textarea, button {
   border-right: none;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.3px;
