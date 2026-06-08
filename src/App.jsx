@@ -7,6 +7,7 @@ import IRPContractForm from './components/IRPContractForm';
 import ContractSearchModal from './components/ContractSearchModal';
 import Dashboard from './components/Dashboard';
 import { menuDataMap } from './menuData';
+import { SunIcon, MoonIcon, LogOutIcon, BellIcon, RefreshIcon, InfoIcon, ChevronDownIcon, SettingsIcon } from './assets/icons';
 import './App.css';
 
 function App() {
@@ -132,11 +133,42 @@ function App() {
     }, 4000);
   };
 
+  const [timeLeft, setTimeLeft] = useState(3599); // 59 mins 59 secs
+  const [showSessionModal, setShowSessionModal] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          addNotification('세션이 만료되었습니다. 다시 로그인 해주세요.', 'warning');
+          handleLogout();
+          return 3599;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [user]);
+
+  const handleExtendSession = () => {
+    setTimeLeft(3599);
+    addNotification('로그인 세션이 60분 연장되었습니다.', 'success');
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     setOpenTabs(['대시보드']);
     setActiveTab('대시보드');
     setActiveDepth1('대시보드');
+    setTimeLeft(3599);
     addNotification(`${userData.name} 님, 환영합니다! 시스템 로그인이 완료되었습니다.`, 'success');
   };
 
@@ -160,6 +192,7 @@ function App() {
     setOpenTabs(['대시보드']);
     setActiveTab('대시보드');
     setActiveDepth1('대시보드');
+    setTimeLeft(3599);
   };
 
   const handleThemeToggle = () => {
@@ -306,42 +339,91 @@ function App() {
   const currentPath = findTabPath(activeTab);
 
   return (
-    <div className="app-container">
-      {/* 1-Depth Left Menu */}
-      <Depth1Menu 
-        activeDepth1={activeDepth1} 
-        onDepth1Select={handleDepth1Select} 
-        collapsed={depth1Collapsed}
+    <div className="app-container" style={{ flexDirection: 'column' }}>
+      {/* Top Header toolbar (combines logo, 1-depth menu) */}
+      <Header
+        activeDepth1={activeDepth1}
+        onDepth1Select={handleDepth1Select}
         onLogoClick={() => handleSidebarTabSelect('대시보드')}
       />
 
-      {/* Sidebar Navigation */}
-      {activeTab !== '대시보드' && (
-        <Sidebar
-          activeTab={activeTab}
-          onTabSelect={handleSidebarTabSelect}
-          activeDepth1={activeDepth1}
-          collapsed={depth1Collapsed}
-          onToggleCollapse={() => setDepth1Collapsed(!depth1Collapsed)}
-        />
-      )}
+      {/* Sub Header for Breadcrumbs & Process banner (Stretches full width above LNB) */}
+      <div style={styles.subHeader}>
+        {/* Right side utilities moved here: Session, Theme, Noti, Profile, Logout */}
+        <div style={styles.subHeaderUtilities}>
+          {/* User Info (Now at the very front) */}
+          <div style={styles.userInfo}>
+            <span style={styles.userName}>{user.name}</span>
+          </div>
 
-      {/* Main content body panel */}
-      <div className="main-content">
-        {/* Top Header toolbar */}
-        <Header
-          user={user}
-          isDark={isDark}
-          onThemeToggle={handleThemeToggle}
-          onLogout={handleLogout}
-          addNotification={addNotification}
-          activeTab={activeTab}
-          activeDepth1={activeDepth1}
-        />
+          {/* Session Timer & Action Buttons */}
+          <div style={{ position: 'relative' }}>
+            <div style={styles.sessionContainer}>
+              <span style={styles.sessionLabel}>세션만료</span>
+              <span style={styles.sessionTimer}>{formatTime(timeLeft)}</span>
+              <button onClick={handleExtendSession} style={styles.extendBtn} className="btn">
+                <RefreshIcon size={12} />
+                연장
+              </button>
+              <button onClick={() => addNotification('세션 변경 설정 창이 열렸습니다.', 'success')} style={{ ...styles.extendBtn, marginLeft: '4px' }} className="btn">
+                <SettingsIcon size={12} />
+                변경
+              </button>
+              <button
+                onClick={handleLogout}
+                style={styles.logoutBtnInline}
+                className="btn"
+                title="로그아웃"
+              >
+                <LogOutIcon size={12} />
+                로그아웃
+              </button>
+            </div>
+          </div>
+        </div>
 
-        {/* Dynamic content screen wrapper */}
-        <div className="scrollable-body">
+        <div style={styles.verticalDivider} />
+
+        <div style={styles.breadcrumb}>
+          {/* Home Icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span style={styles.breadcrumbSeparator}>/</span>
           {activeTab === '대시보드' ? (
+            <span style={styles.breadcrumbActive}>대시보드</span>
+          ) : (
+            <>
+              <span style={styles.breadcrumbHome}>{activeDepth1}</span>
+              {currentPath.parent && (
+                <>
+                  <span style={styles.breadcrumbSeparator}>/</span>
+                  <span style={styles.breadcrumbParent}>{currentPath.parent}</span>
+                </>
+              )}
+              <span style={styles.breadcrumbSeparator}>/</span>
+              <span style={styles.breadcrumbActive}>{activeTab || 'IRP 계약등록'}</span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content Area Container */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', width: '100%' }}>
+        {/* Sidebar Navigation */}
+        {activeTab !== '대시보드' && (
+          <Sidebar
+            activeTab={activeTab}
+            onTabSelect={handleSidebarTabSelect}
+            activeDepth1={activeDepth1}
+            collapsed={depth1Collapsed}
+            onToggleCollapse={() => setDepth1Collapsed(!depth1Collapsed)}
+          />
+        )}
+
+        {/* Main content body panel */}
+        <div className="main-content">
+          {/* Dynamic content screen wrapper */}
+          <div className="scrollable-body">
+            {activeTab === '대시보드' ? (
             <Dashboard isDark={isDark} onTabSelect={handleSidebarTabSelect} user={user} />
           ) : activeTab === 'IRP 계약등록' ? (
             <IRPContractForm
@@ -377,27 +459,28 @@ function App() {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   ...styles.bottomTabItem,
-                  backgroundColor: activeTab === tab ? 'var(--bg-secondary)' : 'transparent',
-                  borderColor: activeTab === tab ? 'var(--border-color)' : 'transparent',
-                  color: activeTab === tab ? 'var(--primary)' : 'var(--text-secondary)'
+                  backgroundColor: activeTab === tab ? 'var(--bg-primary)' : 'var(--bg-tertiary)',
+                  borderLeftColor: 'var(--border-color)',
+                  borderRightColor: 'var(--border-color)',
+                  borderBottomColor: activeTab === tab ? '#ffb81c' : 'var(--border-color)',
+                  borderBottomWidth: activeTab === tab ? '3px' : '1px',
+                  borderBottomStyle: 'solid',
+                  borderTopColor: 'transparent',
+                  color: activeTab === tab ? 'var(--primary)' : 'var(--text-secondary)',
+                  height: activeTab === tab ? '36px' : '34px',
+                  zIndex: activeTab === tab ? 2 : 1,
                 }}
               >
-                <span style={styles.tabIndicator} />
-                <span style={{ fontSize: '0.8rem', fontWeight: activeTab === tab ? '700' : '600' }}>{tab}</span>
+                <span style={{
+                  ...styles.tabIndicator,
+                  backgroundColor: activeTab === tab ? '#ffb81c' : 'var(--text-tertiary)'
+                }} />
+                <span style={{ fontSize: '0.8rem', fontWeight: activeTab === tab ? '700' : '500' }}>{tab}</span>
                 <button onClick={(e) => handleCloseTab(e, tab)} style={styles.tabCloseBtn}>&times;</button>
               </div>
             ))}
           </div>
           <div style={styles.tabActionsWrapper} className="tab-actions-wrapper">
-            {/* File ID Display */}
-            <div style={styles.fileIDContainer}>
-              <span style={{ ...styles.fileIDLabel, color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#475569' }}>File ID</span>
-              <span style={{
-                ...styles.fileIDValue,
-                backgroundColor: isDark ? '#2e3748' : '#e2e8f0',
-                color: isDark ? '#ffffff' : '#0f172a'
-              }}>AGM00005</span>
-            </div>
 
             <button onClick={handleToggleFullscreen} style={styles.tabActionBtn} className="tab-action-btn" title="전체화면">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -440,6 +523,62 @@ function App() {
           </div>
         </div>
       </div>
+    </div>
+
+    {/* Footer Status Bar at the very bottom */}
+    <div style={styles.statusBar}>
+      <div style={styles.statusBarLeft}>
+        <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: '800', marginRight: '8px' }}>처리메시지</span>
+        <div style={{
+          ...styles.processMsgBox,
+          backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+          borderColor: isDark ? '#334155' : '#cbd5e1',
+          padding: '3px 8px',
+          borderRadius: '4px',
+          borderStyle: 'solid',
+          borderWidth: '1px',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#475569' }}>처리소요시간 : </span>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#38bdf8' : '#0284c7', fontWeight: '700' }}>(0.016 sec)</span>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#475569' }}>정상 처리 되었습니다.</span>
+        </div>
+      </div>
+      <div style={styles.statusBarRight}>
+        <span style={{ ...styles.statusBarLabel, marginLeft: 0 }}>(최근)접속일시</span>
+        <span style={{
+          ...styles.statusBarValue,
+          backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+          borderColor: isDark ? '#334155' : '#cbd5e1',
+          color: isDark ? '#38bdf8' : '#0284c7'
+        }}>2026-06-05 16:39:16</span>
+        
+        <span style={styles.statusBarLabel}>(최근)접속IP</span>
+        <span style={{
+          ...styles.statusBarValue,
+          backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+          borderColor: isDark ? '#334155' : '#cbd5e1',
+          color: isDark ? '#38bdf8' : '#0284c7'
+        }}>222.108.214.128</span>
+        
+        <span style={styles.statusBarLabel}>(현)접속일시</span>
+        <span style={{
+          ...styles.statusBarValue,
+          backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+          borderColor: isDark ? '#334155' : '#cbd5e1',
+          color: isDark ? '#38bdf8' : '#0284c7'
+        }}>2026-06-08 10:52:52</span>
+        
+        <span style={styles.statusBarLabel}>File ID</span>
+        <span style={{
+          ...styles.statusBarValue,
+          backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+          borderColor: isDark ? '#334155' : '#cbd5e1',
+          color: isDark ? '#38bdf8' : '#0284c7'
+        }}>AGM00011</span>
+      </div>
+    </div>
 
       {/* Interactive Contract Search popup */}
       <ContractSearchModal
@@ -497,7 +636,7 @@ const styles = {
     display: 'flex',
     gap: '2px',
     height: '100%',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   bottomTabItem: {
     display: 'flex',
@@ -505,10 +644,10 @@ const styles = {
     gap: '8px',
     padding: '0 16px',
     height: '34px',
-    borderTopLeftRadius: '6px',
-    borderTopRightRadius: '6px',
+    borderBottomLeftRadius: '6px',
+    borderBottomRightRadius: '6px',
     border: '1px solid transparent',
-    borderBottom: 'none',
+    marginTop: '-1.5px',
     cursor: 'pointer',
     position: 'relative',
     transition: 'all 0.2s',
@@ -568,7 +707,316 @@ const styles = {
     padding: '6px',
     borderRadius: '4px',
     transition: 'all 0.15s ease',
-  }
+  },
+  subHeader: {
+    height: '52px',
+    backgroundColor: 'var(--bg-secondary)',
+    borderBottom: '1px solid var(--border-color)',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0 24px',
+    gap: '12px',
+    flexShrink: 0,
+  },
+  subHeaderUtilities: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
+  sessionContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: 'var(--bg-tertiary)',
+    padding: '4px 8px 4px 12px',
+    borderRadius: 'var(--radius-sm)',
+    gap: '8px',
+    border: '1px solid var(--border-color)',
+  },
+  infoBtn: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '2px 0 2px 2px',
+    gap: '4px',
+    opacity: 0.9,
+    marginRight: '-3px',
+  },
+  sessionModal: {
+    position: 'absolute',
+    top: 'calc(100% + 8px)',
+    left: '0',
+    width: '310px',
+    borderRadius: 'var(--radius-md)',
+    border: '1px solid var(--border-color)',
+    padding: '14px',
+    zIndex: 99,
+  },
+  modalHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '10px',
+    borderBottom: '1px solid var(--border-color)',
+    paddingBottom: '6px',
+  },
+  modalTitle: {
+    fontSize: '0.85rem',
+    fontWeight: '700',
+  },
+  modalCloseBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1.1rem',
+    cursor: 'pointer',
+    lineHeight: '1',
+    padding: '0 4px',
+  },
+  modalBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  infoRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+  },
+  infoLabel: {
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    whiteSpace: 'nowrap',
+  },
+  infoValBox: {
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    padding: '4px 10px',
+    borderRadius: '4px',
+    fontFamily: 'var(--font-sans)',
+    letterSpacing: '-0.2px',
+    whiteSpace: 'nowrap',
+  },
+  sessionInnerDivider: {
+    width: '1px',
+    height: '14px',
+    backgroundColor: 'var(--border-color)',
+    margin: '0 2px',
+  },
+  modalArrow: {
+    position: 'absolute',
+    top: '-7px',
+    left: '16px',
+    width: '0',
+    height: '0',
+    borderLeft: '7px solid transparent',
+    borderRight: '7px solid transparent',
+    borderBottom: '7px solid var(--border-color)',
+    zIndex: 101,
+  },
+  modalArrowBorder: {
+    position: 'absolute',
+    top: '-8px',
+    left: '15px',
+    width: '0',
+    height: '0',
+    borderLeft: '8px solid transparent',
+    borderRight: '8px solid transparent',
+    borderBottom: '8px solid var(--border-color)',
+    zIndex: 100,
+  },
+  sessionLabel: {
+    fontSize: '0.75rem',
+    color: 'var(--text-secondary)',
+    fontWeight: '500',
+  },
+  sessionTimer: {
+    fontFamily: 'monospace',
+    fontWeight: '700',
+    fontSize: '0.875rem',
+    color: 'var(--danger)',
+    minWidth: '42px',
+  },
+  extendBtn: {
+    padding: '4px 8px',
+    fontSize: '0.72rem',
+    height: '24px',
+    backgroundColor: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    color: 'var(--text-primary)',
+  },
+  divider: {
+    width: '1px',
+    height: '24px',
+    backgroundColor: 'var(--border-color)',
+  },
+  actionBtn: {
+    width: '36px',
+    height: '36px',
+    borderRadius: 'var(--radius-sm)',
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '1px solid var(--border-color)',
+    backgroundColor: 'var(--bg-secondary)',
+    color: 'var(--text-secondary)',
+    cursor: 'pointer',
+    position: 'relative',
+  },
+  notiWrapper: {
+    position: 'relative',
+  },
+  notiBadge: {
+    position: 'absolute',
+    top: '6px',
+    right: '6px',
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    backgroundColor: 'var(--danger)',
+    boxShadow: '0 0 4px var(--danger)',
+  },
+  userInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  avatar: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    backgroundColor: 'var(--primary)',
+    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: '700',
+    fontSize: '0.9rem',
+  },
+  userMeta: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  userName: {
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+  },
+  userRole: {
+    fontSize: '0.7rem',
+    color: 'var(--text-tertiary)',
+    fontWeight: '500',
+  },
+  logoutBtn: {
+    height: '36px',
+    padding: '0 12px',
+    fontSize: '0.8rem',
+    gap: '6px',
+    border: '1px solid var(--border-color)',
+    backgroundColor: 'var(--bg-secondary)',
+    color: 'var(--text-primary)',
+  },
+  logoutBtnInline: {
+    padding: '4px 8px',
+    fontSize: '0.72rem',
+    height: '24px',
+    backgroundColor: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    color: 'var(--text-primary)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    marginLeft: '4px',
+  },
+  verticalDivider: {
+    width: '1px',
+    height: '18px',
+    backgroundColor: 'var(--border-color)',
+    margin: '0 6px',
+  },
+  processBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  processMsgBox: {
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    borderRadius: '4px',
+    padding: '4px 10px',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  processMsgText: {
+    fontSize: '0.8rem',
+    fontWeight: '500',
+    letterSpacing: '-0.2px',
+  },
+  breadcrumb: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+  },
+  breadcrumbHome: {
+    color: 'var(--text-tertiary)',
+    cursor: 'pointer',
+    transition: 'color 0.2s',
+  },
+  breadcrumbSeparator: {
+    color: 'var(--text-tertiary)',
+    fontSize: '0.75rem',
+    opacity: 0.6,
+  },
+  breadcrumbParent: {
+    color: 'var(--text-secondary)',
+    fontWeight: '500',
+  },
+  breadcrumbActive: {
+    color: 'var(--primary)',
+    fontWeight: '700',
+  },
+  statusBar: {
+    height: '36px',
+    backgroundColor: 'var(--bg-secondary)',
+    borderTop: '1px solid var(--border-color)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0 24px',
+    flexShrink: 0,
+    zIndex: 10,
+  },
+  statusBarLeft: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  statusBarRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  statusBarLabel: {
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    color: 'var(--text-secondary)',
+    marginLeft: '12px',
+    marginRight: '4px',
+    userSelect: 'none',
+  },
+  statusBarValue: {
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    fontFamily: 'var(--font-sans)',
+  },
 };
 
 export default App;
