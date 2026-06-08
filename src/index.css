@@ -535,6 +535,110 @@ input, select, textarea, button {
   color: var(--primary);
 }
 
+/* Form Table Grid Layout */
+.form-table-container {
+  border: 1px solid var(--border-color);
+  border-radius: 0px;
+  background-color: var(--bg-secondary);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: none;
+}
+
+.form-table-section-header {
+  background-color: var(--bg-tertiary);
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.2px;
+}
+
+.form-table-row {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.form-table-row:last-child {
+  border-bottom: none;
+}
+
+.form-table-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex: 1;
+  min-width: 250px;
+  min-height: 40px;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  transition: background-color 0.15s;
+}
+
+.form-table-cell:last-child {
+  border-right: none;
+}
+
+.form-table-cell:focus-within {
+  background-color: var(--bg-accent);
+}
+
+.form-table-cell-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-tertiary);
+  width: 140px;
+  min-width: 140px;
+  padding: 10px 14px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  user-select: none;
+}
+
+.form-table-cell-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.form-table-cell-content .form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  height: 100%;
+}
+
+.form-table-cell-content select {
+  width: 100%;
+  height: 100%;
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+
 
 
 
