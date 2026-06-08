@@ -3,43 +3,33 @@ import { SearchIcon, CheckIcon, PrinterIcon, FilePlusIcon, RefreshIcon } from '.
 
 const ButtonGroupSelect = ({ value, onChange, options }) => {
   return (
-    <div style={{ display: 'flex', width: '100%', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '2px', borderRadius: '6px' }}>
-      {options.map(opt => {
-        const isSelected = opt.value === value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => onChange(opt.value)}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              fontSize: '0.8rem',
-              fontWeight: isSelected ? '700' : '500',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              backgroundColor: isSelected ? 'var(--bg-secondary)' : 'transparent',
-              color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)',
-              boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-            }}
-          >
-            {isSelected && (
-              <CheckIcon size={12} style={{ strokeWidth: '3px', flexShrink: 0 }} />
-            )}
-            <span>{opt.label}</span>
-          </button>
-        );
-      })}
-    </div>
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      style={{
+        border: 'none',
+        backgroundColor: 'transparent',
+        width: '100%',
+        height: '100%',
+        padding: '10px 14px',
+        fontSize: '0.9rem',
+        color: 'var(--text-primary)',
+        outline: 'none',
+        cursor: 'pointer',
+        appearance: 'none',
+        backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 14px center',
+        paddingRight: '40px',
+        fontWeight: '500',
+      }}
+    >
+      {options.map(opt => (
+        <option key={opt.value} value={opt.value} style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
   );
 };
 
