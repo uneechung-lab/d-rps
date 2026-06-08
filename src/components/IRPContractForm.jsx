@@ -925,8 +925,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    marginTop: '24px',
-    marginBottom: '12px',
+    marginTop: '48px',
+    marginBottom: '16px',
   },
   readOnly: {
     backgroundColor: 'var(--bg-tertiary)',
