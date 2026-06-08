@@ -592,7 +592,7 @@ input, select, textarea, button {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
   width: 140px;
   min-width: 140px;
   padding: 10px 14px;
