@@ -560,7 +560,7 @@ input, select, textarea, button {
 
 .form-table-row {
   display: flex;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: none;
   flex-wrap: wrap;
 }
 
