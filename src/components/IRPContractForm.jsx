@@ -209,13 +209,12 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
       {/* Tab: 기본정보 (Basic Details) */}
       {activeSubTab === '기본정보' && (
         <form onSubmit={handleFormSave}>
-          <div className="form-table-container">
-            {/* Section 1: 고객 정보 */}
-            <div className="form-table-section-header">
-              <span style={styles.badgeIndex}>1</span>
-              고객 정보 (Customer Details)
-            </div>
-            
+          {/* Section 1: 고객 정보 */}
+          <h3 style={{ ...styles.formSectionTitle, marginTop: '0px' }}>
+            <span style={styles.badgeIndex}>1</span>
+            고객 정보 (Customer Details)
+          </h3>
+          <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
             <div className="form-table-row">
               <div className="form-table-cell">
@@ -358,13 +357,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Section 2: 계약 상세 정보 */}
-            <div className="form-table-section-header">
-              <span style={styles.badgeIndex}>2</span>
-              계약 상세 정보 (Contract Specifications)
-            </div>
-
+          {/* Section 2: 계약 상세 정보 */}
+          <h3 style={styles.formSectionTitle}>
+            <span style={styles.badgeIndex}>2</span>
+            계약 상세 정보 (Contract Specifications)
+          </h3>
+          <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
             <div className="form-table-row">
               <div className="form-table-cell">
@@ -464,13 +464,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Section 3: 부담금 및 수수료 */}
-            <div className="form-table-section-header">
-              <span style={styles.badgeIndex}>3</span>
-              부담금 및 수수료 (Contributions & Fees)
-            </div>
-
+          {/* Section 3: 부담금 및 수수료 */}
+          <h3 style={styles.formSectionTitle}>
+            <span style={styles.badgeIndex}>3</span>
+            부담금 및 수수료 (Contributions & Fees)
+          </h3>
+          <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
             <div className="form-table-row">
               <div className="form-table-cell">
@@ -499,13 +500,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Section 4: 디폴트 옵션 */}
-            <div className="form-table-section-header">
-              <span style={styles.badgeIndex}>4</span>
-              디폴트 옵션 (Default Option)
-            </div>
-
+          {/* Section 4: 디폴트 옵션 */}
+          <h3 style={styles.formSectionTitle}>
+            <span style={styles.badgeIndex}>4</span>
+            디폴트 옵션 (Default Option)
+          </h3>
+          <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
             <div className="form-table-row">
               <div className="form-table-cell">
@@ -542,14 +544,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Section 5: 연간 납입한도 정보 */}
-            <div className="form-table-section-header">
-              <span style={styles.badgeIndex}>5</span>
-              연간 납입한도 정보 (Annual Limits)
-            </div>
-
-            {/* Row 1 */}
+          {/* Section 5: 연간 납입한도 정보 */}
+          <h3 style={styles.formSectionTitle}>
+            <span style={styles.badgeIndex}>5</span>
+            연간 납입한도 정보 (Annual Limits)
+          </h3>
+          <div className="form-table-container">
             <div className="form-table-row">
               <div className="form-table-cell">
                 <span className="form-table-cell-label">연간 납입 한도액</span>
@@ -721,6 +723,16 @@ const styles = {
     justifyContent: 'center',
     fontSize: '0.8rem',
     fontWeight: '700',
+  },
+  formSectionTitle: {
+    fontSize: '0.95rem',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '24px',
+    marginBottom: '12px',
   },
   readOnly: {
     backgroundColor: 'var(--bg-tertiary)',
