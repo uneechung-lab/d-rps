@@ -575,7 +575,7 @@ input, select, textarea, button {
   flex: 1;
   min-width: 250px;
   min-height: 40px;
-  border-right: 1px solid var(--border-color);
+  border-right: none;
   background-color: var(--bg-secondary);
   transition: background-color 0.15s;
 }
@@ -596,7 +596,7 @@ input, select, textarea, button {
   width: 140px;
   min-width: 140px;
   padding: 10px 14px;
-  border-right: 1px solid var(--border-color);
+  border-right: none;
   display: flex;
   align-items: center;
   margin: 0;
