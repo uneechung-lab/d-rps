@@ -196,10 +196,7 @@ const Dashboard = ({ isDark, onTabSelect, user }) => {
   ];
 
   return (
-    <div style={{
-      ...styles.container,
-      backgroundColor: isDark ? '#090a0f' : '#f4f6fa'
-    }}>
+    <div style={styles.container}>
       {/* Main Outer Split: Left Column (260px) and Right Content Area (rest of the width) */}
       <div style={styles.outerLayout}>
         
@@ -669,6 +666,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
+    boxShadow: 'var(--card-shadow)',
     transition: 'transform 0.2s, box-shadow 0.2s',
   },
   kpiHeader: {
@@ -729,7 +727,7 @@ const styles = {
     borderRadius: '12px',
     border: '1px solid var(--border-color)',
     padding: '20px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05)',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',

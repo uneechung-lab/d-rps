@@ -29,6 +29,7 @@ function App() {
   // Toast notifications engine
   const [notifications, setNotifications] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [headerStyle, setHeaderStyle] = useState('simple');
 
 
   // Check if device is mobile/tablet based on User Agent or screen width
@@ -345,6 +346,10 @@ function App() {
         activeDepth1={activeDepth1}
         onDepth1Select={handleDepth1Select}
         onLogoClick={() => handleSidebarTabSelect('대시보드')}
+        isDashboard={activeTab === '대시보드'}
+        headerStyle={headerStyle}
+        setHeaderStyle={setHeaderStyle}
+        addNotification={addNotification}
       />
 
       {/* Sub Header for Breadcrumbs & Process banner (Stretches full width above LNB) */}
@@ -385,13 +390,11 @@ function App() {
         <div style={styles.verticalDivider} />
 
         <div style={styles.breadcrumb}>
-          {/* Home Icon */}
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <span style={styles.breadcrumbSeparator}>/</span>
-          {activeTab === '대시보드' ? (
-            <span style={styles.breadcrumbActive}>대시보드</span>
-          ) : (
+          {activeTab !== '대시보드' && (
             <>
+              {/* Home Icon */}
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span style={styles.breadcrumbSeparator}>/</span>
               <span style={styles.breadcrumbHome}>{activeDepth1}</span>
               {currentPath.parent && (
                 <>
@@ -403,6 +406,59 @@ function App() {
               <span style={styles.breadcrumbActive}>{activeTab || 'IRP 계약등록'}</span>
             </>
           )}
+
+          {/* Right-side: Site selector + Manual + Alert */}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
+
+            <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>사이트</span>
+            <select style={{
+              fontSize: '0.78rem',
+              fontWeight: '600',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '4px',
+              padding: '3px 24px 3px 8px',
+              height: '26px',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: "'Outfit', sans-serif",
+              appearance: 'auto',
+            }}>
+              <option>선택</option>
+              <option>사이트 A</option>
+              <option>사이트 B</option>
+            </select>
+            <button
+              type="button"
+              title="매뉴얼"
+              onClick={() => addNotification('매뉴얼 페이지를 열었습니다.', 'info')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '4px',
+                fontSize: '0.78rem', fontWeight: '700',
+                color: 'var(--text-secondary)',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '3px 6px', borderRadius: '4px',
+                fontFamily: "'Outfit', sans-serif",
+              }}
+            >
+              매뉴얼
+            </button>
+            <button
+              type="button"
+              title="공지사항"
+              onClick={() => addNotification('공지사항을 확인해주세요.', 'warning')}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: '22px', height: '22px', borderRadius: '4px',
+                backgroundColor: '#ef4444', border: 'none', cursor: 'pointer',
+                color: '#fff', fontSize: '0.75rem', fontWeight: '900',
+                flexShrink: 0,
+              }}
+            >
+              !
+            </button>
+          </div>
         </div>
       </div>
 
@@ -432,6 +488,7 @@ function App() {
               onSave={handleSaveContract}
               onReset={handleResetForm}
               addNotification={addNotification}
+              headerStyle={headerStyle}
             />
           ) : (
             <div className="card" style={styles.placeholderCard}>
@@ -459,21 +516,21 @@ function App() {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   ...styles.bottomTabItem,
-                  backgroundColor: activeTab === tab ? 'var(--bg-primary)' : 'transparent',
+                  backgroundColor: activeTab === tab ? (headerStyle === 'simple' ? 'var(--bg-primary)' : '#fff8e1') : 'transparent',
                   borderLeftColor: activeTab === tab ? 'var(--border-color)' : 'transparent',
                   borderRightColor: activeTab === tab ? 'var(--border-color)' : 'transparent',
-                  borderBottomColor: activeTab === tab ? '#ffb81c' : 'transparent',
+                  borderBottomColor: activeTab === tab ? (headerStyle === 'simple' ? 'var(--text-primary)' : '#ffb81c') : 'transparent',
                   borderBottomWidth: activeTab === tab ? '3px' : '1px',
                   borderBottomStyle: 'solid',
                   borderTopColor: 'transparent',
-                  color: activeTab === tab ? 'var(--primary)' : 'var(--text-secondary)',
+                  color: activeTab === tab ? (headerStyle === 'simple' ? 'var(--text-primary)' : 'rgba(7, 17, 38, 0.9)') : 'var(--text-secondary)',
                   height: activeTab === tab ? '36px' : '34px',
                   zIndex: activeTab === tab ? 2 : 1,
                 }}
               >
                 <span style={{
                   ...styles.tabIndicator,
-                  backgroundColor: activeTab === tab ? '#ffb81c' : 'var(--text-tertiary)'
+                  backgroundColor: activeTab === tab ? (headerStyle === 'simple' ? 'var(--text-primary)' : '#ffb81c') : 'var(--text-tertiary)'
                 }} />
                 <span style={{ fontSize: '0.8rem', fontWeight: activeTab === tab ? '700' : '500' }}>{tab}</span>
                 <button onClick={(e) => handleCloseTab(e, tab)} style={styles.tabCloseBtn}>&times;</button>
@@ -540,9 +597,9 @@ function App() {
           display: 'flex',
           alignItems: 'center'
         }}>
-          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#475569' }}>처리소요시간 : </span>
-          <span style={{ fontSize: '0.75rem', color: isDark ? '#38bdf8' : '#0284c7', fontWeight: '700' }}>(0.016 sec)</span>
-          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#475569' }}>정상 처리 되었습니다.</span>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#475569', fontFamily: "'Outfit', sans-serif" }}>처리소요시간 : </span>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#38bdf8' : '#0284c7', fontWeight: '700', fontFamily: "'Outfit', sans-serif" }}>(0.016 sec)</span>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#475569', fontFamily: "'Outfit', sans-serif" }}>정상 처리 되었습니다.</span>
         </div>
       </div>
       <div style={styles.statusBarRight}>
@@ -833,7 +890,7 @@ const styles = {
     fontWeight: '500',
   },
   sessionTimer: {
-    fontFamily: 'monospace',
+    fontFamily: "'Outfit', sans-serif",
     fontWeight: '700',
     fontSize: '0.875rem',
     color: 'var(--danger)',
@@ -961,6 +1018,8 @@ const styles = {
     gap: '8px',
     fontSize: '0.85rem',
     fontWeight: '600',
+    flex: 1,
+    overflow: 'hidden',
   },
   breadcrumbHome: {
     color: 'var(--text-tertiary)',
@@ -1007,6 +1066,7 @@ const styles = {
     marginLeft: '12px',
     marginRight: '4px',
     userSelect: 'none',
+    fontFamily: "'Outfit', sans-serif",
   },
   statusBarValue: {
     fontSize: '0.75rem',
@@ -1015,7 +1075,7 @@ const styles = {
     borderRadius: '4px',
     borderStyle: 'solid',
     borderWidth: '1px',
-    fontFamily: 'var(--font-sans)',
+    fontFamily: "'Outfit', sans-serif",
   },
 };
 

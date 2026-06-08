@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SearchIcon, CheckIcon, PrinterIcon, FilePlusIcon, RefreshIcon } from '../assets/icons';
+import { SearchIcon, CheckIcon, PrinterIcon, FilePlusIcon, RefreshIcon, UserIcon, FileTextIcon } from '../assets/icons';
 
 const ButtonGroupSelect = ({ value, onChange, options }) => {
   return (
@@ -11,16 +11,16 @@ const ButtonGroupSelect = ({ value, onChange, options }) => {
         backgroundColor: 'transparent',
         width: '100%',
         height: '100%',
-        padding: '10px 14px',
-        fontSize: '0.9rem',
+        padding: '10px 32px 10px 12px',
+        fontSize: '0.85rem',
         color: 'var(--text-primary)',
         outline: 'none',
         cursor: 'pointer',
         appearance: 'none',
         backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'right 14px center',
-        paddingRight: '40px',
+        backgroundPosition: 'right 12px center',
+        paddingRight: '32px',
         fontWeight: '500',
       }}
     >
@@ -33,7 +33,7 @@ const ButtonGroupSelect = ({ value, onChange, options }) => {
   );
 };
 
-const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addNotification }) => {
+const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addNotification, headerStyle }) => {
   const [activeSubTab, setActiveSubTab] = useState('기본정보');
   const [accountChecked, setAccountChecked] = useState(false);
   const [checkingAccount, setCheckingAccount] = useState(false);
@@ -145,10 +145,24 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
   return (
     <div style={styles.container}>
+      {/* Screen Title */}
+      <div style={{ ...styles.screenTitleContainer, display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <h2 style={styles.screenTitle}>IRP 계약등록</h2>
+        <button onClick={onReset} className="btn btn-secondary" style={{ height: '32px', padding: '0 12px', fontSize: '0.8rem' }}>
+          <RefreshIcon size={14} />
+          초기화
+        </button>
+      </div>
+
       {/* Top Search Toolbar */}
-      <div style={{ ...styles.topToolbar, border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--bg-secondary)' }} className="toolbar-card">
+      <div style={{
+        ...styles.topToolbar,
+        border: '10px solid var(--border-color)',
+        borderRadius: '0px',
+        backgroundColor: 'var(--bg-secondary)'
+      }} className="toolbar-card">
         <div style={styles.toolbarRow}>
-          <div className="form-group" style={{ flex: 1, margin: 0 }}>
+          <div className="form-group" style={{ width: '380px', margin: 0 }}>
             <label className="form-label">계약번호</label>
             <div className="search-input-wrapper">
               <input
@@ -165,7 +179,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
             </div>
           </div>
 
-          <div className="form-group" style={{ flex: 1, margin: 0 }}>
+          <div className="form-group" style={{ width: '280px', margin: 0 }}>
             <label className="form-label">IRP 유형</label>
             <ButtonGroupSelect
               value={formData.irpType}
@@ -181,10 +195,6 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
             <button onClick={onOpenSearch} className="btn btn-primary" style={styles.actionBtn}>
               <SearchIcon size={16} />
               계약 찾기
-            </button>
-            <button onClick={onReset} className="btn btn-secondary" style={styles.actionBtn}>
-              <RefreshIcon size={16} />
-              초기화
             </button>
           </div>
         </div>
@@ -211,8 +221,8 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
         <form onSubmit={handleFormSave}>
           {/* Section 1: 고객 정보 */}
           <h3 style={{ ...styles.formSectionTitle, marginTop: '0px' }}>
-            <span style={styles.badgeIndex}>1</span>
-            고객정보 (Customer Info)
+            <span style={{ display: 'inline-block', width: '4px', height: '14px', backgroundColor: 'var(--primary)', borderRadius: '2px' }} />
+            고객정보
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
@@ -220,7 +230,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               <div className="form-table-cell">
                 <span className="form-table-cell-label">실명확인번호</span>
                 <div className="form-table-cell-content">
-                  <input type="text" className="form-input" placeholder="실명확인번호" />
+                  <input type="text" className="form-input" placeholder="______-_______" />
                 </div>
               </div>
               <div className="form-table-cell">
@@ -268,19 +278,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   />
                 </div>
               </div>
-              <div className="form-table-cell">
-                <span className="form-table-cell-label">주민등록번호 *</span>
-                <div className="form-table-cell-content">
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.residentNo}
-                    onChange={(e) => handleInputChange('residentNo', e.target.value)}
-                    placeholder="700730-1770510"
-                    required
-                  />
-                </div>
-              </div>
+              <div className="form-table-cell" style={{ borderRight: 'none', backgroundColor: 'transparent' }} />
             </div>
 
             {/* Row 2 */}
@@ -301,16 +299,24 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               <div className="form-table-cell">
                 <span className="form-table-cell-label">국적</span>
                 <div className="form-table-cell-content">
-                  <input type="text" className="form-input" value={formData.nationality} onChange={(e) => handleInputChange('nationality', e.target.value)} />
+                  <select
+                    className="form-input"
+                    value={formData.nationality}
+                    onChange={(e) => handleInputChange('nationality', e.target.value)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <option value="한국">한국</option>
+                    <option value="미국">미국</option>
+                    <option value="중국">중국</option>
+                    <option value="일본">일본</option>
+                    <option value="기타">기타</option>
+                  </select>
                 </div>
               </div>
               <div className="form-table-cell">
-                <span className="form-table-cell-label">
-                  <input type="checkbox" style={{ marginRight: '6px' }} />
-                  거주국일
-                </span>
-                <div className="form-table-cell-content">
-                  <input type="date" className="form-input" />
+                <div className="form-table-cell-content" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <input type="checkbox" id="residencyDateCheck" style={{ cursor: 'pointer', flexShrink: 0 }} />
+                  <label htmlFor="residencyDateCheck" style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', cursor: 'pointer' }}>거주국등일</label>
                 </div>
               </div>
               <div className="form-table-cell">
@@ -320,9 +326,9 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
               <div className="form-table-cell">
-                <span className="form-table-cell-label">지역전화번호</span>
+                <span className="form-table-cell-label">자택전화번호</span>
                 <div className="form-table-cell-content">
-                  <input type="text" className="form-input" placeholder="02-XXX-XXXX" />
+                  <input type="text" className="form-input" placeholder="___-___-____" />
                 </div>
               </div>
             </div>
@@ -463,13 +469,13 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
           {/* Section 2: 계약 상세 정보 */}
           <h3 style={styles.formSectionTitle}>
-            <span style={styles.badgeIndex}>2</span>
-            계약정보 (Contract Info)
+            <span style={{ display: 'inline-block', width: '4px', height: '14px', backgroundColor: 'var(--primary)', borderRadius: '2px' }} />
+            계약정보
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
             <div className="form-table-row">
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 2 }}>
                 <span className="form-table-cell-label">계약명</span>
                 <div className="form-table-cell-content">
                   <input
@@ -481,74 +487,93 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   />
                 </div>
               </div>
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">계약개시일</span>
                 <div className="form-table-cell-content">
                   <input type="date" className="form-input" value={formData.startDate} onChange={(e) => handleInputChange('startDate', e.target.value)} />
                 </div>
               </div>
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">계약등록일</span>
                 <div className="form-table-cell-content">
                   <input type="date" className="form-input" value={formData.regDate} onChange={(e) => handleInputChange('regDate', e.target.value)} />
                 </div>
               </div>
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">계약종료일</span>
                 <div className="form-table-cell-content">
                   <input type="date" className="form-input" value={formData.endDate} onChange={(e) => handleInputChange('endDate', e.target.value)} />
                 </div>
               </div>
+              <div className="form-table-cell" style={{ flex: 1, borderRight: 'none', backgroundColor: 'transparent' }} />
             </div>
 
             {/* Row 2 */}
             <div className="form-table-row">
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">계약일자</span>
                 <div className="form-table-cell-content">
                   <input type="date" className="form-input" value={formData.startDate} />
                 </div>
               </div>
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 2 }}>
                 <span className="form-table-cell-label">계약이전구분</span>
-                <div className="form-table-cell-content">
-                  <ButtonGroupSelect
-                    value={formData.marketingType}
-                    onChange={(val) => handleInputChange('marketingType', val)}
-                    options={[
-                      { value: '신규', label: '신규' },
-                      { value: '이전', label: '이전' }
-                    ]}
-                  />
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '4px', width: '100%' }}>
+                  <div style={{ width: '30%', minWidth: '60px' }}>
+                    <ButtonGroupSelect
+                      value={formData.marketingType}
+                      onChange={(val) => handleInputChange('marketingType', val)}
+                      options={[
+                        { value: '신규', label: '신규' },
+                        { value: '이전', label: '이전' }
+                      ]}
+                    />
+                  </div>
+                  <div className="search-input-wrapper" style={{ flex: 1 }}>
+                    <input type="text" className="form-input" placeholder="" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'var(--bg-secondary)', padding: '6px 10px', height: '32px' }} />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <input type="text" className="form-input" placeholder="" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'var(--bg-secondary)', padding: '6px 10px', height: '32px', width: '100%' }} />
+                  </div>
                 </div>
               </div>
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">영업담당자</span>
-                <div className="form-table-cell-content">
-                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '4px', width: '100%' }}>
+                  <div className="search-input-wrapper" style={{ width: '45%' }}>
                     <input type="text" className="form-input" value={formData.salesManager} onChange={(e) => handleInputChange('salesManager', e.target.value)} />
                     <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
                       <SearchIcon size={14} />
                     </button>
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <input type="text" className="form-input" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'var(--bg-secondary)', padding: '6px 10px', height: '32px', width: '100%' }} />
+                  </div>
                 </div>
               </div>
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">RK담당자</span>
-                <div className="form-table-cell-content">
-                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '4px', width: '100%' }}>
+                  <div className="search-input-wrapper" style={{ width: '45%' }}>
                     <input type="text" className="form-input" value={formData.rkManager} onChange={(e) => handleInputChange('rkManager', e.target.value)} />
                     <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
                       <SearchIcon size={14} />
                     </button>
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <input type="text" className="form-input" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'var(--bg-secondary)', padding: '6px 10px', height: '32px', width: '100%' }} />
+                  </div>
                 </div>
               </div>
+              <div className="form-table-cell" style={{ flex: 1, borderRight: 'none', backgroundColor: 'transparent' }} />
             </div>
 
             {/* Row 3 */}
             <div className="form-table-row">
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">계약상태</span>
                 <div className="form-table-cell-content">
                   <ButtonGroupSelect
@@ -561,26 +586,29 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   />
                 </div>
               </div>
-              <div className="form-table-cell">
+              <div className="form-table-cell" style={{ flex: 2 }}>
                 <span className="form-table-cell-label">사용자</span>
-                <div className="form-table-cell-content">
-                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '4px', width: '100%' }}>
+                  <div className="search-input-wrapper" style={{ width: '40%' }}>
                     <input type="text" className="form-input" placeholder="사용자 조회" />
                     <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
                       <SearchIcon size={14} />
                     </button>
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <input type="text" className="form-input" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'var(--bg-secondary)', padding: '6px 10px', height: '32px', width: '100%' }} />
+                  </div>
                 </div>
               </div>
-              <div className="form-table-cell" style={{ flex: 2, borderRight: 'none', backgroundColor: 'transparent' }} />
+              <div className="form-table-cell" style={{ flex: 3, borderRight: 'none', backgroundColor: 'transparent' }} />
             </div>
 
             {/* Row 4 */}
             <div className="form-table-row">
-              <div className="form-table-cell" style={{ flex: 2 }}>
+              <div className="form-table-cell" style={{ flex: 4 }}>
                 <span className="form-table-cell-label">계좌번호 *</span>
-                <div className="form-table-cell-content">
-                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                  <div className="search-input-wrapper" style={{ width: '25%' }}>
                     <input
                       type="text"
                       className="form-input"
@@ -592,14 +620,25 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                       placeholder="302-XXXX-XXXX-XX"
                       required
                     />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
+                  <div style={{ width: '25%' }}>
+                    <input type="text" className="form-input" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'var(--bg-secondary)', padding: '6px 10px', height: '32px', width: '100%' }} />
+                  </div>
+                  <div style={{ width: '25%' }}>
+                    <input type="text" className="form-input" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'var(--bg-secondary)', padding: '6px 10px', height: '32px', width: '100%' }} />
+                  </div>
+                  <div>
                     <button
                       type="button"
                       onClick={handleAccountCheck}
                       className="btn btn-secondary"
-                      style={styles.checkBtn}
+                      style={{ height: '32px', fontSize: '0.8rem', padding: '0 12px', borderRadius: '4px' }}
                       disabled={checkingAccount}
                     >
-                      {checkingAccount ? '...' : accountChecked ? <CheckIcon size={16} style={{ color: 'var(--accent)' }} /> : '계좌체크'}
+                      {checkingAccount ? '...' : accountChecked ? <CheckIcon size={16} /> : '계좌체크'}
                     </button>
                   </div>
                 </div>
@@ -610,8 +649,8 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
           {/* Section 3: 부담금 및 수수료 */}
           <h3 style={styles.formSectionTitle}>
-            <span style={styles.badgeIndex}>3</span>
-            부담금/수수료 (Contributions & Fees)
+            <span style={{ display: 'inline-block', width: '4px', height: '14px', backgroundColor: 'var(--primary)', borderRadius: '2px' }} />
+            부담금/수수료
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
@@ -646,8 +685,8 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
           {/* Section 4: 디폴트 옵션 */}
           <h3 style={styles.formSectionTitle}>
-            <span style={styles.badgeIndex}>4</span>
-            디폴트옵션 (Default Option)
+            <span style={{ display: 'inline-block', width: '4px', height: '14px', backgroundColor: 'var(--primary)', borderRadius: '2px' }} />
+            디폴트옵션
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
@@ -733,14 +772,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
           {/* Section 5: 연간 납입한도 정보 */}
           <h3 style={styles.formSectionTitle}>
-            <span style={styles.badgeIndex}>5</span>
-            연간납입한도정보 (Annual Limits)
+            <span style={{ display: 'inline-block', width: '4px', height: '14px', backgroundColor: 'var(--primary)', borderRadius: '2px' }} />
+            연간납입한도정보
           </h3>
-          <div className="form-table-container">
+          <div className="form-table-container" style={{ marginBottom: '20px' }}>
             <div className="form-table-row">
               <div className="form-table-cell">
                 <span className="form-table-cell-label">연간납입한도액</span>
-                <div className="form-table-cell-content" style={{ paddingRight: '80px' }}>
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '4px' }}>
                   <input
                     type="number"
                     className="form-input"
@@ -749,40 +788,42 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                       handleInputChange('annualLimit', e.target.value);
                       handleInputChange('setTotalLimit', e.target.value);
                     }}
-                    style={{ fontWeight: '700', color: 'var(--primary)' }}
+                    style={{ flex: 1, fontWeight: '700', color: 'var(--primary)' }}
                   />
-                  <button type="button" className="btn btn-secondary" style={{ ...styles.checkBtn, position: 'absolute', right: '4px', top: '4px', bottom: '4px', height: 'auto', padding: '0 12px' }}>
-                    저장
-                  </button>
+                  <button type="button" className="btn btn-secondary" style={{ height: '32px', padding: '0 10px', fontSize: '0.8rem', flexShrink: 0 }}>저장</button>
                 </div>
               </div>
               <div className="form-table-cell">
                 <span className="form-table-cell-label">연간계좌한도설정총액</span>
-                <div className="form-table-cell-content" style={{ paddingRight: '80px' }}>
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '4px' }}>
                   <input
                     type="number"
                     className="form-input"
                     value={formData.setTotalLimit}
                     readOnly
-                    style={{ ...styles.readOnly, fontWeight: '700', color: 'var(--accent)' }}
+                    style={{ flex: 1, fontWeight: '700', color: 'var(--accent)', backgroundColor: 'var(--bg-tertiary)', cursor: 'not-allowed' }}
                   />
-                  <button type="button" className="btn btn-secondary" style={{ ...styles.checkBtn, position: 'absolute', right: '4px', top: '4px', bottom: '4px', height: 'auto', padding: '0 12px' }}>
-                    실행
-                  </button>
+                  <button type="button" className="btn btn-secondary" style={{ height: '32px', padding: '0 10px', fontSize: '0.8rem', flexShrink: 0 }}>실행</button>
                 </div>
               </div>
               <div className="form-table-cell">
                 <span className="form-table-cell-label">전문번호</span>
-                <div className="form-table-cell-content" style={{ paddingRight: '90px' }}>
+                <div className="form-table-cell-content" style={{ display: 'flex', gap: '4px' }}>
                   <input
                     type="text"
                     className="form-input"
                     value={formData.reqReason}
                     onChange={(e) => handleInputChange('reqReason', e.target.value)}
-                    placeholder="전문번호"
+                    style={{ flex: 1 }}
                   />
-                  <button type="button" className="btn btn-secondary" style={{ ...styles.checkBtn, position: 'absolute', right: '4px', top: '4px', bottom: '4px', height: 'auto', padding: '0 12px' }}>
-                    통합확인
+                  <button type="button" className="btn btn-secondary" style={{ height: '32px', padding: '0 10px', fontSize: '0.8rem', flexShrink: 0 }}>통합확인</button>
+                </div>
+              </div>
+              <div className="form-table-cell" style={{ borderRight: 'none', backgroundColor: 'transparent', justifyContent: 'flex-end' }}>
+                <div className="form-table-cell-content" style={{ justifyContent: 'flex-end' }}>
+                  <button type="button" className="btn btn-secondary" style={{ height: '32px', padding: '0 12px', fontSize: '0.8rem' }}>
+                    <SearchIcon size={14} />
+                    실제조회
                   </button>
                 </div>
               </div>
@@ -790,7 +831,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
           </div>
 
           {/* Form Actions Toolbar */}
-          <div style={styles.actionsBar} className="actions-bar">
+          <div style={{ ...styles.actionsBar, background: headerStyle === 'simple' ? 'var(--bg-primary)' : '#fff8e1' }} className="actions-bar">
             <div className="left-actions" style={{ display: 'flex', gap: '12px' }}>
               <button type="button" onClick={handleFormPrint} className="btn btn-secondary">
                 <PrinterIcon size={16} />
@@ -884,16 +925,14 @@ const styles = {
   },
   toolbarRow: {
     display: 'flex',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: '20px',
   },
   toolbarInput: {
     height: '38px',
-    backgroundColor: 'var(--bg-tertiary)',
   },
   toolbarSelect: {
     height: '38px',
-    backgroundColor: 'var(--bg-tertiary)',
   },
   toolbarIconBtn: {
     right: '12px',
@@ -953,9 +992,9 @@ const styles = {
     padding: '16px 24px',
     display: 'flex',
     justifyContent: 'space-between',
-    backgroundColor: 'var(--bg-secondary)',
+    background: '#fff8e1',
     borderTop: '1px solid var(--border-color)',
-    boxShadow: '0 -8px 24px rgba(0, 0, 0, 0.05)',
+    boxShadow: '0 -4px 8px rgba(0, 0, 0, 0.12)',
     zIndex: 10,
   },
   rightActions: {
@@ -1056,6 +1095,16 @@ const styles = {
   dragText: {
     fontSize: '0.8rem',
     color: 'var(--text-tertiary)',
+    margin: 0,
+  },
+  screenTitleContainer: {
+    marginBottom: '16px',
+    paddingLeft: '4px',
+  },
+  screenTitle: {
+    fontSize: '1.2rem',
+    fontWeight: '800',
+    color: 'var(--text-primary)',
     margin: 0,
   }
 };

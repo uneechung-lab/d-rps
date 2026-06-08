@@ -91,6 +91,24 @@ const Sidebar = ({ activeTab, onTabSelect, activeDepth1, collapsed, onToggleColl
     setOpenGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
+  const handleExpandAll = () => {
+    const currentGroups = menuDataMap[activeDepth1] || [];
+    const allOpen = {};
+    currentGroups.forEach(group => {
+      allOpen[group.id] = true;
+    });
+    setOpenGroups(allOpen);
+  };
+
+  const handleCollapseAll = () => {
+    const currentGroups = menuDataMap[activeDepth1] || [];
+    const allCollapsed = {};
+    currentGroups.forEach(group => {
+      allCollapsed[group.id] = false;
+    });
+    setOpenGroups(allCollapsed);
+  };
+
   const handleMenuClick = (menuItem) => {
     onTabSelect(menuItem.name);
   };
@@ -117,25 +135,11 @@ const Sidebar = ({ activeTab, onTabSelect, activeDepth1, collapsed, onToggleColl
         padding: '0 16px',
         gap: '0',
         borderBottom: '1px solid var(--border-color)',
+        justifyContent: 'center',
       }}>
         <div style={styles.brand}>
           <span style={{ ...styles.brandTitle, color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '800' }}>{activeDepth1}</span>
         </div>
-        <button
-          onClick={onToggleCollapse}
-          style={{
-            ...styles.toggleBtn,
-            width: '28px',
-            height: '28px',
-            padding: 0,
-            color: 'var(--text-secondary)',
-            borderColor: 'var(--border-color)',
-            backgroundColor: 'var(--bg-tertiary)',
-          }}
-          title={collapsed ? "메뉴 열기" : "메뉴 접기"}
-        >
-          {collapsed ? <ChevronRightIcon size={16} /> : <ChevronRightIcon size={16} style={{ transform: 'rotate(180deg)' }} />}
-        </button>
       </div>
 
       {/* Sidebar search bar */}
@@ -157,6 +161,62 @@ const Sidebar = ({ activeTab, onTabSelect, activeDepth1, collapsed, onToggleColl
             />
             <span style={{ ...styles.searchIcon, color: 'var(--text-tertiary)' }}><SearchIcon size={14} /></span>
           </div>
+          {!collapsed && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '10px',
+              paddingTop: '10px',
+              borderTop: '1px solid var(--border-color)',
+              gap: '8px'
+            }}>
+              <button
+                onClick={handleCollapseAll}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '4px',
+                  width: '24px',
+                  height: '24px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  transition: 'all 0.2s',
+                }}
+                title="전체 접기"
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)'; e.currentTarget.style.backgroundColor = 'var(--border-color)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'; }}
+              >
+                <ChevronDownIcon size={14} style={{ transform: 'rotate(180deg)' }} />
+              </button>
+              <button
+                onClick={handleExpandAll}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '4px',
+                  width: '24px',
+                  height: '24px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  transition: 'all 0.2s',
+                }}
+                title="전체 펼치기"
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)'; e.currentTarget.style.backgroundColor = 'var(--border-color)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'; }}
+              >
+                <ChevronDownIcon size={14} />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -225,13 +285,7 @@ const Sidebar = ({ activeTab, onTabSelect, activeDepth1, collapsed, onToggleColl
         })}
       </div>
 
-      <div style={styles.sidebarFooter}>
-        <div style={styles.helpCard}>
-          <h4 style={styles.helpTitle}>지원 센터</h4>
-          <p style={styles.helpText}>Tel: 1544-0000</p>
-          <p style={styles.helpText}>내선: 8909 (퇴직연금팀)</p>
-        </div>
-      </div>
+
     </aside>
   );
 };
@@ -327,7 +381,7 @@ const styles = {
     gap: '10px',
   },
   groupTitle: {
-    fontSize: '0.825rem',
+    fontSize: '0.925rem',
     fontWeight: '600',
   },
   groupItems: {
@@ -342,7 +396,7 @@ const styles = {
     alignItems: 'center',
     gap: '8px',
     padding: '8px 12px',
-    fontSize: '0.8rem',
+    fontSize: '0.9rem',
     borderRadius: '6px',
     cursor: 'pointer',
     transition: 'all 0.2s',
@@ -351,30 +405,7 @@ const styles = {
     fontSize: '1rem',
     lineHeight: 1,
   },
-  sidebarFooter: {
-    padding: '16px',
-    borderTop: '1px solid var(--border-color)',
-    backgroundColor: 'var(--bg-primary)',
-  },
-  helpCard: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '12px',
-    boxShadow: 'var(--card-shadow)',
-  },
-  helpTitle: {
-    margin: '0 0 6px 0',
-    fontSize: '0.75rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-  },
-  helpText: {
-    margin: 0,
-    fontSize: '0.7rem',
-    color: 'var(--text-secondary)',
-    lineHeight: '1.4',
-  },
+
   collapsedLogo: {
     width: '32px',
     height: '32px',
