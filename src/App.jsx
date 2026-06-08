@@ -459,10 +459,10 @@ function App() {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   ...styles.bottomTabItem,
-                  backgroundColor: activeTab === tab ? 'var(--bg-primary)' : 'var(--bg-tertiary)',
-                  borderLeftColor: 'var(--border-color)',
-                  borderRightColor: 'var(--border-color)',
-                  borderBottomColor: activeTab === tab ? '#ffb81c' : 'var(--border-color)',
+                  backgroundColor: activeTab === tab ? 'var(--bg-primary)' : 'transparent',
+                  borderLeftColor: activeTab === tab ? 'var(--border-color)' : 'transparent',
+                  borderRightColor: activeTab === tab ? 'var(--border-color)' : 'transparent',
+                  borderBottomColor: activeTab === tab ? '#ffb81c' : 'transparent',
                   borderBottomWidth: activeTab === tab ? '3px' : '1px',
                   borderBottomStyle: 'solid',
                   borderTopColor: 'transparent',
