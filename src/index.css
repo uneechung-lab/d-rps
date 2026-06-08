@@ -218,40 +218,61 @@ input, select, textarea, button {
 /* Input Fields styling */
 .form-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
+  flex-direction: row;
+  align-items: stretch;
+  margin-bottom: 0px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  overflow: hidden;
+  min-height: 40px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(7, 17, 38, 0.08);
 }
 
 .form-label {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
+  background-color: var(--bg-tertiary);
+  width: 140px;
+  min-width: 140px;
+  padding: 10px 14px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  user-select: none;
+}
+
+.form-group > *:not(.form-label) {
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .form-input {
   width: 100%;
   padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-secondary);
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
   color: var(--text-primary);
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  height: 100%;
 }
 
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 12px;
 }
 
 /* Tabs */
