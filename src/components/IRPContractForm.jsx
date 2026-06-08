@@ -212,21 +212,45 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
           {/* Section 1: 고객 정보 */}
           <h3 style={{ ...styles.formSectionTitle, marginTop: '0px' }}>
             <span style={styles.badgeIndex}>1</span>
-            고객 정보 (Customer Details)
+            고객정보 (Customer Info)
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
             <div className="form-table-row">
               <div className="form-table-cell">
+                <span className="form-table-cell-label">실명확인번호</span>
+                <div className="form-table-cell-content">
+                  <input type="text" className="form-input" placeholder="실명확인번호" />
+                </div>
+              </div>
+              <div className="form-table-cell">
                 <span className="form-table-cell-label">고객명 *</span>
                 <div className="form-table-cell-content">
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.custName}
-                    onChange={(e) => handleInputChange('custName', e.target.value)}
-                    placeholder="예: 홍길동"
-                    required
+                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.custName}
+                      onChange={(e) => handleInputChange('custName', e.target.value)}
+                      placeholder="예: 홍길동"
+                      required
+                    />
+                    <button type="button" onClick={onOpenSearch} className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">고객유형</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.nationality === '한국' ? '내국인' : '외국인'}
+                    onChange={(val) => handleInputChange('nationality', val === '내국인' ? '한국' : '외국')}
+                    options={[
+                      { value: '내국인', label: '내국인' },
+                      { value: '외국인', label: '외국인' }
+                    ]}
                   />
                 </div>
               </div>
@@ -262,12 +286,6 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
             {/* Row 2 */}
             <div className="form-table-row">
               <div className="form-table-cell">
-                <span className="form-table-cell-label">국적</span>
-                <div className="form-table-cell-content">
-                  <input type="text" className="form-input" value={formData.nationality} onChange={(e) => handleInputChange('nationality', e.target.value)} />
-                </div>
-              </div>
-              <div className="form-table-cell">
                 <span className="form-table-cell-label">거주여부</span>
                 <div className="form-table-cell-content">
                   <ButtonGroupSelect
@@ -281,15 +299,48 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
               <div className="form-table-cell">
+                <span className="form-table-cell-label">국적</span>
+                <div className="form-table-cell-content">
+                  <input type="text" className="form-input" value={formData.nationality} onChange={(e) => handleInputChange('nationality', e.target.value)} />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">
+                  <input type="checkbox" style={{ marginRight: '6px' }} />
+                  거주국일
+                </span>
+                <div className="form-table-cell-content">
+                  <input type="date" className="form-input" />
+                </div>
+              </div>
+              <div className="form-table-cell">
                 <span className="form-table-cell-label">거주국가</span>
                 <div className="form-table-cell-content">
                   <input type="text" className="form-input" value={formData.country} onChange={(e) => handleInputChange('country', e.target.value)} />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">지역전화번호</span>
+                <div className="form-table-cell-content">
+                  <input type="text" className="form-input" placeholder="02-XXX-XXXX" />
                 </div>
               </div>
             </div>
 
             {/* Row 3 */}
             <div className="form-table-row">
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">직장전화번호</span>
+                <div className="form-table-cell-content">
+                  <input type="text" className="form-input" placeholder="02-XXX-XXXX" />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">팩스번호</span>
+                <div className="form-table-cell-content">
+                  <input type="text" className="form-input" placeholder="02-XXX-XXXX" />
+                </div>
+              </div>
               <div className="form-table-cell">
                 <span className="form-table-cell-label">핸드폰번호</span>
                 <div className="form-table-cell-content">
@@ -316,6 +367,40 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
               <div className="form-table-cell">
+                <span className="form-table-cell-label">정보제공수신방법</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.postDest === '자택' ? '우편' : '이메일'}
+                    onChange={(val) => handleInputChange('postDest', val === '우편' ? '자택' : '직장')}
+                    options={[
+                      { value: '우편', label: '우편' },
+                      { value: '이메일', label: '이메일' }
+                    ]}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Row 4 */}
+            <div className="form-table-row">
+              <div className="form-table-cell" style={{ flex: 3 }}>
+                <span className="form-table-cell-label">자택 주소</span>
+                <div className="form-table-cell-content">
+                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.homeAddr}
+                      onChange={(e) => handleInputChange('homeAddr', e.target.value)}
+                      placeholder="우편번호 찾기 및 도로명 주소 입력"
+                    />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="form-table-cell" style={{ flex: 1 }}>
                 <span className="form-table-cell-label">이메일</span>
                 <div className="form-table-cell-content">
                   <input
@@ -327,20 +412,36 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   />
                 </div>
               </div>
+              <div className="form-table-cell" style={{ flex: 1 }}>
+                <span className="form-table-cell-label">이메일수신여부</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.emailReceive}
+                    onChange={(val) => handleInputChange('emailReceive', val)}
+                    options={[
+                      { value: '수신', label: '수신' },
+                      { value: '미수신', label: '미수신' }
+                    ]}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Row 4 */}
+            {/* Row 5 */}
             <div className="form-table-row">
-              <div className="form-table-cell" style={{ flex: 2 }}>
-                <span className="form-table-cell-label">자택 주소</span>
+              <div className="form-table-cell" style={{ flex: 3 }}>
+                <span className="form-table-cell-label">직장 주소</span>
                 <div className="form-table-cell-content">
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.homeAddr}
-                    onChange={(e) => handleInputChange('homeAddr', e.target.value)}
-                    placeholder="우편번호 찾기 및 도로명 주소 입력"
-                  />
+                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="직장 주소 입력"
+                    />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="form-table-cell" style={{ flex: 1 }}>
@@ -356,13 +457,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   />
                 </div>
               </div>
+              <div className="form-table-cell" style={{ flex: 1, borderRight: 'none', backgroundColor: 'transparent' }} />
             </div>
           </div>
 
           {/* Section 2: 계약 상세 정보 */}
           <h3 style={styles.formSectionTitle}>
             <span style={styles.badgeIndex}>2</span>
-            계약 상세 정보 (Contract Specifications)
+            계약정보 (Contract Info)
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
@@ -379,29 +481,6 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   />
                 </div>
               </div>
-              <div className="form-table-cell">
-                <span className="form-table-cell-label">계약유형</span>
-                <div className="form-table-cell-content">
-                  <ButtonGroupSelect
-                    value={formData.contractType}
-                    onChange={(val) => handleInputChange('contractType', val)}
-                    options={[
-                      { value: '가입자형IRP', label: '가입자형 IRP' },
-                      { value: '기업형IRP', label: '기업형 IRP' }
-                    ]}
-                  />
-                </div>
-              </div>
-              <div className="form-table-cell">
-                <span className="form-table-cell-label">계약상태</span>
-                <div className="form-table-cell-content">
-                  <input type="text" className="form-input" value={formData.status} readOnly style={styles.readOnly} />
-                </div>
-              </div>
-            </div>
-
-            {/* Row 2 */}
-            <div className="form-table-row">
               <div className="form-table-cell">
                 <span className="form-table-cell-label">계약개시일</span>
                 <div className="form-table-cell-content">
@@ -422,9 +501,83 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
               </div>
             </div>
 
+            {/* Row 2 */}
+            <div className="form-table-row">
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">계약일자</span>
+                <div className="form-table-cell-content">
+                  <input type="date" className="form-input" value={formData.startDate} />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">계약이전구분</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.marketingType}
+                    onChange={(val) => handleInputChange('marketingType', val)}
+                    options={[
+                      { value: '신규', label: '신규' },
+                      { value: '이전', label: '이전' }
+                    ]}
+                  />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">영업담당자</span>
+                <div className="form-table-cell-content">
+                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                    <input type="text" className="form-input" value={formData.salesManager} onChange={(e) => handleInputChange('salesManager', e.target.value)} />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">RK담당자</span>
+                <div className="form-table-cell-content">
+                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                    <input type="text" className="form-input" value={formData.rkManager} onChange={(e) => handleInputChange('rkManager', e.target.value)} />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Row 3 */}
             <div className="form-table-row">
               <div className="form-table-cell">
+                <span className="form-table-cell-label">계약상태</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.status}
+                    onChange={(val) => handleInputChange('status', val)}
+                    options={[
+                      { value: '진행업무없음', label: '진행업무없음' },
+                      { value: '정상', label: '정상' }
+                    ]}
+                  />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">사용자</span>
+                <div className="form-table-cell-content">
+                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                    <input type="text" className="form-input" placeholder="사용자 조회" />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="form-table-cell" style={{ flex: 2, borderRight: 'none', backgroundColor: 'transparent' }} />
+            </div>
+
+            {/* Row 4 */}
+            <div className="form-table-row">
+              <div className="form-table-cell" style={{ flex: 2 }}>
                 <span className="form-table-cell-label">계좌번호 *</span>
                 <div className="form-table-cell-content">
                   <div className="search-input-wrapper" style={{ width: '100%' }}>
@@ -451,42 +604,18 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   </div>
                 </div>
               </div>
-              <div className="form-table-cell">
-                <span className="form-table-cell-label">영업담당자</span>
-                <div className="form-table-cell-content">
-                  <input type="text" className="form-input" value={formData.salesManager} onChange={(e) => handleInputChange('salesManager', e.target.value)} />
-                </div>
-              </div>
-              <div className="form-table-cell">
-                <span className="form-table-cell-label">RK담당자</span>
-                <div className="form-table-cell-content">
-                  <input type="text" className="form-input" value={formData.rkManager} onChange={(e) => handleInputChange('rkManager', e.target.value)} />
-                </div>
-              </div>
+              <div className="form-table-cell" style={{ flex: 2, borderRight: 'none', backgroundColor: 'transparent' }} />
             </div>
           </div>
 
           {/* Section 3: 부담금 및 수수료 */}
           <h3 style={styles.formSectionTitle}>
             <span style={styles.badgeIndex}>3</span>
-            부담금 및 수수료 (Contributions & Fees)
+            부담금/수수료 (Contributions & Fees)
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
             <div className="form-table-row">
-              <div className="form-table-cell">
-                <span className="form-table-cell-label">운용수수료</span>
-                <div className="form-table-cell-content">
-                  <ButtonGroupSelect
-                    value={formData.feePaymentMethod}
-                    onChange={(val) => handleInputChange('feePaymentMethod', val)}
-                    options={[
-                      { value: '자산차감', label: '자산차감' },
-                      { value: '직접납부', label: '직접납부' }
-                    ]}
-                  />
-                </div>
-              </div>
               <div className="form-table-cell">
                 <span className="form-table-cell-label">최초납입일자</span>
                 <div className="form-table-cell-content">
@@ -499,13 +628,26 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   <input type="date" className="form-input" value={formData.lastPayDate} onChange={(e) => handleInputChange('lastPayDate', e.target.value)} />
                 </div>
               </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">운용수수료납입방법</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.feePaymentMethod}
+                    onChange={(val) => handleInputChange('feePaymentMethod', val)}
+                    options={[
+                      { value: '자산차감', label: '자산차감' },
+                      { value: '직접납부', label: '직접납부' }
+                    ]}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Section 4: 디폴트 옵션 */}
           <h3 style={styles.formSectionTitle}>
             <span style={styles.badgeIndex}>4</span>
-            디폴트 옵션 (Default Option)
+            디폴트옵션 (Default Option)
           </h3>
           <div className="form-table-container" style={{ marginBottom: '20px' }}>
             {/* Row 1 */}
@@ -524,6 +666,39 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                 </div>
               </div>
               <div className="form-table-cell">
+                <span className="form-table-cell-label">가입일자</span>
+                <div className="form-table-cell-content">
+                  <input type="date" className="form-input" value={formData.regDate} />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">상품유형</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.productType}
+                    onChange={(val) => handleInputChange('productType', val)}
+                    options={[
+                      { value: 'TDF (Target Date Fund)', label: 'TDF (Target Date Fund)' },
+                      { value: '기타형', label: '기타형' }
+                    ]}
+                  />
+                </div>
+              </div>
+              <div className="form-table-cell">
+                <span className="form-table-cell-label">상품위험등급</span>
+                <div className="form-table-cell-content">
+                  <ButtonGroupSelect
+                    value={formData.productRisk}
+                    onChange={(val) => handleInputChange('productRisk', val)}
+                    options={[
+                      { value: '중중립위험', label: '중중립위험' },
+                      { value: '고위험', label: '고위험' },
+                      { value: '저위험', label: '저위험' }
+                    ]}
+                  />
+                </div>
+              </div>
+              <div className="form-table-cell">
                 <span className="form-table-cell-label">투자성향</span>
                 <div className="form-table-cell-content">
                   <ButtonGroupSelect
@@ -537,25 +712,35 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                   />
                 </div>
               </div>
-              <div className="form-table-cell">
-                <span className="form-table-cell-label">지정 상품명</span>
+            </div>
+
+            {/* Row 2 */}
+            <div className="form-table-row">
+              <div className="form-table-cell" style={{ flex: 2 }}>
+                <span className="form-table-cell-label">상품명</span>
                 <div className="form-table-cell-content">
-                  <input type="text" className="form-input" value={formData.productName} onChange={(e) => handleInputChange('productName', e.target.value)} />
+                  <div className="search-input-wrapper" style={{ width: '100%' }}>
+                    <input type="text" className="form-input" value={formData.productName} onChange={(e) => handleInputChange('productName', e.target.value)} />
+                    <button type="button" className="input-icon-btn" style={{ right: '8px' }}>
+                      <SearchIcon size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
+              <div className="form-table-cell" style={{ flex: 3, borderRight: 'none', backgroundColor: 'transparent' }} />
             </div>
           </div>
 
           {/* Section 5: 연간 납입한도 정보 */}
           <h3 style={styles.formSectionTitle}>
             <span style={styles.badgeIndex}>5</span>
-            연간 납입한도 정보 (Annual Limits)
+            연간납입한도정보 (Annual Limits)
           </h3>
           <div className="form-table-container">
             <div className="form-table-row">
               <div className="form-table-cell">
-                <span className="form-table-cell-label">연간 납입 한도액</span>
-                <div className="form-table-cell-content">
+                <span className="form-table-cell-label">연간납입한도액</span>
+                <div className="form-table-cell-content" style={{ paddingRight: '80px' }}>
                   <input
                     type="number"
                     className="form-input"
@@ -566,11 +751,14 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                     }}
                     style={{ fontWeight: '700', color: 'var(--primary)' }}
                   />
+                  <button type="button" className="btn btn-secondary" style={{ ...styles.checkBtn, position: 'absolute', right: '4px', top: '4px', bottom: '4px', height: 'auto', padding: '0 12px' }}>
+                    저장
+                  </button>
                 </div>
               </div>
               <div className="form-table-cell">
-                <span className="form-table-cell-label">설정 한도 총액</span>
-                <div className="form-table-cell-content">
+                <span className="form-table-cell-label">연간계좌한도설정총액</span>
+                <div className="form-table-cell-content" style={{ paddingRight: '80px' }}>
                   <input
                     type="number"
                     className="form-input"
@@ -578,18 +766,24 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
                     readOnly
                     style={{ ...styles.readOnly, fontWeight: '700', color: 'var(--accent)' }}
                   />
+                  <button type="button" className="btn btn-secondary" style={{ ...styles.checkBtn, position: 'absolute', right: '4px', top: '4px', bottom: '4px', height: 'auto', padding: '0 12px' }}>
+                    실행
+                  </button>
                 </div>
               </div>
               <div className="form-table-cell">
-                <span className="form-table-cell-label">요청 원인 사유</span>
-                <div className="form-table-cell-content">
+                <span className="form-table-cell-label">전문번호</span>
+                <div className="form-table-cell-content" style={{ paddingRight: '90px' }}>
                   <input
                     type="text"
                     className="form-input"
                     value={formData.reqReason}
                     onChange={(e) => handleInputChange('reqReason', e.target.value)}
-                    placeholder="예: 퇴직연금 개인납입 한도증액"
+                    placeholder="전문번호"
                   />
+                  <button type="button" className="btn btn-secondary" style={{ ...styles.checkBtn, position: 'absolute', right: '4px', top: '4px', bottom: '4px', height: 'auto', padding: '0 12px' }}>
+                    통합확인
+                  </button>
                 </div>
               </div>
             </div>
