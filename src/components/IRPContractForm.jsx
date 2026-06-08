@@ -146,7 +146,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
   return (
     <div style={styles.container}>
       {/* Top Search Toolbar */}
-      <div style={styles.topToolbar} className="card toolbar-card">
+      <div style={{ ...styles.topToolbar, border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--bg-secondary)' }} className="toolbar-card">
         <div style={styles.toolbarRow}>
           <div className="form-group" style={{ flex: 1, margin: 0 }}>
             <label className="form-label">계약번호</label>
@@ -622,7 +622,7 @@ const IRPContractForm = ({ selectedContract, onOpenSearch, onSave, onReset, addN
 
       {/* Tab: 서류정보 (Documents) */}
       {activeSubTab === '서류정보' && (
-        <div className="card" style={styles.docCard}>
+        <div style={{ ...styles.docCard, padding: '0px' }}>
           <h3 className="card-title">필수 증빙 서류 업로드</h3>
           <p style={styles.docDesc}>
             퇴직연금 계약 진행을 위해 다음 서류들을 스캔하여 PDF 또는 이미지로 업로드해 주세요.
